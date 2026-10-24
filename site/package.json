@@ -8,9 +8,9 @@
     "preview": "vite preview --configLoader runner"
   },
   "dependencies": {
-    "@kumochart-sdk/core": "1.0.0-beta.1",
-    "@kumochart-sdk/react": "1.0.0-beta.1",
-    "@kumochart-sdk/vue": "1.0.0-beta.1",
+    "@kumochart-sdk/core": "1.0.0-beta.2",
+    "@kumochart-sdk/react": "1.0.0-beta.2",
+    "@kumochart-sdk/vue": "1.0.0-beta.2",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "vue": "^3.5.43"

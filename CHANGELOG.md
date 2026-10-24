@@ -2,7 +2,7 @@
 
 The packages of KumoChart share one version. Each release lists what changed for those who use them.
 
-## Unreleased
+## 1.0.0-beta.2
 
 **License**: from this release on, the packages are licensed under [Apache-2.0](LICENSE), with a [NOTICE](NOTICE) asking websites and apps that use KumoChart to credit it with a link to kumochart.com; 1.0.0-beta.1 stays MIT.
 

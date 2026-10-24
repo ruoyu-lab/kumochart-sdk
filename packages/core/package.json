@@ -1,6 +1,6 @@
 {
   "name": "@kumochart-sdk/core",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Framework-agnostic, high-performance Canvas trading chart SDK: a small core, and indicators, drawing tools, chart types, alerts, orders, markers, replay, volume profiles and a watermark as modules.",
   "license": "Apache-2.0",
   "type": "module",
