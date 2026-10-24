@@ -1,0 +1,47 @@
+name: Release
+
+# Pushing a tag such as v0.3.0 publishes every package to npm and creates the GitHub release.
+# npm authenticates this workflow through trusted publishing (OpenID Connect), so no token is
+# stored; each package names this repository and `release.yml` as its trusted publisher.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          # Trusted publishing needs npm 11.5.1 or newer, which ships with Node.js 24.
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      - run: node scripts/release.mjs check "$GITHUB_REF_NAME"
+      - run: npm run verify
+      - run: node scripts/release.mjs publish
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          node scripts/release.mjs notes "$version" > notes.md
+          prerelease=""
+          if [[ "$version" == *-* ]]; then prerelease="--prerelease"; fi
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            echo "The release $GITHUB_REF_NAME exists already."
+          else
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md $prerelease
+          fi

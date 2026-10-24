@@ -1,0 +1,56 @@
+/* The frame of a live example: `#chart` fills it; the colors are those of the site's panels. */
+
+:root {
+  color-scheme: light;
+  background: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  background: #0e0e0e;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+#chart {
+  height: 100%;
+  animation: chart-in 0.35s ease both;
+}
+
+/* The chart fades in rather than appearing at once in its frame. */
+@keyframes chart-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #chart {
+    animation: none;
+  }
+}
+
+.frame-error {
+  position: absolute;
+  inset: auto 12px 12px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fdecec;
+  color: #a12121;
+  font:
+    12px/1.5 'JetBrains Mono Variable',
+    ui-monospace,
+    monospace;
+  white-space: pre-wrap;
+}
+
+:root[data-theme='dark'] .frame-error {
+  background: #2a1414;
+  color: #f2a7a7;
+}

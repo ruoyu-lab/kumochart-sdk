@@ -1,0 +1,101 @@
+{
+  "name": "@kumochart-sdk/core",
+  "version": "1.0.0-beta.1",
+  "description": "Framework-agnostic, high-performance Canvas trading chart SDK: a small core, and indicators, drawing tools, chart types, alerts, orders, markers, replay, volume profiles and a watermark as modules.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "@kumochart-sdk/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./indicators": {
+      "@kumochart-sdk/source": "./src/indicators/index.ts",
+      "types": "./dist/indicators.d.ts",
+      "default": "./dist/indicators.js"
+    },
+    "./drawings": {
+      "@kumochart-sdk/source": "./src/drawings/index.ts",
+      "types": "./dist/drawings.d.ts",
+      "default": "./dist/drawings.js"
+    },
+    "./chart-types": {
+      "@kumochart-sdk/source": "./src/chart-types/index.ts",
+      "types": "./dist/chart-types.d.ts",
+      "default": "./dist/chart-types.js"
+    },
+    "./alerts": {
+      "@kumochart-sdk/source": "./src/alerts/index.ts",
+      "types": "./dist/alerts.d.ts",
+      "default": "./dist/alerts.js"
+    },
+    "./trading": {
+      "@kumochart-sdk/source": "./src/trading/index.ts",
+      "types": "./dist/trading.d.ts",
+      "default": "./dist/trading.js"
+    },
+    "./replay": {
+      "@kumochart-sdk/source": "./src/replay/index.ts",
+      "types": "./dist/replay.d.ts",
+      "default": "./dist/replay.js"
+    },
+    "./volume-profile": {
+      "@kumochart-sdk/source": "./src/volume-profile/index.ts",
+      "types": "./dist/volume-profile.d.ts",
+      "default": "./dist/volume-profile.js"
+    },
+    "./watermark": {
+      "@kumochart-sdk/source": "./src/watermark/index.ts",
+      "types": "./dist/watermark.d.ts",
+      "default": "./dist/watermark.js"
+    },
+    "./all": {
+      "@kumochart-sdk/source": "./src/all.ts",
+      "types": "./dist/all.d.ts",
+      "default": "./dist/all.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/kumochart.iife.js",
+  "jsdelivr": "./dist/kumochart.iife.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "tsdown"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruoyu-lab/kumochart-sdk.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://www.kumochart.com/",
+  "bugs": {
+    "url": "https://github.com/ruoyu-lab/kumochart-sdk/issues"
+  },
+  "keywords": [
+    "chart",
+    "trading",
+    "candlestick",
+    "kline",
+    "canvas",
+    "technical-analysis",
+    "financial-charts",
+    "indicators",
+    "volume-profile",
+    "sdk"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

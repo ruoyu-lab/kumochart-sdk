@@ -1,0 +1,82 @@
+import { ALMA, BBI, EMA, HMA, KAMA, MA, SMMA, VWMA, WMA } from './definitions/averages';
+import { BOLL, DC, KC } from './definitions/channels';
+import {
+  BIAS,
+  BRAR,
+  CCI,
+  DPO,
+  FISHER,
+  KDJ,
+  MACD,
+  MTM,
+  PSY,
+  ROC,
+  RSI,
+  STOCH,
+  STOCHRSI,
+  WR
+} from './definitions/momentum';
+import { ADR, PIVOTS, PREVHLC } from './definitions/periods';
+import { SESSIONS } from './definitions/sessions';
+import { AROON, CHANDELIER, DMA, DMI, ICHIMOKU, SAR, SUPERTREND, TRIX } from './definitions/trend';
+import { ATR, CHOP, STD } from './definitions/volatility';
+import { CMF, EMV, MFI, OBV, VOL, VR, VWAP } from './definitions/volume';
+import { ALLIGATOR, FRACTALS } from './definitions/williams';
+import type { IndicatorDefinition } from './types';
+
+/**
+ * Every indicator type of the SDK, for `indicators(allIndicators)`. Listed one by one, so that an
+ * application picking a few ships only those.
+ */
+export const allIndicators: readonly IndicatorDefinition[] = [
+  MA,
+  EMA,
+  SMMA,
+  BOLL,
+  ICHIMOKU,
+  VOL,
+  MACD,
+  RSI,
+  KDJ,
+  WR,
+  CCI,
+  ROC,
+  BIAS,
+  OBV,
+  VR,
+  EMV,
+  MFI,
+  ATR,
+  STD,
+  DMI,
+  VWAP,
+  SAR,
+  SUPERTREND,
+  KC,
+  DC,
+  WMA,
+  HMA,
+  KAMA,
+  ALMA,
+  VWMA,
+  BBI,
+  DMA,
+  TRIX,
+  AROON,
+  CHANDELIER,
+  STOCH,
+  STOCHRSI,
+  FISHER,
+  MTM,
+  DPO,
+  PSY,
+  BRAR,
+  CMF,
+  CHOP,
+  ALLIGATOR,
+  FRACTALS,
+  PIVOTS,
+  PREVHLC,
+  ADR,
+  SESSIONS
+];

@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build and test outputs
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.tgz
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment overrides
+.env
+.env.*
+!.env.example
+
+# Editor, OS and agent files
+.idea/
+.vscode/
+.claude/
+.DS_Store
+Thumbs.db
+
+# The documentation site's generated files
+site/.cache/

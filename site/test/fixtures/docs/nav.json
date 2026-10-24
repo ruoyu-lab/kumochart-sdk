@@ -1,0 +1,79 @@
+{
+  "groups": [
+    {
+      "title": {
+        "zh-CN": "开始",
+        "en": "Getting started",
+        "ja": "はじめに",
+        "ko": "시작하기"
+      },
+      "items": [
+        {
+          "page": "guide.md",
+          "title": {
+            "zh-CN": "写法示例",
+            "en": "Writing pages",
+            "ja": "書き方の例",
+            "ko": "작성 예시"
+          }
+        },
+        {
+          "page": "planned.md",
+          "title": {
+            "zh-CN": "还没写的页",
+            "en": "A planned page",
+            "ja": "まだないページ",
+            "ko": "아직 없는 페이지"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "zh-CN": "例子",
+        "en": "Examples",
+        "ja": "例",
+        "ko": "예제"
+      },
+      "items": [
+        {
+          "page": "live.md",
+          "title": {
+            "zh-CN": "可操作的图表",
+            "en": "Live charts",
+            "ja": "操作できるチャート",
+            "ko": "조작할 수 있는 차트"
+          }
+        },
+        {
+          "page": "frameworks.md",
+          "title": {
+            "zh-CN": "Vue 和 React",
+            "en": "Vue and React",
+            "ja": "Vue と React",
+            "ko": "Vue와 React"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "zh-CN": "参考",
+        "en": "Reference",
+        "ja": "リファレンス",
+        "ko": "레퍼런스"
+      },
+      "items": [
+        {
+          "generated": "api",
+          "title": {
+            "zh-CN": "API",
+            "en": "API",
+            "ja": "API",
+            "ko": "API"
+          }
+        }
+      ]
+    }
+  ]
+}

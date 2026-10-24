@@ -1,0 +1,10 @@
+dist
+coverage
+playwright-report
+test-results
+node_modules
+package-lock.json
+*.tgz
+site/.cache
+site/data/*.json
+.worktrees

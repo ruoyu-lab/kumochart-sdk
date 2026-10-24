@@ -1,0 +1,17 @@
+name: 提需求 / Feature request
+description: 想要一个新功能，或者现有的接口不好用。A new feature, or an API that is hard to use.
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: 想做什么 / What you want to do
+      description: 你在做什么，现在哪里做不到或者很麻烦。What you are building, and what is missing or awkward today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 希望怎么用 / How you would like to use it
+      description: 想象中的写法，比如一段代码。The API you imagine, such as a snippet.
+      render: ts

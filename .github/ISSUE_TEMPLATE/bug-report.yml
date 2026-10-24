@@ -1,0 +1,36 @@
+name: 报 BUG / Bug report
+description: 图表的表现和文档说的不一样，或者报错了。Something does not work as documented, or throws.
+labels: ['bug']
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么 / What happened
+      description: 你做了什么，期望看到什么，实际看到了什么。What you did, what you expected, what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 怎么复现 / How to reproduce
+      description: 最好是一小段能直接运行的代码，或者一个在线示例的链接。A short runnable snippet, or a link to a live example.
+      render: ts
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本 / Version
+      description: '`@kumochart-sdk/core` 的版本号。The version of `@kumochart-sdk/core`.'
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: 浏览器和系统 / Browser and OS
+      placeholder: Chrome 131, macOS 15
+  - type: textarea
+    id: more
+    attributes:
+      label: 其它 / Anything else
+      description: 报错信息、截图等。Error messages, screenshots.

@@ -1,0 +1,27 @@
+# @kumochart-sdk/react
+
+The `KumoChart` component and the `useKumoChart` hook for React, around [`@kumochart-sdk/core`](https://www.npmjs.com/package/@kumochart-sdk/core).
+
+```bash
+npm install @kumochart-sdk/core @kumochart-sdk/react
+```
+
+```tsx
+import { KumoChart } from '@kumochart-sdk/react';
+import { indicators, MACD } from '@kumochart-sdk/core/indicators';
+import type { BarInput } from '@kumochart-sdk/core';
+
+const modules = [indicators([MACD])];
+
+export function PriceChart({ bars }: { bars: BarInput[] }) {
+  return (
+    <div style={{ height: 480 }}>
+      <KumoChart modules={modules} data={bars} interval="1m" timeframe="15m" />
+    </div>
+  );
+}
+```
+
+Documentation: [docs.kumochart.com/en/react](https://docs.kumochart.com/en/react/) · [中文](https://docs.kumochart.com/zh-CN/react/)
+
+Apache-2.0 License. If you use KumoChart in a website or an app, please credit it with a link to [kumochart.com](https://kumochart.com), as NOTICE asks.

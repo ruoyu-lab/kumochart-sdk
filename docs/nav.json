@@ -1,0 +1,289 @@
+{
+  "groups": [
+    {
+      "title": {
+        "zh-CN": "开始",
+        "en": "Getting started",
+        "ja": "はじめに",
+        "ko": "시작하기"
+      },
+      "items": [
+        {
+          "page": "introduction.md",
+          "title": {
+            "zh-CN": "介绍",
+            "en": "Introduction",
+            "ja": "紹介",
+            "ko": "소개"
+          }
+        },
+        {
+          "page": "getting-started.md",
+          "title": {
+            "zh-CN": "快速开始",
+            "en": "Quick start",
+            "ja": "クイックスタート",
+            "ko": "빠른 시작"
+          }
+        },
+        {
+          "page": "modules.md",
+          "title": {
+            "zh-CN": "模块",
+            "en": "Modules",
+            "ja": "モジュール",
+            "ko": "모듈"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "zh-CN": "基础",
+        "en": "Basics",
+        "ja": "基本",
+        "ko": "기본"
+      },
+      "items": [
+        {
+          "page": "data.md",
+          "title": {
+            "zh-CN": "数据",
+            "en": "Data",
+            "ja": "データ",
+            "ko": "데이터"
+          }
+        },
+        {
+          "page": "timeframes.md",
+          "title": {
+            "zh-CN": "周期和交易日历",
+            "en": "Timeframes and trading calendars",
+            "ja": "時間足と取引カレンダー",
+            "ko": "주기와 거래 캘린더"
+          }
+        },
+        {
+          "page": "appearance.md",
+          "title": {
+            "zh-CN": "外观",
+            "en": "Appearance",
+            "ja": "外観",
+            "ko": "외관"
+          }
+        },
+        {
+          "page": "panes.md",
+          "title": {
+            "zh-CN": "窗格",
+            "en": "Panes",
+            "ja": "ペイン",
+            "ko": "창"
+          }
+        },
+        {
+          "page": "interaction.md",
+          "title": {
+            "zh-CN": "交互",
+            "en": "Interaction",
+            "ja": "操作",
+            "ko": "조작"
+          }
+        },
+        {
+          "page": "events.md",
+          "title": {
+            "zh-CN": "事件",
+            "en": "Events",
+            "ja": "イベント",
+            "ko": "이벤트"
+          }
+        },
+        {
+          "page": "state.md",
+          "title": {
+            "zh-CN": "保存和恢复",
+            "en": "Saving and restoring",
+            "ja": "保存と復元",
+            "ko": "저장과 복원"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "zh-CN": "模块",
+        "en": "Modules",
+        "ja": "モジュール",
+        "ko": "모듈"
+      },
+      "items": [
+        {
+          "page": "indicators.md",
+          "title": {
+            "zh-CN": "指标",
+            "en": "Indicators",
+            "ja": "インジケーター",
+            "ko": "지표"
+          }
+        },
+        {
+          "page": "drawings.md",
+          "title": {
+            "zh-CN": "画线",
+            "en": "Drawings",
+            "ja": "描画ツール",
+            "ko": "그리기 도구"
+          }
+        },
+        {
+          "page": "chart-types.md",
+          "title": {
+            "zh-CN": "图表类型",
+            "en": "Chart types",
+            "ja": "チャートタイプ",
+            "ko": "차트 유형"
+          }
+        },
+        {
+          "page": "alerts.md",
+          "title": {
+            "zh-CN": "提醒",
+            "en": "Alerts",
+            "ja": "アラート",
+            "ko": "알림"
+          }
+        },
+        {
+          "page": "trading.md",
+          "title": {
+            "zh-CN": "委托单线和成交标记",
+            "en": "Order lines and trade markers",
+            "ja": "注文ラインと約定マーカー",
+            "ko": "주문선과 체결 표시"
+          }
+        },
+        {
+          "page": "replay.md",
+          "title": {
+            "zh-CN": "回放",
+            "en": "Replay",
+            "ja": "リプレイ",
+            "ko": "리플레이"
+          }
+        },
+        {
+          "page": "volume-profile.md",
+          "title": {
+            "zh-CN": "成交量分布",
+            "en": "Volume profile",
+            "ja": "価格帯別出来高",
+            "ko": "매물대"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "zh-CN": "扩展",
+        "en": "Extending",
+        "ja": "拡張",
+        "ko": "확장"
+      },
+      "items": [
+        {
+          "page": "custom-modules.md",
+          "title": {
+            "zh-CN": "自定义模块",
+            "en": "Custom modules",
+            "ja": "カスタムモジュール",
+            "ko": "사용자 정의 모듈"
+          }
+        },
+        {
+          "page": "custom-indicators.md",
+          "title": {
+            "zh-CN": "自定义指标",
+            "en": "Custom indicators",
+            "ja": "カスタムインジケーター",
+            "ko": "사용자 정의 지표"
+          }
+        },
+        {
+          "page": "custom-drawings.md",
+          "title": {
+            "zh-CN": "自定义画线",
+            "en": "Custom drawings",
+            "ja": "カスタム描画ツール",
+            "ko": "사용자 정의 그리기 도구"
+          }
+        },
+        {
+          "page": "custom-series.md",
+          "title": {
+            "zh-CN": "自定义图形",
+            "en": "Custom series",
+            "ja": "カスタムシリーズ",
+            "ko": "사용자 정의 시리즈"
+          }
+        },
+        {
+          "page": "plugins.md",
+          "title": {
+            "zh-CN": "插件绘制",
+            "en": "Painting with plugins",
+            "ja": "プラグインで描く",
+            "ko": "플러그인으로 그리기"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "zh-CN": "框架",
+        "en": "Frameworks",
+        "ja": "フレームワーク",
+        "ko": "프레임워크"
+      },
+      "items": [
+        {
+          "page": "vue.md",
+          "title": {
+            "zh-CN": "Vue",
+            "en": "Vue",
+            "ja": "Vue",
+            "ko": "Vue"
+          }
+        },
+        {
+          "page": "react.md",
+          "title": {
+            "zh-CN": "React",
+            "en": "React",
+            "ja": "React",
+            "ko": "React"
+          }
+        }
+      ]
+    },
+    {
+      "title": {
+        "zh-CN": "参考",
+        "en": "Reference",
+        "ja": "リファレンス",
+        "ko": "레퍼런스"
+      },
+      "items": [
+        {
+          "generated": "api",
+          "title": {
+            "zh-CN": "API",
+            "en": "API",
+            "ja": "API",
+            "ko": "API"
+          }
+        }
+      ]
+    }
+  ]
+}
