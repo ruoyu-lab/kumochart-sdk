@@ -2,7 +2,7 @@
 
 The packages of KumoChart share one version. Each release lists what changed for those who use them.
 
-## Unreleased
+## 1.0.0-beta.3
 
 **Fixes**
 
