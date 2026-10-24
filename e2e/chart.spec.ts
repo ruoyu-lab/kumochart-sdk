@@ -256,6 +256,23 @@ test('draws pivot levels, session boxes and volume candles', async ({ page }) =>
     const sessions = chart.indicators.add({ type: 'SESSIONS' });
     const after = columns([inside, outside]);
     const values = chart.indicators.valuesAt(sessions, inside);
+    // What the sessions hold at the bar outside them, and where its column changed, if it did.
+    const outsideValues = chart.indicators
+      .valuesAt(sessions, outside)
+      .filter((value) => value.value !== null)
+      .map((value) => `${value.key} ${value.text}`);
+    const pixels = (column: string | undefined) => column?.split(',').map(Number) ?? [];
+    const [was, now] = [pixels(before[1]), pixels(after[1])];
+    const first = was.findIndex((channel, index) => channel !== now[index]);
+    const changed =
+      first < 0
+        ? null
+        : {
+            row: Math.floor(first / 4),
+            rows: was.length / 4,
+            was: was.slice(first - (first % 4), first - (first % 4) + 4),
+            now: now.slice(first - (first % 4), first - (first % 4) + 4)
+          };
     chart.indicators.remove(sessions);
 
     const pivots = chart.indicators.add({ type: 'PIVOTS' });
@@ -271,6 +288,7 @@ test('draws pivot levels, session boxes and volume candles', async ({ page }) =>
     return {
       boxed: before[0] !== after[0],
       untouched: before[1] === after[1],
+      outside: { time: chart.data.at(outside)?.time, values: outsideValues, changed },
       london: values.filter((value) => value.key.startsWith('london')).map((value) => value.value),
       levels: levels.map((value) => value.key),
       candles: candles !== narrowed
@@ -278,7 +296,7 @@ test('draws pivot levels, session boxes and volume candles', async ({ page }) =>
   });
 
   expect(result.boxed).toBe(true);
-  expect(result.untouched).toBe(true);
+  expect(result.untouched, JSON.stringify(result.outside)).toBe(true);
   expect(result.london.every((value) => typeof value === 'number')).toBe(true);
   expect(result.levels).toEqual(['p', 'r1', 's1', 'r2', 's2', 'r3', 's3', 'r4', 's4', 'r5', 's5']);
   expect(result.candles).toBe(true);
