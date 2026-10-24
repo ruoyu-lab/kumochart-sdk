@@ -2,6 +2,18 @@
 
 The packages of KumoChart share one version. Each release lists what changed for those who use them.
 
+## Unreleased
+
+**Fixes**
+
+- In a time zone whose clocks change within an hour of UTC, as at 15:30 UTC in a zone of +10:30 (Adelaide, St. John's, Lord Howe Island), the half hour after the change showed times, and cut days and sessions, by the offset before it.
+- Lifting one of three fingers from a pinch no longer makes the chart jump at the next move: the two fingers left pinch on from where they are.
+- The axis labels of a drawing stay at their own places when one of its points is off the scale, as on a logarithmic scale; they were shifted onto the points after it.
+- Boxes sized by `params.percentage`, of Renko, Kagi and point-and-figure charts, take the percentage of the latest closed close, as the documentation says, rather than of the bar still forming.
+- A value area of the whole volume, `valueArea: 1`, takes every row; a rounding could leave out the last.
+- The steps of the price axis below 1 are no longer raised a level on engines whose negative powers of ten are not exact, as 0.0005 to 0.001.
+- `loadState()` names the field of a pane that has no `range`, instead of throwing a `TypeError`.
+
 ## 1.0.0-beta.2
 
 **License**: from this release on, the packages are licensed under [Apache-2.0](LICENSE), with a [NOTICE](NOTICE) asking websites and apps that use KumoChart to credit it with a link to kumochart.com; 1.0.0-beta.1 stays MIT.
