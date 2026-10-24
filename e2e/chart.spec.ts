@@ -262,8 +262,12 @@ test('draws pivot levels, session boxes and volume candles', async ({ page }) =>
       .filter((value) => value.value !== null)
       .map((value) => `${value.key} ${value.text}`);
     const pixels = (column: string | undefined) => column?.split(',').map(Number) ?? [];
+    // Rasterizers may round a pixel of what they paint again by a step or two.
+    const TOLERANCE = 2;
+    const differs = (left: number[], right: number[]) =>
+      left.findIndex((channel, index) => Math.abs(channel - (right[index] ?? 0)) > TOLERANCE);
     const [was, now] = [pixels(before[1]), pixels(after[1])];
-    const first = was.findIndex((channel, index) => channel !== now[index]);
+    const first = differs(was, now);
     const changed =
       first < 0
         ? null
@@ -286,8 +290,8 @@ test('draws pivot levels, session boxes and volume candles', async ({ page }) =>
     const narrowed = columns(around).join();
 
     return {
-      boxed: before[0] !== after[0],
-      untouched: before[1] === after[1],
+      boxed: differs(pixels(before[0]), pixels(after[0])) >= 0,
+      untouched: first < 0,
       outside: { time: chart.data.at(outside)?.time, values: outsideValues, changed },
       london: values.filter((value) => value.key.startsWith('london')).map((value) => value.value),
       levels: levels.map((value) => value.key),
