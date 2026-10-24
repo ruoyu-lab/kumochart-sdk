@@ -38,16 +38,6 @@ export default defineConfig({
         }
       },
       {
-        test: {
-          name: 'site',
-          root: 'site',
-          environment: 'node',
-          include: ['test/**/*.test.ts'],
-          // Building the API reference and the site before the tests takes seconds, more on CI.
-          hookTimeout: 60_000
-        }
-      },
-      {
         resolve: { conditions: sourceConditions },
         test: {
           name: 'react',

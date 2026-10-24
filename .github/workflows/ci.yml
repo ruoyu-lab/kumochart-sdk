@@ -40,11 +40,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
-      - run: npm run test:e2e:docs
       - if: failure()
         uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: |
             test-results
-            site/test-results

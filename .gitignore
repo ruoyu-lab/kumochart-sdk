@@ -25,5 +25,3 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# The documentation site's generated files
-site/.cache/

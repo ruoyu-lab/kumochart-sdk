@@ -35,7 +35,7 @@ chart.drawings.startTool('trend-line');
 
 ## 文档
 
-[docs.kumochart.com](https://docs.kumochart.com/zh-CN/)，也可以直接在 [docs/zh-CN](docs/zh-CN/introduction.md) 里读。
+[docs.kumochart.com](https://docs.kumochart.com/zh-CN/)
 
 ## 许可
 

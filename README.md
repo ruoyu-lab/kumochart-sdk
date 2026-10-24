@@ -35,7 +35,7 @@ chart.drawings.startTool('trend-line');
 
 ## Documentation
 
-[docs.kumochart.com](https://docs.kumochart.com/en/), or read it in [docs/en](docs/en/introduction.md).
+[docs.kumochart.com](https://docs.kumochart.com/en/)
 
 ## License
 

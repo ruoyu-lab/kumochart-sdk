@@ -12,7 +12,6 @@ export default typescriptEslint.config(
       '**/coverage/**',
       'playwright-report/**',
       'test-results/**',
-      'site/.cache/**',
       '.worktrees/**'
     ]
   },
@@ -28,7 +27,7 @@ export default typescriptEslint.config(
       },
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['*.mjs', 'scripts/*.mjs', 'site/scripts/*.mjs']
+          allowDefaultProject: ['*.mjs', 'scripts/*.mjs']
         },
         extraFileExtensions: ['.vue'],
         parser: typescriptEslint.parser,
@@ -88,13 +87,6 @@ export default typescriptEslint.config(
     languageOptions: {
       globals: globals.node
     },
-    rules: {
-      'no-console': 'off'
-    }
-  },
-  {
-    // The command-line scripts of the documentation site report on the console.
-    files: ['site/scripts/**', 'site/data/**'],
     rules: {
       'no-console': 'off'
     }
