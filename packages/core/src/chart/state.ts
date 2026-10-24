@@ -181,6 +181,7 @@ export function loadState(core: ChartCore, state: ChartState): void {
       panes.setScaleMargins(entry.id, scale.id, scale.margins);
 
       if (scale.range !== null) {
+        checkObject(`${label}.range`, scale.range);
         checkNumber(`${label}.range.min`, scale.range.min);
         checkNumber(`${label}.range.max`, scale.range.max);
       }

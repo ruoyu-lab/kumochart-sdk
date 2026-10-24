@@ -622,9 +622,15 @@ export class InputController {
     }
   }
 
-  /** After a pinch, a remaining finger continues as a pan from where it is, without a jump. */
+  /**
+   * After a pinch, a remaining finger continues as a pan from where it is, without a jump; two
+   * remaining fingers pinch on from where they are.
+   */
   private endPinch(): void {
-    if (this.touches.size >= 2) {
+    const fingers = this.fingers();
+
+    if (fingers) {
+      this.gesture = { kind: 'pinch', pinch: new Pinch(...fingers) };
       return;
     }
 

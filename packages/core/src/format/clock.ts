@@ -1,4 +1,6 @@
 const HOUR_MS = 3_600_000;
+/** Zones change their offsets at quarters of an hour, some within an hour of UTC. */
+const QUARTER_MS = 900_000;
 /** Slots of the offset cache: a power of two, covering about half a year of hours. */
 const SLOTS = 4096;
 
@@ -20,7 +22,8 @@ function readPart(parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPar
 /**
  * Converts instants into calendar fields of one time zone. Zone offsets are looked up once per
  * hour and kept in a direct-mapped cache: a hit costs one comparison, so bucketing hundreds of
- * thousands of bars stays fast.
+ * thousands of bars stays fast. An hour the offset changes within, as at 15:30 UTC in a zone of
+ * +10:30, is not cached: its offset is looked up by the quarter.
  */
 export class Clock {
   private readonly hours = new Float64Array(SLOTS).fill(Number.NaN);
@@ -60,8 +63,21 @@ export class Clock {
     }
 
     const instant = hour * HOUR_MS;
+    const offset = this.lookUp(format, instant);
+
+    if (this.lookUp(format, instant + HOUR_MS - QUARTER_MS) !== offset) {
+      return this.lookUp(format, Math.floor(time / QUARTER_MS) * QUARTER_MS);
+    }
+
+    this.hours[slot] = hour;
+    this.offsets[slot] = offset;
+    return offset;
+  }
+
+  /** The offset of the zone at a whole second. */
+  private lookUp(format: Intl.DateTimeFormat, instant: number): number {
     const parts = format.formatToParts(instant);
-    const offset =
+    return (
       Date.UTC(
         readPart(parts, 'year'),
         readPart(parts, 'month') - 1,
@@ -69,10 +85,8 @@ export class Clock {
         readPart(parts, 'hour'),
         readPart(parts, 'minute'),
         readPart(parts, 'second')
-      ) - instant;
-    this.hours[slot] = hour;
-    this.offsets[slot] = offset;
-    return offset;
+      ) - instant
+    );
   }
 
   /**

@@ -42,16 +42,16 @@ export function paintAxisMarks(
   ctx.font = font(options.font.size, options.font.family);
   const top = pane.plot.y + half;
   const bottom = pane.plot.y + pane.plot.height - half;
-  const ys = marks.prices
-    .map((price) => pane.plot.y + pane.scale.valueToY(price))
-    .filter((y) => Number.isFinite(y));
+  // By the index of each mark: one off the scale has no label, and the others keep theirs.
+  const ys = marks.prices.map((price) => pane.plot.y + pane.scale.valueToY(price));
+  const shownYs = ys.filter((y) => Number.isFinite(y));
 
-  if (options.priceScale.visible && ys.length > 0) {
+  if (options.priceScale.visible && shownYs.length > 0) {
     const axis = pane.axis;
 
-    if (!labelsOnly && ys.length > 1) {
-      const from = Math.max(pane.plot.y, Math.min(...ys));
-      const to = Math.min(pane.plot.y + pane.plot.height, Math.max(...ys));
+    if (!labelsOnly && shownYs.length > 1) {
+      const from = Math.max(pane.plot.y, Math.min(...shownYs));
+      const to = Math.min(pane.plot.y + pane.plot.height, Math.max(...shownYs));
       ctx.fillStyle = withAlpha(color, 0.14);
       ctx.fillRect(axis.x, from, axis.width, Math.max(0, to - from));
     }
@@ -72,15 +72,16 @@ export function paintAxisMarks(
   }
 
   const timeAxis = frame.layout.timeAxis;
-  const xs = marks.times.map((time) => timeToX(context, time)).filter((x) => Number.isFinite(x));
+  const xs = marks.times.map((time) => timeToX(context, time));
+  const shownXs = xs.filter((x) => Number.isFinite(x));
 
-  if (!timeAxis || xs.length === 0) {
+  if (!timeAxis || shownXs.length === 0) {
     return;
   }
 
-  if (!labelsOnly && xs.length > 1) {
-    const from = Math.max(0, Math.min(...xs));
-    const to = Math.min(frame.layout.plotWidth, Math.max(...xs));
+  if (!labelsOnly && shownXs.length > 1) {
+    const from = Math.max(0, Math.min(...shownXs));
+    const to = Math.min(frame.layout.plotWidth, Math.max(...shownXs));
     ctx.fillStyle = withAlpha(color, 0.14);
     ctx.fillRect(from, timeAxis.y, Math.max(0, to - from), timeAxis.height);
   }
@@ -89,7 +90,7 @@ export function paintAxisMarks(
   marks.times.forEach((time, index) => {
     const x = xs[index];
 
-    if (x === undefined || x < 0 || x > frame.layout.plotWidth) {
+    if (x === undefined || !Number.isFinite(x) || x < 0 || x > frame.layout.plotWidth) {
       return;
     }
 

@@ -129,7 +129,8 @@ export function valueAreaOf(
     const up = above > below || (above === below && high + 1 - poc <= poc - (low - 1));
     const next = up ? above : below;
 
-    if (volume + next > target) {
+    // Summed in another order than the total, the rows may pass it by a rounding.
+    if (volume + next > target + total * 1e-9) {
       break;
     }
 

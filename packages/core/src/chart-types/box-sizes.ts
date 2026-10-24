@@ -121,17 +121,17 @@ function percentageSize(percentage: number, close: number): number {
 }
 
 /**
- * The size a rule gives the bars a stream is built from: the percentage of the last close, or
- * the average true range at the latest closed bar, leaving out the latest one, which may still
- * be forming. `NaN` while they cannot tell, such as with fewer closed bars than the length.
+ * The size a rule gives the bars a stream is built from: the percentage of the latest closed
+ * close, or the average true range at the latest closed bar, leaving out the latest one, which
+ * may still be forming. `NaN` while they cannot tell, such as with fewer closed bars than the length.
  */
 export function sizeFor(rule: SizeRule, input: BarsView): number {
   switch (rule.kind) {
     case 'fixed':
       return rule.size;
     case 'percentage':
-      return input.length > 0
-        ? percentageSize(rule.percentage, input.close(input.length - 1))
+      return input.length > 1
+        ? percentageSize(rule.percentage, input.close(input.length - 2))
         : Number.NaN;
     case 'atr': {
       // Sizes by an ATR length of 1 are the true range of the last closed bar.

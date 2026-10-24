@@ -8,26 +8,29 @@ export function niceStep(rawStep: number): number {
     return 1;
   }
 
-  const power = 10 ** Math.floor(Math.log10(rawStep));
-  const fraction = rawStep / power;
+  const exponent = Math.floor(Math.log10(rawStep));
+  // Below 1 by exact powers of ten: a negative power, as 10 ** -4, is not exact on every engine.
+  const times = (multiple: number) =>
+    exponent < 0 ? multiple / 10 ** -exponent : multiple * 10 ** exponent;
+  const fraction = exponent < 0 ? rawStep * 10 ** -exponent : rawStep / 10 ** exponent;
 
   if (fraction <= 1) {
-    return power;
+    return times(1);
   }
 
   if (fraction <= 2) {
-    return 2 * power;
+    return times(2);
   }
 
   if (fraction <= 2.5) {
-    return 2.5 * power;
+    return times(2.5);
   }
 
   if (fraction <= 5) {
-    return 5 * power;
+    return times(5);
   }
 
-  return 10 * power;
+  return times(10);
 }
 
 /** Returns evenly spaced "nice" values covering [min, max]. */
