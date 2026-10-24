@@ -49,9 +49,13 @@ async function setVersion(version) {
     await writeJson(path, manifest);
   }
 
-  const examples = await readJson('examples/package.json');
-  pinWorkspace(examples.dependencies, version);
-  await writeJson('examples/package.json', examples);
+  // The examples and the documentation site build on the packages of the workspace.
+  for (const path of ['examples/package.json', 'site/package.json']) {
+    const manifest = await readJson(path);
+    pinWorkspace(manifest.dependencies, version);
+    await writeJson(path, manifest);
+  }
+
   execFileSync('npm', ['install', '--package-lock-only', '--ignore-scripts'], {
     cwd: root,
     stdio: 'inherit'
