@@ -131,14 +131,25 @@ describe('info line', () => {
     expect(texts.some((text) => /^-?\d+\.\d\d°$/.test(text))).toBe(true);
   });
 
-  it('is selected on its line and on its box, and alerts watch its line', () => {
+  it('shows its figures by the middle of the line, above it, selected there too', () => {
     const chart = chartWithTools();
     const id = add(chart, 'info-line', [point(150, 180), point(160, 190)]);
+    const canvas = chart.element.querySelector<HTMLCanvasElement>('canvas[data-layer="objects"]');
+    const calls = canvas ? canvasCalls(canvas) : [];
+    calls.length = 0;
+    chart.screenshot();
+    const figure = calls.find(
+      (call) => call.name === 'fillText' && String(call.args[0]) === '+10.00 (+5.56%)'
+    );
+    const [x, y] = [Number(figure?.args[1]), Number(figure?.args[2])];
+    const [mx, my] = at(chart, 155, 185);
+    const [ex, ey] = at(chart, 160, 190);
 
+    // Nearer the middle than the second anchor, and above the line there.
+    expect(Math.hypot(x - mx, y - my)).toBeLessThan(Math.hypot(x - ex, y - ey));
+    expect(y).toBeLessThan(my);
     expect(selects(chart, id, 155, 185)).toBe(true);
-    // The box lies past the second anchor, away from the first.
-    const [x, y] = at(chart, 160, 190);
-    expect(selectsAt(chart, id, x + 30, y - 20)).toBe(true);
+    expect(selectsAt(chart, id, x + 4, y + 4)).toBe(true);
     expect(chart.drawings.levels(id)).toEqual(['line']);
   });
 });

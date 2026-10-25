@@ -6,8 +6,8 @@ import { barsBetween, priceChangeText } from './ranges';
 import { bodyHit, segmentHit, strokeDrawing, tracePath } from './shared';
 
 const PADDING = 6;
-/** Between the second anchor and the box of the figures. */
-const GAP = 10;
+/** Between the line and the box of the figures. */
+const GAP = 8;
 const LINE_GAP = 4;
 
 interface InfoBox extends DrawingBounds {
@@ -32,10 +32,14 @@ function infoLineOf(geometry: DrawingGeometry<Anchors<2>>): InfoLine {
   const lineHeight = style.fontSize + LINE_GAP;
   const width = Math.max(...lines.map((line) => geometry.measureText(line))) + PADDING * 2;
   const height = lines.length * lineHeight - LINE_GAP + PADDING * 2;
-  // Beside the second anchor, on the side away from the first, and inside the plot.
-  const after = end.x >= start.x;
-  const x = after ? end.x + GAP : end.x - GAP - width;
-  const y = end.y >= start.y ? end.y + GAP : end.y - GAP - height;
+  // By the middle of the line, above it (right of an upright one), clear of it, inside the plot.
+  const length = Math.hypot(end.x - start.x, end.y - start.y);
+  const [nx, ny] =
+    length === 0 ? [0, -1] : [(start.y - end.y) / length, (end.x - start.x) / length];
+  const [ux, uy] = ny > 0 || (ny === 0 && nx < 0) ? [-nx, -ny] : [nx, ny];
+  const reach = (Math.abs(ux) * width + Math.abs(uy) * height) / 2 + GAP;
+  const x = (start.x + end.x) / 2 + ux * reach - width / 2;
+  const y = (start.y + end.y) / 2 + uy * reach - height / 2;
   return {
     line: extendSides(
       start,
@@ -57,7 +61,7 @@ function infoLineOf(geometry: DrawingGeometry<Anchors<2>>): InfoLine {
 }
 
 /**
- * An info line: a trend line with its figures in a box by its second anchor, the change of value
+ * An info line: a trend line with its figures in a box by its middle, the change of value
  * and its percentage, the bars and the time between the anchors, and its angle on screen.
  */
 export const infoLine: DrawingTypeDefinition<Anchors<2>> = {
