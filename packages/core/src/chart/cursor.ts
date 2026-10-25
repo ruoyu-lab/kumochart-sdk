@@ -170,7 +170,14 @@ function buildLegends(
     mainLegend(sources, frame, index)
   );
 
-  // The series added to the chart come next to the main series, as compared symbols do.
+  for (const provider of sources.legendRows) {
+    for (const row of provider(frame, index)) {
+      if (listed(row.item)) {
+        add(row.item, row.segments());
+      }
+    }
+  }
+
   const time = sources.bars.time(index);
 
   series.list().forEach((entry, position) => {
@@ -199,15 +206,6 @@ function buildLegends(
 
     add(item, segments);
   });
-
-  // Then what modules add, such as the indicators.
-  for (const provider of sources.legendRows) {
-    for (const row of provider(frame, index)) {
-      if (listed(row.item)) {
-        add(row.item, row.segments());
-      }
-    }
-  }
 
   return rows;
 }

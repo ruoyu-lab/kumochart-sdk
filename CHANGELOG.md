@@ -2,12 +2,6 @@
 
 The packages of KumoChart share one version. Each release lists what changed for those who use them.
 
-## Unreleased
-
-**Changes**
-
-- The legend lists the series added to the chart, such as compared symbols, right after the main series and before the indicators of their pane; they came after the indicators.
-
 ## 1.0.0-beta.3
 
 **Fixes**
