@@ -11,18 +11,24 @@ import {
 } from './tools/lines';
 import { parallelChannel, path, rectangle, text } from './tools/shapes';
 import { fibChannel, fibExtension, fibRetracement, fibTimeZone } from './tools/fibonacci';
-import { brush } from './tools/brush';
+import { brush, highlighter } from './tools/brush';
 import { callout } from './tools/callout';
-import { circle, ellipse, triangle } from './tools/figures';
-import { fibSpeedFan, gannBox } from './tools/gann';
-import { flagMark, priceLabel } from './tools/marks';
+import { circle, ellipse, rotatedRectangle, triangle } from './tools/figures';
+import { cyclicLines } from './tools/cycles';
+import { fibSpeedFan, gannBox, gannFan } from './tools/gann';
+import { infoLine } from './tools/info-line';
+import { arrowMarkDown, arrowMarkUp, flagMark, priceLabel } from './tools/marks';
 import {
+  abcdPattern,
   elliottCorrection,
+  elliottDoubleCombo,
   elliottImpulse,
+  elliottTriangle,
+  elliottTripleCombo,
   headAndShoulders,
   xabcdPattern
 } from './tools/patterns';
-import { pitchfork } from './tools/pitchfork';
+import { modifiedSchiffPitchfork, pitchfork, schiffPitchfork } from './tools/pitchfork';
 import { longPosition, shortPosition } from './tools/position';
 import { datePriceRange, dateRange, priceRange } from './tools/ranges';
 import { regressionTrend } from './tools/regression';
@@ -71,5 +77,18 @@ export const allDrawings: readonly DrawingTypeDefinition[] = [
   headAndShoulders,
   elliottImpulse,
   elliottCorrection,
-  anchoredVwap
+  anchoredVwap,
+  infoLine,
+  schiffPitchfork,
+  modifiedSchiffPitchfork,
+  gannFan,
+  abcdPattern,
+  elliottTriangle,
+  elliottDoubleCombo,
+  elliottTripleCombo,
+  cyclicLines,
+  highlighter,
+  rotatedRectangle,
+  arrowMarkUp,
+  arrowMarkDown
 ];

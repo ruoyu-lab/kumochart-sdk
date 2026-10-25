@@ -192,6 +192,65 @@ export const xabcdPattern: DrawingTypeDefinition<Anchors<5>> = {
   bounds: (geometry) => labelledPoints(geometry, geometry.points, XABCD)
 };
 
+/** The retracements of an ABCD pattern, as they are labelled: BC of AB on AC, CD of BC on BD. */
+export function abcdRatios([a, b, c, d]: Anchors<4>): { readonly ac: number; readonly bd: number } {
+  return { ac: move(b, c) / move(a, b), bd: move(c, d) / move(b, c) };
+}
+
+/**
+ * A harmonic ABCD pattern: the legs through four points, and dotted lines labelled with the
+ * retracement each measures, BC of AB and CD of BC; the CD leg completes the pattern where it
+ * matches AB.
+ */
+export const abcdPattern: DrawingTypeDefinition<Anchors<4>> = {
+  type: 'abcd-pattern',
+  points: 4,
+  fields: ['color', 'lineWidth', 'textColor', 'fontSize', 'bold', 'italic'],
+  defaultStyle: () => ({ textColor: '#ffffff' }),
+  paint: (context) => {
+    const { points } = context.geometry;
+    const [a, b, c, d] = points;
+    const ratios = abcdRatios(context.geometry.anchors);
+    const measured: ReadonlyArray<[number, Point, Point]> = [
+      [ratios.ac, a, c],
+      [ratios.bd, b, d]
+    ];
+
+    for (const [, from, to] of measured) {
+      dotted(context, [from, to]);
+    }
+
+    strokeDrawing(
+      context,
+      (path) => {
+        tracePath(path, points, false);
+      },
+      { lineStyle: 'solid' }
+    );
+
+    for (const [value, from, to] of measured) {
+      if (Number.isFinite(value)) {
+        paintRatio(context, value, from, to);
+      }
+    }
+
+    const labelled: ReadonlyArray<readonly [string, Point, Point | undefined, Point | undefined]> =
+      [
+        ['A', a, undefined, b],
+        ['B', b, a, c],
+        ['C', c, b, d],
+        ['D', d, c, undefined]
+      ];
+
+    for (const [label, at, before, after] of labelled) {
+      paintPointLabel(context, label, at, isTop(at, before, after));
+    }
+  },
+  hitTest: (geometry, point, tolerance) =>
+    segmentsHit(point, segmentsOf(geometry.points, false), tolerance),
+  bounds: (geometry) => labelledPoints(geometry, geometry.points, ['A', 'B', 'C', 'D'])
+};
+
 /** Where the line through `a` and `b` crosses the segment from `from` to `to`, if it does. */
 function crossing(a: Point, b: Point, from: Point, to: Point): Point | null {
   const direction = { x: b.x - a.x, y: b.y - a.y };
@@ -315,17 +374,19 @@ const FRAMES: readonly Frame[] = ['circle', 'parentheses', 'plain'];
 /**
  * The label of wave `index` (from 1) at a degree, as Elliott wave notation writes it: e.g. Primary ①, Intermediate (1), Minor 1, Cycle I, Minute ⓘ, Minuette
  * (i); corrections take letters, capital where the impulses are Arabic (Intermediate (A)) and
- * small where they are Roman (Cycle a).
+ * small where they are Roman (Cycle a): A, B, C on, or those of `letters`, such as `WXY` for a
+ * combination.
  */
 export function waveLabel(
   degree: WaveDegree,
   index: number,
-  corrective: boolean
+  corrective: boolean,
+  letters?: string
 ): { readonly text: string; readonly circled: boolean } {
   const position = WAVE_DEGREES.indexOf(degree);
   const numerals = NUMERALS[Math.floor(position / 3)] ?? 'arabic';
   const frame = FRAMES[position % 3] ?? 'plain';
-  const letter = String.fromCharCode(65 + index - 1);
+  const letter = letters?.[index - 1] ?? String.fromCharCode(65 + index - 1);
   const bare = corrective
     ? numerals === 'arabic'
       ? letter
@@ -371,9 +432,15 @@ function paintWaveLabel(
 
 /**
  * An Elliott wave: the waves through the points from where it starts, each labelled in the
- * notation of the wave `degree` (Intermediate by default), above tops and below bottoms.
+ * notation of the wave `degree` (Intermediate by default), above tops and below bottoms; the
+ * waves of a correction by letter, those of `letters` where given.
  */
-function elliottWave(type: string, waves: number, corrective: boolean): DrawingTypeDefinition {
+function elliottWave(
+  type: string,
+  waves: number,
+  corrective: boolean,
+  letters?: string
+): DrawingTypeDefinition {
   return {
     type,
     points: waves + 1,
@@ -391,7 +458,7 @@ function elliottWave(type: string, waves: number, corrective: boolean): DrawingT
       segmentsOf(points, false).forEach(([before, point], index) => {
         paintWaveLabel(
           context,
-          waveLabel(style.degree, index + 1, corrective),
+          waveLabel(style.degree, index + 1, corrective, letters),
           point,
           isTop(point, before, points[index + 2])
         );
@@ -405,7 +472,7 @@ function elliottWave(type: string, waves: number, corrective: boolean): DrawingT
         geometry.points,
         Array.from(
           { length: waves },
-          (_, index) => waveLabel(geometry.style.degree, index + 1, corrective).text
+          (_, index) => waveLabel(geometry.style.degree, index + 1, corrective, letters).text
         )
       )
   };
@@ -415,3 +482,19 @@ function elliottWave(type: string, waves: number, corrective: boolean): DrawingT
 export const elliottImpulse = /* @__PURE__ */ elliottWave('elliott-impulse', 5, false);
 /** The three waves of a correction, A to C, from four points. */
 export const elliottCorrection = /* @__PURE__ */ elliottWave('elliott-correction', 3, true);
+/** The five waves of a triangle, A to E, from six points. */
+export const elliottTriangle = /* @__PURE__ */ elliottWave('elliott-triangle', 5, true);
+/** The three waves of a double combination, W, X and Y, from four points. */
+export const elliottDoubleCombo = /* @__PURE__ */ elliottWave(
+  'elliott-double-combo',
+  3,
+  true,
+  'WXY'
+);
+/** The five waves of a triple combination, W, X, Y, X and Z, from six points. */
+export const elliottTripleCombo = /* @__PURE__ */ elliottWave(
+  'elliott-triple-combo',
+  5,
+  true,
+  'WXYXZ'
+);

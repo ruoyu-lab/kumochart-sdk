@@ -1,6 +1,6 @@
 import type { Point } from '../../interaction/types';
 import { boundsOf, insidePolygon, segmentsOf } from '../geometry';
-import type { Anchors, DrawingTypeDefinition } from '../types';
+import type { Anchors, DrawingAxisMarks, DrawingTypeDefinition } from '../types';
 import { arrowLength, paintArrowHead } from './labels';
 import { bodyHit, last, segmentsHit, strokeDrawing } from './shared';
 
@@ -30,6 +30,16 @@ function endAngle(points: Stroke, fromEnd: boolean, reach: number): number {
   const back =
     (fromEnd ? points.findLast(far) : points.find(far)) ?? (fromEnd ? points[0] : last(points));
   return Math.atan2(tip.y - back.y, tip.x - back.x);
+}
+
+/** What a stroke marks on the axes: the highest and lowest of its values, its first and last time. */
+function strokeMarks(anchors: Anchors<0>): DrawingAxisMarks {
+  const prices = anchors.map((anchor) => anchor.price);
+  const times = anchors.map((anchor) => anchor.time);
+  return {
+    prices: [Math.max(...prices), Math.min(...prices)],
+    times: [Math.min(...times), Math.max(...times)]
+  };
 }
 
 /**
@@ -75,12 +85,35 @@ export const brush: DrawingTypeDefinition<Anchors<0>> = {
     (geometry.style.fill && insidePolygon(point, geometry.points) ? bodyHit : null),
   handles: () => [],
   bounds: (geometry) => boundsOf(geometry.points),
-  axisMarks: (anchors) => {
-    const prices = anchors.map((anchor) => anchor.price);
-    const times = anchors.map((anchor) => anchor.time);
-    return {
-      prices: [Math.max(...prices), Math.min(...prices)],
-      times: [Math.min(...times), Math.max(...times)]
-    };
-  }
+  axisMarks: strokeMarks
+};
+
+/**
+ * A broad stroke drawn by hand that the chart shows through, as of a marker pen: a see-through
+ * color, smoothed, without arrows or a fill. It moves as a whole, as a brush does.
+ */
+export const highlighter: DrawingTypeDefinition<Anchors<0>> = {
+  type: 'highlighter',
+  points: 0,
+  freehand: true,
+  fields: ['color', 'lineWidth'],
+  defaultStyle: () => ({ color: 'rgba(255, 196, 0, 0.35)', lineWidth: 12 }),
+  paint: (context) => {
+    strokeDrawing(
+      context,
+      (path) => {
+        traceSmooth(path, context.geometry.points);
+      },
+      { lineStyle: 'solid' }
+    );
+  },
+  hitTest: (geometry, point, tolerance) =>
+    segmentsHit(
+      point,
+      segmentsOf(geometry.points, false),
+      tolerance + geometry.style.lineWidth / 2
+    ),
+  handles: () => [],
+  bounds: (geometry) => boundsOf(geometry.points, geometry.style.lineWidth / 2),
+  axisMarks: strokeMarks
 };

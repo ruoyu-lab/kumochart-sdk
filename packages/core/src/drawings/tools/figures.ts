@@ -226,3 +226,47 @@ export const triangle: DrawingTypeDefinition<Anchors<3>> = {
     ),
   bounds: (geometry) => boundsOf(geometry.points)
 };
+
+/**
+ * The corners of a rectangle with its first side from `a` to `b`, as wide as `c` is from the line
+ * through them, on the side of `c`.
+ */
+function rotatedCorners([a, b, c]: readonly [Point, Point, Point]): Point[] {
+  const length = Math.hypot(b.x - a.x, b.y - a.y);
+
+  if (length === 0) {
+    return [a, b, b, a];
+  }
+
+  const normal = { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
+  const depth = (c.x - a.x) * normal.x + (c.y - a.y) * normal.y;
+  const shift = { x: normal.x * depth, y: normal.y * depth };
+  return [a, b, { x: b.x + shift.x, y: b.y + shift.y }, { x: a.x + shift.x, y: a.y + shift.y }];
+}
+
+/**
+ * A rectangle at any angle, as along a sloping channel or a flag: its first side from the first
+ * anchor to the second, as wide as the third anchor is from that side, filled.
+ */
+export const rotatedRectangle: DrawingTypeDefinition<Anchors<3>> = {
+  type: 'rotated-rectangle',
+  points: 3,
+  fields: ['color', 'lineWidth', 'lineStyle', 'fill', 'fillColor'],
+  defaultStyle: (theme) => ({ fillColor: withAlpha(theme.accent, 0.12) }),
+  paint: (context) => {
+    const corners = rotatedCorners(context.geometry.points);
+
+    if (context.geometry.style.fill) {
+      fillArea(context.ctx, corners, context.geometry.style.fillColor);
+    }
+
+    strokeDrawing(context, (ctx) => {
+      tracePath(ctx, corners, true);
+    });
+  },
+  hitTest: (geometry, point, tolerance) => {
+    const corners = rotatedCorners(geometry.points);
+    return shapeHit(point, segmentsOf(corners, true), corners, tolerance, geometry.style.fill);
+  },
+  bounds: (geometry) => boundsOf([...rotatedCorners(geometry.points), ...geometry.points])
+};

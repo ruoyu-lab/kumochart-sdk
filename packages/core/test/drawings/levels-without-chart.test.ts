@@ -169,6 +169,22 @@ const SKETCHES: readonly Sketch[] = [
       [130, 87_000]
     ]
   ],
+  [
+    'gann-fan',
+    [
+      [10, 82_000],
+      [60, 84_000]
+    ],
+    { levels: [{ value: 2 }, { value: 1 }, { value: 1 / 3 }, { value: 0.25, visible: false }] }
+  ],
+  [
+    'info-line',
+    [
+      [30, 84_000],
+      [150, 86_000]
+    ],
+    { extendRight: true }
+  ],
   ['cross-line', [[100, 85_000]]],
   [
     'trend-angle',
@@ -341,7 +357,7 @@ describe('lines of drawings without a chart', () => {
         .filter(hasLines)
         .sort()
     ).toEqual([...covered].sort());
-    expect(covered.size).toBe(20);
+    expect(covered.size).toBe(22);
   });
 
   // Every drawing type bar by bar takes a few seconds, longer with coverage.

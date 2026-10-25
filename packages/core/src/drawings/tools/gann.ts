@@ -408,3 +408,154 @@ export const fibSpeedFan: DrawingTypeDefinition<Anchors<2>> = {
     ];
   }
 };
+
+// ─── Gann fan ──────────────────────────────────────────────────────────────
+
+/**
+ * The angles of a Gann fan, as levels: units of value per unit of time against the 1×1, the line
+ * from the first anchor to the second; 2 is the 2×1, twice as steep, ½ the 1×2.
+ */
+const GANN_ANGLES: readonly number[] = [8, 4, 3, 2, 1, 1 / 2, 1 / 3, 1 / 4, 1 / 8];
+
+/**
+ * An angle as Gann wrote it: `2×1`, `1×1`, `1×2`; a third written as `0.333` is still `1×3`.
+ */
+export function gannAngleText(ratio: number): string {
+  return ratio >= 1 ? `${ratioText(ratio)}×1` : `1×${ratioText(Math.round(100 / ratio) / 100)}`;
+}
+
+/** An angle of a fan: its ray from the first anchor, and where it leaves the box of the anchors. */
+interface GannAngle {
+  readonly ratio: number;
+  readonly color: string;
+  readonly ray: Segment;
+  readonly edge: Point;
+}
+
+function gannFanOf(geometry: DrawingGeometry<Anchors<2>>): GannAngle[] {
+  const [origin, corner] = geometry.points;
+  const across = corner.x - origin.x;
+  const along = corner.y - origin.y;
+
+  if (across === 0 && along === 0) {
+    return [];
+  }
+
+  return shownLevels(geometry.style.levels, geometry.style, geometry.theme.palette)
+    .filter(({ value }) => value > 0)
+    .sort((a, b) => b.value - a.value)
+    .map(({ value, color }) => {
+      // Flatter than the 1×1, the angle leaves the box by its far side; steeper, by its top or bottom.
+      const edge =
+        value <= 1
+          ? { x: corner.x, y: origin.y + along * value }
+          : { x: origin.x + across / value, y: corner.y };
+      return {
+        ratio: value,
+        color,
+        ray: extendSegment(origin, edge, geometry.width, geometry.height, 'ray'),
+        edge
+      };
+    });
+}
+
+/**
+ * A Gann fan: rays from the first anchor at Gann's angles, 8×1 to 1×8, the 1×1 through the
+ * second anchor, each labelled where it leaves the box of the anchors, and the wedges between
+ * them filled. Alerts watch each ray, by its angle, as `2×1`.
+ */
+export const gannFan: DrawingTypeDefinition<Anchors<2>> = {
+  type: 'gann-fan',
+  points: 2,
+  fields: ['color', 'lineWidth', 'lineStyle', 'levels', 'fill'],
+  defaultStyle: () => ({ levels: GANN_ANGLES.map((value) => ({ value })) }),
+  paint: (context) => {
+    const { ctx, geometry } = context;
+    const angles = gannFanOf(geometry);
+    const [origin] = geometry.points;
+
+    if (geometry.style.fill) {
+      angles.forEach(({ ray, color }, index) => {
+        const next = angles[index + 1];
+
+        if (next) {
+          fillArea(ctx, [origin, ray[1], next.ray[1]], withAlpha(color, BAND_ALPHA));
+        }
+      });
+    }
+
+    for (const { ray, color } of angles) {
+      strokeLine(context, ray, { color });
+    }
+
+    // The flatter angles labelled beyond the far side of the box, the steeper above or below it.
+    const [, corner] = geometry.points;
+    const right = corner.x >= origin.x;
+    const up = corner.y <= origin.y;
+    setLabelFont(ctx, geometry);
+
+    for (const { ratio, color, edge } of angles) {
+      ctx.fillStyle = color;
+
+      if (ratio <= 1) {
+        ctx.textAlign = right ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(gannAngleText(ratio), edge.x + (right ? LABEL_GAP : -LABEL_GAP), edge.y);
+      } else {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = up ? 'bottom' : 'top';
+        ctx.fillText(gannAngleText(ratio), edge.x, edge.y + (up ? -LABEL_GAP : LABEL_GAP));
+      }
+    }
+  },
+  hitTest: (geometry, point, tolerance) => {
+    const angles = gannFanOf(geometry);
+    const [origin] = geometry.points;
+    const wedges = angles.flatMap(({ ray }, index) => {
+      const next = angles[index + 1];
+      return next ? [[origin, ray[1], next.ray[1]]] : [];
+    });
+    return (
+      segmentsHit(
+        point,
+        angles.map(({ ray }) => ray),
+        tolerance
+      ) ??
+      (geometry.style.fill && wedges.some((area) => insidePolygon(point, area)) ? bodyHit : null)
+    );
+  },
+  bounds: (geometry) => {
+    const angles = gannFanOf(geometry);
+    const reach = Math.max(
+      0,
+      ...angles.map(({ ratio }) => geometry.measureText(gannAngleText(ratio)) + LABEL_GAP)
+    );
+    return boundsOf(
+      [...geometry.points, ...angles.flatMap(({ ray }) => ray)],
+      Math.max(reach, geometry.style.fontSize)
+    );
+  },
+  levels: ([origin, corner], scale, style, { barIndex, timeAt }) => {
+    const from = scale.toScale(origin.price);
+    const to = scale.toScale(corner.price);
+    const start = barIndex(origin.time);
+    const span = barIndex(corner.time) - start;
+
+    // Anchors at one time make every angle a vertical line, which no price crosses.
+    if (origin.time === corner.time) {
+      return [];
+    }
+
+    return shownLevels(style.levels, style)
+      .filter(({ value }) => value > 0)
+      .map(({ value }): DrawingLevel => ({
+        key: gannAngleText(value),
+        from: origin,
+        to:
+          value <= 1
+            ? { time: corner.time, price: scale.fromScale(from + (to - from) * value) }
+            : { time: timeAt(start + span / value), price: corner.price },
+        extend: 'end'
+      }));
+  }
+};

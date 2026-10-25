@@ -26,7 +26,10 @@ const BUDGETS = [
   // the API and keep its collections, colors checked as they are given, modules of applications
   // with options, events and state, the watermark, series taking trades, and indicators of a
   // timeframe of their own (1.5 kB). The words of the indicators are a script of their own.
-  { file: 'packages/core/dist/kumochart.iife.js', gzip: 112.5 },
+  // Thirteen drawing types after it (the info line, Schiff pitchforks, the Gann fan, the ABCD,
+  // three Elliott waves, cyclic lines, the highlighter, the rotated rectangle and the arrow
+  // marks) add 1.5 kB.
+  { file: 'packages/core/dist/kumochart.iife.js', gzip: 114.5 },
   { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 6.5 },
   { file: 'packages/vue/dist/index.js', gzip: 3 },
   { file: 'packages/react/dist/index.js', gzip: 3 }
@@ -75,10 +78,11 @@ const APPS = [
     gzip: 59.5
   },
   {
-    // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB.
+    // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB;
+    // the thirteen drawing types after the review 1.3 kB.
     name: 'the core with every drawing type',
     code: `export { createChart } from 'core'; export { drawings, allDrawings } from 'core/drawings';`,
-    gzip: 74.5
+    gzip: 76
   },
   {
     // The price ticks the axis labels cover, and the transform kept in saved states, add 0.1 kB.
@@ -121,10 +125,11 @@ const APPS = [
     // The fixes of the indicators add 0.4 kB; their averages to pick from and new options 1.3 kB;
     // the price ticks the axis labels cover and the transform kept in saved states 0.1 kB; the
     // volume profiles module and the fixed range volume profile drawing type 3.1 kB, to 102.9 kB;
-    // the review after the first release, as for the script for pages without a bundler, 111 kB.
+    // the review after the first release, as for the script for pages without a bundler, 111 kB;
+    // the thirteen drawing types after it 1.5 kB.
     name: 'everything',
     code: `export { createChart } from 'core'; export { allModules } from 'core/all';`,
-    gzip: 111.5
+    gzip: 113.5
   },
   {
     // MACD picks EMAs or SMAs, which brings the averages to pick from: 8.5 kB; the checks of a

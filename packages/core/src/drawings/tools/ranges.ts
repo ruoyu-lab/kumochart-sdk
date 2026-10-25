@@ -19,14 +19,23 @@ import { boxLevels, corners } from './shapes';
 
 const LABEL_PADDING = 8;
 
-/** The change from `from` to `to`, its percentage and the bars between the anchors. */
-function changeText(geometry: DrawingGeometry, from: DrawingPoint, to: DrawingPoint): string {
+/** The change from `from` to `to` and its percentage, as `+12.50 (+1.25%)`. */
+export function priceChangeText(
+  geometry: DrawingGeometry,
+  from: DrawingPoint,
+  to: DrawingPoint
+): string {
   const change = to.price - from.price;
   const sign = change > 0 ? '+' : '';
   const value = `${sign}${geometry.formatValue(change)}`;
   const percent =
     from.price === 0 ? '' : ` (${sign}${((change / Math.abs(from.price)) * 100).toFixed(2)}%)`;
-  return `${value}${percent} · ${geometry.texts.bars(barsBetween(geometry, from, to))}`;
+  return `${value}${percent}`;
+}
+
+/** The change from `from` to `to`, its percentage and the bars between the anchors. */
+function changeText(geometry: DrawingGeometry, from: DrawingPoint, to: DrawingPoint): string {
+  return `${priceChangeText(geometry, from, to)} · ${geometry.texts.bars(barsBetween(geometry, from, to))}`;
 }
 
 /** The time between the anchors, e.g. `6h`. */
@@ -34,7 +43,11 @@ function durationText(geometry: DrawingGeometry, from: DrawingPoint, to: Drawing
   return geometry.texts.duration(to.time - from.time);
 }
 
-function barsBetween(geometry: DrawingGeometry, from: DrawingPoint, to: DrawingPoint): number {
+export function barsBetween(
+  geometry: DrawingGeometry,
+  from: DrawingPoint,
+  to: DrawingPoint
+): number {
   return Math.round(Math.abs(geometry.barIndex(to.time) - geometry.barIndex(from.time)));
 }
 

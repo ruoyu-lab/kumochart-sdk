@@ -2,6 +2,21 @@
 
 The packages of KumoChart share one version. Each release lists what changed for those who use them.
 
+## Unreleased
+
+**Added**
+
+- Thirteen drawing types, each in `allDrawings` and on its own for applications that pick a few:
+  - `info-line`, a trend line showing the change of value and its percentage, the bars, the time and its angle between its anchors in a box by its second anchor.
+  - `schiff-pitchfork` and `modified-schiff-pitchfork`, pitchforks whose median line starts halfway up the handle, in value alone or in time and value, for trends too steep for Andrews' fork.
+  - `gann-fan`, rays from the first anchor at Gann's angles, 8×1 to 1×8, the 1×1 through the second anchor, alerts watching each by its angle, as `2×1`.
+  - `abcd-pattern`, the harmonic ABCD with the retracements of BC and CD.
+  - `elliott-triangle` (A to E), `elliott-double-combo` (W, X, Y) and `elliott-triple-combo` (W, X, Y, X, Z), labelled in the notation of their degree as the impulse and the correction are.
+  - `cyclic-lines`, vertical lines repeating the span between the anchors on to the right edge, to time cycles.
+  - `highlighter`, a wide see-through freehand stroke drawn while the button is held, as the brush is.
+  - `rotated-rectangle`, a rectangle at any angle, along a sloping channel or a flag.
+  - `arrow-mark-up` and `arrow-mark-down`, arrows under or above a point in the colors of up and down, with a text of their own.
+
 ## 1.0.0-beta.3
 
 **Fixes**

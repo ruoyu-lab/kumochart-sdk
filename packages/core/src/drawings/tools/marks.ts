@@ -1,7 +1,7 @@
 import type { Point } from '../../interaction/types';
-import { insidePolygon, insideRect } from '../geometry';
+import { boundsOf, insidePolygon, insideRect } from '../geometry';
 import type { Anchors, DrawingBounds, DrawingGeometry, DrawingTypeDefinition } from '../types';
-import { bodyHit, fillArea, strokeDrawing, tracePath } from './shared';
+import { bodyHit, fillArea, LABEL_GAP, strokeDrawing, tracePath } from './shared';
 
 const LABEL_PADDING = 8;
 /** How far up and right of its point a price label sits. */
@@ -138,3 +138,117 @@ export const flagMark: DrawingTypeDefinition<Anchors<1>> = {
     height: FLAG_HEIGHT
   })
 };
+
+/** An arrow mark: as tall as this, its head this tall and wide, its shaft this wide. */
+const MARK_HEIGHT = 22;
+const MARK_HEAD = 10;
+const MARK_WIDTH = 16;
+const MARK_SHAFT = 6;
+
+interface ArrowMark {
+  readonly outline: readonly Point[];
+  /** Where its text starts, at its far end from the point: below an up arrow, above a down one. */
+  readonly textAt: Point;
+}
+
+function arrowMarkOf(geometry: DrawingGeometry<Anchors<1>>, up: boolean): ArrowMark {
+  const [tip] = geometry.points;
+  // An up arrow stands under its point, a down arrow hangs over it.
+  const away = up ? 1 : -1;
+  const at = (dx: number, dy: number): Point => ({ x: tip.x + dx, y: tip.y + away * dy });
+  return {
+    outline: [
+      tip,
+      at(MARK_WIDTH / 2, MARK_HEAD),
+      at(MARK_SHAFT / 2, MARK_HEAD),
+      at(MARK_SHAFT / 2, MARK_HEIGHT),
+      at(-MARK_SHAFT / 2, MARK_HEIGHT),
+      at(-MARK_SHAFT / 2, MARK_HEAD),
+      at(-MARK_WIDTH / 2, MARK_HEAD)
+    ],
+    textAt: at(0, MARK_HEIGHT + LABEL_GAP)
+  };
+}
+
+/** The box of the text of a mark, centered under or over its arrow. */
+function markTextBox(
+  geometry: DrawingGeometry<Anchors<1>>,
+  mark: ArrowMark,
+  up: boolean
+): DrawingBounds | null {
+  if (geometry.text === '') {
+    return null;
+  }
+
+  const width = geometry.measureText(geometry.text);
+  const height = geometry.style.fontSize;
+  return {
+    x: mark.textAt.x - width / 2,
+    y: up ? mark.textAt.y : mark.textAt.y - height,
+    width,
+    height
+  };
+}
+
+/**
+ * An arrow marking a bar, pointing at its point: up from below, as for a buy, or down from above,
+ * as for a sell, with its text, if it has one, at its other end.
+ */
+function arrowMark(type: string, up: boolean): DrawingTypeDefinition<Anchors<1>> {
+  return {
+    type,
+    points: 1,
+    fields: ['color', 'text', 'textColor', 'fontSize', 'bold', 'italic'],
+    defaultStyle: (theme) => ({ color: up ? theme.up : theme.down }),
+    paint: (context) => {
+      const { ctx, geometry } = context;
+      const mark = arrowMarkOf(geometry, up);
+      fillArea(ctx, mark.outline, geometry.style.color);
+
+      if (geometry.text !== '' && !context.editing) {
+        ctx.font = geometry.textFont;
+        ctx.fillStyle = geometry.style.textColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = up ? 'top' : 'bottom';
+        ctx.fillText(geometry.text, mark.textAt.x, mark.textAt.y);
+      }
+    },
+    hitTest: (geometry, point, tolerance) => {
+      const mark = arrowMarkOf(geometry, up);
+      const box = markTextBox(geometry, mark, up);
+      const inText =
+        box !== null &&
+        insideRect(
+          point,
+          { x: box.x, y: box.y },
+          { x: box.x + box.width, y: box.y + box.height },
+          tolerance
+        );
+      // The shaft is narrow: the box around the arrow is what takes a click.
+      const [tip] = geometry.points;
+      const around = insideRect(
+        point,
+        { x: tip.x - MARK_WIDTH / 2, y: up ? tip.y : tip.y - MARK_HEIGHT },
+        { x: tip.x + MARK_WIDTH / 2, y: up ? tip.y + MARK_HEIGHT : tip.y },
+        tolerance
+      );
+      return around || inText || insidePolygon(point, mark.outline) ? bodyHit : null;
+    },
+    bounds: (geometry) => {
+      const mark = arrowMarkOf(geometry, up);
+      const box = markTextBox(geometry, mark, up);
+      return boundsOf([
+        ...mark.outline,
+        ...(box
+          ? [
+              { x: box.x, y: box.y },
+              { x: box.x + box.width, y: box.y + box.height }
+            ]
+          : [])
+      ]);
+    }
+  };
+}
+
+export const arrowMarkUp = /* @__PURE__ */ arrowMark('arrow-mark-up', true);
+export const arrowMarkDown = /* @__PURE__ */ arrowMark('arrow-mark-down', false);
