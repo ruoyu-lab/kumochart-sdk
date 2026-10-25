@@ -89,6 +89,24 @@ describe('legend', () => {
     );
   });
 
+  it('lists the series added right after the main series, before the indicators', () => {
+    const chart = chartWithBars(100, { locale: 'en-US' });
+    const bars = createBars(100);
+    chart.indicators.add({ type: 'MA', params: { periods: [9] } });
+    // Added after the indicator, as a symbol compared later is.
+    chart.series.add({
+      id: 'eth',
+      type: 'line',
+      title: 'ETH',
+      data: bars.map((bar) => ({ time: bar.time, value: 2000 }))
+    });
+    const texts = legend(chart);
+    const at = (text: string) => texts.indexOf(text);
+
+    expect(at('ETH')).toBeGreaterThan(texts.findIndex((text) => text.startsWith('O')));
+    expect(at('ETH')).toBeLessThan(at('MA 9'));
+  });
+
   it('names the values of parameters that have options, and leaves out settings', () => {
     const chart = chartWithBars(100, { locale: 'en-US' });
     chart.indicators.add({ type: 'VWAP' });

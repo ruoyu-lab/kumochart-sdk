@@ -133,7 +133,11 @@ export interface LatestPriceOptions {
   color: string | null;
 }
 
-/** A row of the legend: the main series, an indicator, or a series added to the chart. */
+/**
+ * A row of the legend: the main series, a series added to the chart, or an indicator. Each pane
+ * lists them in that order: the main series, the series in the order they were added, then the
+ * indicators.
+ */
 export interface LegendItem {
   readonly kind: 'main' | 'indicator' | 'series';
   /** The indicator's or the series' id; `main` for the main series. */
