@@ -1,14 +1,12 @@
+import { IDLE, type Gesture } from './gestures';
 import { KineticScroll, VELOCITY_WINDOW_MS } from './kinetic';
 import { runKeyCommand } from './keyboard';
 import { Pinch } from './pinch';
 import {
   NO_MODIFIERS,
-  type DragSession,
   type HitTarget,
   type InteractionHost,
-  type LegendHit,
   type Modifiers,
-  type PaneResizeSession,
   type Point,
   type Region
 } from './types';
@@ -23,61 +21,6 @@ const MODIFIER_KEYS = new Set(['Shift', 'Alt', 'Control', 'Meta']);
 function modifiersOf(event: MouseEvent | KeyboardEvent): Modifiers {
   return { shift: event.shiftKey, alt: event.altKey, command: event.ctrlKey || event.metaKey };
 }
-
-type Gesture =
-  | { readonly kind: 'idle' }
-  /** Pressed but not moved yet: becomes a click, a drag or (touch) a long press. */
-  | {
-      readonly kind: 'pressed';
-      readonly pointerId: number;
-      readonly touch: boolean;
-      readonly start: Point;
-      readonly region: Region;
-      readonly target: HitTarget | null;
-    }
-  | {
-      readonly kind: 'pan';
-      readonly pointerId: number;
-      /** Touch pans do not show the crosshair. */
-      readonly touch: boolean;
-      readonly paneId: string | null;
-      last: Point;
-      samples: Array<{ x: number; time: number }>;
-    }
-  | {
-      readonly kind: 'drag';
-      readonly pointerId: number;
-      readonly touch: boolean;
-      readonly session: DragSession;
-    }
-  | {
-      readonly kind: 'time-axis';
-      readonly pointerId: number;
-      /** Where the axis was pressed, which the drag zooms from. */
-      readonly startX: number;
-      lastX: number;
-    }
-  | {
-      readonly kind: 'price-axis';
-      readonly pointerId: number;
-      readonly paneId: string;
-      readonly scale: string;
-      readonly anchorY: number;
-      lastY: number;
-    }
-  | {
-      readonly kind: 'separator';
-      readonly pointerId: number;
-      readonly startY: number;
-      readonly session: PaneResizeSession;
-    }
-  | { readonly kind: 'touch-crosshair'; readonly pointerId: number }
-  /** Pressed on a legend button: a click if released there. */
-  | { readonly kind: 'legend'; readonly pointerId: number; readonly hit: LegendHit }
-  | { readonly kind: 'pinch'; readonly pinch: Pinch }
-  | { readonly kind: 'tool'; readonly pointerId: number; readonly touch: boolean };
-
-const IDLE: Gesture = { kind: 'idle' };
 
 function distance(left: Point, right: Point): number {
   return Math.hypot(left.x - right.x, left.y - right.y);
@@ -699,6 +642,7 @@ export class InputController {
         Math.exp(-(y + pinch) * WHEEL_ZOOM_SPEED),
         point.y
       );
+      this.followPointer();
       return;
     }
 
@@ -714,6 +658,7 @@ export class InputController {
     }
 
     this.host.setPointer(point);
+    this.followPointer();
   }
 
   private readonly onDoubleClick = (event: MouseEvent): void => {
@@ -760,7 +705,19 @@ export class InputController {
     }
 
     this.modifiers = modifiersOf(event);
+    this.followPointer();
+  }
+
+  /**
+   * Moves what is dragged, or the drawing being placed, to where the pointer is now: as the
+   * modifiers change, or as the view moves under a pointer at rest, as by the wheel.
+   */
+  private followPointer(): void {
     const gesture = this.gesture;
+
+    if (!this.lastPoint) {
+      return;
+    }
 
     if (gesture.kind === 'drag') {
       gesture.session.move(this.lastPoint, this.modifiers);

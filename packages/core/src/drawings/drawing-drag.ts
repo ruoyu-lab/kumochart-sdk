@@ -37,17 +37,27 @@ function spaceOf(bars: BarPositions, pane: PaneFrame): DrawingSpace {
   };
 }
 
-/** Anchors moved by whole bars and by the pointer's value change. */
+/** Where a drag started on the bars: the logical index and the scaled value under the pointer. */
+interface DragStart {
+  readonly index: number;
+  readonly value: number;
+}
+
+/**
+ * Anchors moved by whole bars and by the value from where the drag started to the pointer. The
+ * start is kept on the bars, not on the screen, so that a drawing dragged as the view scrolls or
+ * zooms stays under the pointer.
+ */
 function translated(
   context: ObjectContext,
   pane: PaneFrame,
   original: readonly DrawingPoint[],
-  start: Point,
+  start: DragStart,
   position: Point
 ): DrawingPoint[] {
   const { timeScale, bars } = context;
-  const steps = Math.round(timeScale.xToIndex(position.x) - timeScale.xToIndex(start.x));
-  const shift = pane.scale.yToScale(position.y) - pane.scale.yToScale(start.y);
+  const steps = Math.round(timeScale.xToIndex(position.x) - start.index);
+  const shift = pane.scale.yToScale(position.y) - start.value;
   return original.map((anchor) => ({
     time: bars.timeOfLogicalIndex(bars.logicalIndexOf(anchor.time) + steps),
     price: pane.scale.fromScale((pane.scale.toScale(anchor.price) ?? Number.NaN) + shift)
@@ -86,7 +96,11 @@ export function beginDrawingDrag(
   const below = entry.definition.paintBelow !== undefined;
   const original = entry.points.map((anchor) => ({ ...anchor }));
   const startPane = paneOf(context.frame, entry.pane);
-  const start = startPane ? local(startPane, point) : point;
+  const pressed = startPane ? local(startPane, point) : point;
+  const start: DragStart = {
+    index: context.timeScale.xToIndex(pressed.x),
+    value: startPane ? startPane.scale.yToScale(pressed.y) : Number.NaN
+  };
   let moved = false;
   host.select(entry.id);
   /**

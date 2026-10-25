@@ -201,6 +201,58 @@ describe('handles', () => {
   });
 });
 
+describe('a drag as the view moves', () => {
+  /** Turns the wheel at chart coordinates, zooming the time scale around them. */
+  const wheel = async (chart: Chart, [x, y]: [number, number], deltaY: number) => {
+    chart.element.dispatchEvent(
+      new WheelEvent('wheel', { deltaY, clientX: x, clientY: y, cancelable: true })
+    );
+    await nextFrame();
+  };
+
+  it('keeps a drawing dragged as a whole under the pointer as the wheel zooms', async () => {
+    const chart = chartWithBars(200, { timeScale: { barSpacing: 12 } });
+    const id = trendLine(chart, [150, 180], [170, 190]);
+    const grab = at(chart, 160, 185);
+    pointer(chart, 'pointerdown', ...grab);
+    const held = at(chart, 165, 185);
+    pointer(chart, 'pointermove', ...held);
+
+    // The bars move under the pointer, which stays where it is.
+    await wheel(chart, [held[0] + 120, held[1]], -300);
+    await wheel(chart, [held[0] - 200, held[1]], 200);
+
+    // The point of the line grabbed, ten bars on from its start, is still under the pointer.
+    const points = () => chart.drawings.get(id)?.points ?? [];
+    const [first, second] = points();
+    const start = chart.data.indexOf(first?.time ?? Number.NaN);
+    const under = chart.timeScale.xToIndex(held[0]) ?? Number.NaN;
+    expect(Math.abs(start + 10 - under)).toBeLessThanOrEqual(0.5);
+    expect(chart.data.indexOf(second?.time ?? Number.NaN)).toBe(start + 20);
+    expect(start).not.toBe(155);
+
+    pointer(chart, 'pointerup', ...held);
+    expect(points()[0]?.time).toBe(first?.time);
+  });
+
+  it('keeps a handle dragged under the pointer as the wheel zooms', async () => {
+    const chart = chartWithBars(200, { timeScale: { barSpacing: 12 } });
+    const id = trendLine(chart, [150, 180], [170, 190]);
+    chart.select({ kind: 'drawing', id });
+    pointer(chart, 'pointerdown', ...at(chart, 170, 190));
+    const held = at(chart, 175, 192);
+    pointer(chart, 'pointermove', ...held);
+    await wheel(chart, [held[0] + 150, held[1]], -300);
+
+    // The end follows the pointer to the bar under it now.
+    const time = chart.timeScale.xToTime(held[0]) ?? Number.NaN;
+    const end = chart.drawings.get(id)?.points[1]?.time ?? Number.NaN;
+    expect(Math.abs(end - time)).toBeLessThanOrEqual(MINUTE);
+    expect(end).not.toBe(T0 + 175 * MINUTE);
+    pointer(chart, 'pointerup', ...held);
+  });
+});
+
 describe('a drag the API changes the drawings under', () => {
   /** A horizontal line `id` at `price` on bar 150. */
   const level = (id: string, price: number) => ({
