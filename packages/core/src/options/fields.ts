@@ -26,7 +26,8 @@ const SECTION_FIELDS: {
     vertical: true,
     horizontal: true,
     labels: true,
-    style: true
+    style: true,
+    snapToBars: true
   }),
   mainSeries: fieldsOf<MainSeriesOptions>({
     type: true,

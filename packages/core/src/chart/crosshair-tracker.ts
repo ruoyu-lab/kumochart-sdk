@@ -161,7 +161,7 @@ export class CrosshairTracker {
     const { core } = this;
 
     if (this.pointer) {
-      const free = this.moving || this.restingAt !== null;
+      const free = !core.options.crosshair.snapToBars || this.moving || this.restingAt !== null;
       return crosshairAt(core, frame, this.pointer.x, this.pointer.y, !free);
     }
 

@@ -4,6 +4,10 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 ## Unreleased
 
+**Breaking**
+
+- The HLC area fills the band from the highs to the closes in `highFillColor` and the one from the closes to the lows in `lowFillColor`, rather than both in `fillColor`; by default the highs are cyan and the lows pink, each band a faint fill of its line's color.
+
 **Fixes**
 
 - A drawing dragged while the wheel zooms or scrolls the chart stays under the pointer: dragged as a whole it drifted by as much as the view moved, and a handle or a drawing being placed waited for the pointer to move again.
@@ -21,6 +25,8 @@ The packages of KumoChart share one version. Each release lists what changed for
   - `highlighter`, a wide see-through freehand stroke drawn while the button is held, as the brush is.
   - `rotated-rectangle`, a rectangle at any angle, along a sloping channel or a flag: its middle line between the first two anchors, as wide on each side as the third is from it, with handles at the ends of that line, which turn it at its width, and at its corners, which widen it.
   - `arrow-mark-up` and `arrow-mark-down`, arrows under or above a point in the colors of up and down, with a text of their own.
+- `crosshair.snapToBars`, on by default: off, the vertical line follows the pointer smoothly rather than stepping from bar to bar, its time label and the legend those of the bar under it.
+- `loadMore` says in `bars` how many more of the bars shown the view wants before the first, the room left empty on the left included, so that bars built from many, as Kagi lines are, can be filled at once.
 - `DrawingSpace.unitHeight`, how tall a unit of the scale is on screen in widths of a bar, for `moveHandle()` to keep angles and lengths as the screen shows them.
 
 ## 1.0.0-beta.3

@@ -351,7 +351,7 @@ describe('timeframes', () => {
     chart.timeScale.scrollToIndex(0, 'left');
     chart.timeScale.visibleRange();
 
-    expect(loadMore).toHaveBeenLastCalledWith({ before: T0 + 2 * MINUTE });
+    expect(loadMore).toHaveBeenLastCalledWith(expect.objectContaining({ before: T0 + 2 * MINUTE }));
   });
 
   it('computes indicators on the displayed bars', () => {

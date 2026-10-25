@@ -3,6 +3,8 @@ import type { Chart } from '../helpers/chart';
 import type { ChartPointerEvent } from '../../src/chart/events';
 import type { SeriesType } from '../../src/series/styles';
 import type { SeriesPaintContext } from '../../src/series/types';
+import { hlcAreaSeries } from '../../src/series/lines';
+import { lightTheme } from '../../src/options/themes';
 import { createBars, MINUTE, T0 } from '../helpers/bars';
 import {
   chartWithBars,
@@ -378,6 +380,21 @@ describe('series', () => {
       .map((call) => Number(call.args[2]));
 
     expect([...widths].sort((a, b) => a - b)).toEqual([1, 9, 18, 36]);
+  });
+
+  it('fills an HLC area in two bands: highs to closes, closes to lows', () => {
+    const chart = chartWithBars(30);
+    chart.applyOptions({ mainSeries: { type: 'hlc-area' } });
+    const calls = canvasCalls(layer(chart, 'scene'));
+    calls.length = 0;
+    chart.screenshot();
+
+    expect(calls.filter((call) => call.name === 'fill')).toHaveLength(2);
+    expect(hlcAreaSeries.defaultStyle(lightTheme, '#2962ff')).toMatchObject({
+      highColor: '#00bcd4',
+      lowColor: '#e91e63',
+      closeColor: '#2962ff'
+    });
   });
 
   it('draws columns from the bottom of a logarithmic pane, where zero is not', () => {

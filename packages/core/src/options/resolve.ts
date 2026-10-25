@@ -96,6 +96,7 @@ function validateOptions(options: ChartOptions): void {
   checkBoolean('options.crosshair.horizontal', options.crosshair.horizontal);
   checkBoolean('options.crosshair.labels', options.crosshair.labels);
   checkOneOf('options.crosshair.style', options.crosshair.style, LINE_STYLES);
+  checkBoolean('options.crosshair.snapToBars', options.crosshair.snapToBars);
 
   checkString('options.mainSeries.type', options.mainSeries.type);
   checkOneOf('options.mainSeries.source', options.mainSeries.source, PRICE_SOURCES);

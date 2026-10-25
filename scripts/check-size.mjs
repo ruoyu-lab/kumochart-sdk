@@ -28,8 +28,8 @@ const BUDGETS = [
   // timeframe of their own (1.5 kB). The words of the indicators are a script of their own.
   // Thirteen drawing types after it (the info line, Schiff pitchforks, the Gann fan, the ABCD,
   // three Elliott waves, cyclic lines, the highlighter, the rotated rectangle and the arrow
-  // marks) add 1.5 kB; the view kept in time as bars are replaced 0.2 kB.
-  { file: 'packages/core/dist/kumochart.iife.js', gzip: 115 },
+  // marks) add 1.5 kB; the fixes of the view, the drags and the crosshair after them 0.5 kB.
+  { file: 'packages/core/dist/kumochart.iife.js', gzip: 115.5 },
   { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 6.5 },
   { file: 'packages/vue/dist/index.js', gzip: 3 },
   { file: 'packages/react/dist/index.js', gzip: 3 }
@@ -58,31 +58,33 @@ for (const budget of BUDGETS) {
  * from 45 to 47.2 kB: the fixes of the data, the rendering and the interaction, the API named one
  * way with collections kept alike and `null` for what is not there, colors checked as they are
  * given, and the options, events and state of modules of applications; each module grew by its
- * own fixes besides.
+ * own fixes besides. The view kept in place as the bars are replaced, a drag kept under the pointer
+ * as the view moves, a crosshair that need not snap to the bars and how many bars `loadMore`
+ * wants took the core to 47.6 kB, and each application with it.
  */
 const APPS = [
-  { name: 'the core', code: `export { createChart } from 'core';`, gzip: 48 },
+  { name: 'the core', code: `export { createChart } from 'core';`, gzip: 48.5 },
   {
     name: 'the core with every indicator',
     code: `export { createChart } from 'core'; export { indicators, allIndicators } from 'core/indicators';`,
     // The averages to pick from, the moving average of an oscillator and the new options of the
     // types took it from 60.4 to 61.4 kB; the indicators of a timeframe of their own add 1.5 kB,
     // their words in the chart's language 0.3 kB.
-    gzip: 68.5
+    gzip: 69
   },
   {
     // Only the three definitions go in, 50.5 kB; MACD picks its averages and RSI has its own
     // moving average with bands since, 52.4 kB.
     name: 'the core with MA, MACD and RSI',
     code: `export { createChart } from 'core'; export { indicators, MA, MACD, RSI } from 'core/indicators';`,
-    gzip: 59.5
+    gzip: 60
   },
   {
     // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB;
     // the thirteen drawing types after the review 1.5 kB.
     name: 'the core with every drawing type',
     code: `export { createChart } from 'core'; export { drawings, allDrawings } from 'core/drawings';`,
-    gzip: 76.5
+    gzip: 77
   },
   {
     // The price ticks the axis labels cover, and the transform kept in saved states, add 0.1 kB.
@@ -93,12 +95,12 @@ const APPS = [
   {
     name: 'the core with every chart type',
     code: `export { createChart } from 'core'; export { chartTypes, allChartTypes } from 'core/chart-types';`,
-    gzip: 52.5
+    gzip: 53
   },
   {
     name: 'the core with alerts',
     code: `export { createChart } from 'core'; export { alerts } from 'core/alerts';`,
-    gzip: 52.5
+    gzip: 53
   },
   {
     name: 'the core with orders and markers',
@@ -108,28 +110,29 @@ const APPS = [
   {
     name: 'the core with replay',
     code: `export { createChart } from 'core'; export { replay } from 'core/replay';`,
-    gzip: 48.5
+    gzip: 49
   },
   {
     // The profiles of the bars in view and of the trading days, their cache and their state.
     name: 'the core with volume profiles',
     code: `export { createChart } from 'core'; export { volumeProfiles } from 'core/volume-profile';`,
-    gzip: 50.5
+    gzip: 51
   },
   {
     name: 'the core with the watermark',
     code: `export { createChart } from 'core'; export { watermark } from 'core/watermark';`,
-    gzip: 48
+    gzip: 48.5
   },
   {
     // The fixes of the indicators add 0.4 kB; their averages to pick from and new options 1.3 kB;
     // the price ticks the axis labels cover and the transform kept in saved states 0.1 kB; the
     // volume profiles module and the fixed range volume profile drawing type 3.1 kB, to 102.9 kB;
     // the review after the first release, as for the script for pages without a bundler, 111 kB;
-    // the thirteen drawing types after it 1.5 kB; the view kept in time as bars are replaced 0.2 kB.
+    // the thirteen drawing types after it 1.5 kB; the fixes of the view, the drags and the
+    // crosshair after them 0.5 kB.
     name: 'everything',
     code: `export { createChart } from 'core'; export { allModules } from 'core/all';`,
-    gzip: 114
+    gzip: 114.5
   },
   {
     // MACD picks EMAs or SMAs, which brings the averages to pick from: 8.5 kB; the checks of a

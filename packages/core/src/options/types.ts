@@ -52,6 +52,12 @@ export interface CrosshairOptions {
   /** Shows the time and price labels on the axes. */
   labels: boolean;
   style: LineStyle;
+  /**
+   * Puts the vertical line on the middle of the bar under the pointer, so that it steps from bar to
+   * bar; off, it follows the pointer smoothly, its time label and the legend those of the bar under
+   * it all the same.
+   */
+  snapToBars: boolean;
 }
 
 /** Formats a time label. `kind` tells where the label is shown. */

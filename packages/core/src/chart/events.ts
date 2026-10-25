@@ -24,7 +24,14 @@ export interface VisibleRangeChangeEvent {
 
 /** The view approaches the oldest bar: load bars before `before` and pass them to `data.prepend()`. */
 export interface LoadMoreEvent {
+  /** The time of the first source bar: older bars go before it. */
   readonly before: number;
+  /**
+   * How many more of the bars shown the view wants before the first: those it lacks of
+   * `loadMoreThreshold`, and the room left empty on the left. Bars built from many, as Kagi lines
+   * or Renko bricks are, need as many more source bars as each takes.
+   */
+  readonly bars: number;
 }
 
 /** The object under the pointer when it was clicked. */

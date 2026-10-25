@@ -274,6 +274,18 @@ describe('loadMore', () => {
 
     expect(requests).toEqual([all[300]!.time, all[0]!.time]);
   });
+
+  it('says how many bars the view wants before the first, the empty room on the left included', () => {
+    const chart = createTestChart({ timeScale: { loadMoreThreshold: 10 } });
+    const wanted: number[] = [];
+    chart.on('loadMore', ({ bars }) => wanted.push(bars));
+    chart.data.set(createBars(100));
+    // The first bar 40 bars from the left edge.
+    chart.timeScale.setVisibleLogicalRange({ from: -40, to: 60 });
+    chart.timeScale.visibleRange();
+
+    expect(wanted).toEqual([50]);
+  });
 });
 
 describe('time scale', () => {
@@ -386,6 +398,33 @@ describe('events', () => {
 
     expect(moves).toHaveBeenCalledTimes(1);
     expect(moves.mock.calls[0]?.[0]).toMatchObject({ visible: true, paneId: 'main' });
+  });
+
+  it('steps the vertical line from bar to bar, or follows the pointer smoothly without snapToBars', () => {
+    const at = (chart: ReturnType<typeof chartWithBars>, x: number) => {
+      pointer(chart, 'pointermove', x, 100, { buttons: 0 });
+      chart.screenshot();
+      return chart.crosshair.get();
+    };
+    const snapped = chartWithBars(200, { timeScale: { barSpacing: 12 } });
+    const x = (snapped.timeScale.timeToX(T0 + 180 * MINUTE) ?? 0) + 3;
+
+    expect(at(snapped, x)?.x).toBe(snapped.timeScale.timeToX(T0 + 180 * MINUTE));
+
+    const smooth = chartWithBars(200, {
+      timeScale: { barSpacing: 12 },
+      crosshair: { snapToBars: false }
+    });
+
+    // At the pointer, the time and the bar still those under it.
+    expect(at(smooth, x)).toMatchObject({
+      x,
+      time: T0 + 180 * MINUTE,
+      bar: { time: T0 + 180 * MINUTE }
+    });
+    expect(() => {
+      smooth.applyOptions({ crosshair: { snapToBars: 'yes' as unknown as boolean } });
+    }).toThrow(/crosshair.snapToBars/);
   });
 
   it('hides a programmatic crosshair with set(null)', () => {

@@ -27,7 +27,8 @@ export function createDefaultOptions(sections: readonly OptionsSection[] = []): 
       vertical: true,
       horizontal: true,
       labels: true,
-      style: 'dashed'
+      style: 'dashed',
+      snapToBars: true
     },
     mainSeries: {
       type: 'candles',

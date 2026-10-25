@@ -35,7 +35,8 @@ export class ViewportWatcher {
       return;
     }
 
-    const nearStart = timeScale.logicalRange().from < options.timeScale.loadMoreThreshold;
+    const wanted = options.timeScale.loadMoreThreshold - timeScale.logicalRange().from;
+    const nearStart = wanted > 0;
 
     if (!nearStart) {
       this.loadMoreArmed = true;
@@ -47,7 +48,7 @@ export class ViewportWatcher {
     if (this.loadMoreArmed || firstTime !== this.loadMoreFirstTime) {
       this.loadMoreArmed = false;
       this.loadMoreFirstTime = firstTime;
-      bus.emit('loadMore', { before: firstTime });
+      bus.emit('loadMore', { before: firstTime, bars: Math.ceil(wanted) });
     }
   }
 }

@@ -301,27 +301,40 @@ export const baselineSeries: SeriesTypeDefinition<BaselineStyle> = {
   }
 };
 
+const HLC_HIGH = '#00bcd4';
+const HLC_LOW = '#e91e63';
+
 export const hlcAreaSeries: SeriesTypeDefinition<HlcAreaStyle> = {
   type: 'hlc-area',
   input: 'ohlc',
-  defaultStyle: (theme, color) => ({
-    highColor: theme.up,
-    lowColor: theme.down,
+  // The highs in cyan and the lows in pink, each filled faintly to the closes between them.
+  defaultStyle: (_theme, color) => ({
+    highColor: HLC_HIGH,
+    lowColor: HLC_LOW,
     closeColor: color,
-    fillColor: withAlpha(color, 0.14),
+    highFillColor: withAlpha(HLC_HIGH, 0.25),
+    lowFillColor: withAlpha(HLC_LOW, 0.25),
     lineWidth: 1.5
   }),
   paint: ({ ctx, points, style }) => {
-    ctx.beginPath();
-    tracePolyline(ctx, points, (index) => points.high(index));
+    const bands = [
+      { color: style.highFillColor, edge: (index: number) => points.high(index) },
+      { color: style.lowFillColor, edge: (index: number) => points.low(index) }
+    ];
 
-    for (let index = points.count - 1; index >= 0; index -= 1) {
-      ctx.lineTo(points.x(index), points.low(index));
+    // Each band from its edge back along the closes.
+    for (const band of bands) {
+      ctx.beginPath();
+      tracePolyline(ctx, points, band.edge);
+
+      for (let index = points.count - 1; index >= 0; index -= 1) {
+        ctx.lineTo(points.x(index), points.close(index));
+      }
+
+      ctx.closePath();
+      ctx.fillStyle = band.color;
+      ctx.fill();
     }
-
-    ctx.closePath();
-    ctx.fillStyle = style.fillColor;
-    ctx.fill();
 
     const lines = [
       { color: style.highColor, read: (index: number) => points.high(index) },

@@ -58,7 +58,10 @@ export interface HlcAreaStyle {
   highColor: string;
   lowColor: string;
   closeColor: string;
-  fillColor: string;
+  /** Between the highs and the closes. */
+  highFillColor: string;
+  /** Between the closes and the lows. */
+  lowFillColor: string;
   lineWidth: number;
 }
 
