@@ -657,7 +657,13 @@ export class InputController {
       this.host.zoomTime(Math.exp(-y * WHEEL_ZOOM_SPEED), point.x);
     }
 
-    this.host.setPointer(point);
+    // The crosshair stays with the pointer input. The wheel events of a fling, which a trackpad
+    // sends on after the fingers lift, tell where it began, while the pointer moves on; only
+    // before any pointer input does the wheel tell where the pointer is.
+    if (!this.lastPoint) {
+      this.host.setPointer(point);
+    }
+
     this.followPointer();
   }
 

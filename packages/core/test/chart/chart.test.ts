@@ -7,7 +7,7 @@ import { darkTheme, lightTheme } from '../../src/options/themes';
 import { lineSeries } from '../../src/series/lines';
 import { ChartError } from '../../src/utils/errors';
 import { createBars, MINUTE, T0 } from '../helpers/bars';
-import { chartWithBars, createTestChart, pointer } from '../helpers/chart';
+import { chartWithBars, createTestChart, nextFrame, pointer } from '../helpers/chart';
 import { canvasCalls, resizeObservers } from '../setup';
 
 describe('createChart', () => {
@@ -425,6 +425,36 @@ describe('events', () => {
     expect(() => {
       smooth.applyOptions({ crosshair: { snapToBars: 'yes' as unknown as boolean } });
     }).toThrow(/crosshair.snapToBars/);
+  });
+
+  it('keeps the crosshair at the pointer as the wheel moves the bars from elsewhere', async () => {
+    const chart = chartWithBars(200, { crosshair: { snapToBars: false } });
+    /** A wheel event at chart x 400, as those of a fling that began there. */
+    const fling = () => {
+      chart.element.dispatchEvent(
+        new WheelEvent('wheel', { deltaX: -30, clientX: 400, clientY: 100, cancelable: true })
+      );
+    };
+    const crosshairX = async () => {
+      await nextFrame();
+      return chart.crosshair.get()?.x;
+    };
+
+    // Before any pointer input, the wheel tells where the pointer is.
+    fling();
+    expect(await crosshairX()).toBe(400);
+
+    // The pointer moves on as the fling goes on; the crosshair goes with it, frame after frame.
+    for (const x of [200, 210, 220]) {
+      pointer(chart, 'pointermove', x, 100, { buttons: 0 });
+      fling();
+      expect(await crosshairX()).toBe(x);
+    }
+
+    // Off the chart, the fling does not bring the crosshair back.
+    chart.element.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }));
+    fling();
+    expect(await crosshairX()).toBeUndefined();
   });
 
   it('hides a programmatic crosshair with set(null)', () => {
