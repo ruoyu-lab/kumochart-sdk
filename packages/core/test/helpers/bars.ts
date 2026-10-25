@@ -29,7 +29,8 @@ export const PLAIN_SPACE: DrawingSpace = {
   toScale: (value) => value,
   fromScale: (scaled) => scaled,
   barIndex: (time) => time,
-  timeAt: (index) => index
+  timeAt: (index) => index,
+  unitHeight: 1
 };
 
 /** The style of a drawing on a chart whose options are the defaults. */

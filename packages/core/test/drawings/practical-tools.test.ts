@@ -225,14 +225,54 @@ describe('cyclic lines', () => {
 });
 
 describe('rotated rectangle', () => {
-  it('is as wide as its third anchor is from its first side', () => {
-    const chart = chartWithTools();
-    const id = add(chart, 'rotated-rectangle', [point(150, 180), point(170, 190), point(150, 186)]);
+  /** A rectangle along prices of 180 from bar 150 to 170, from 174 to 186. */
+  const rectangle = (chart: Chart) =>
+    add(chart, 'rotated-rectangle', [point(150, 180), point(170, 180), point(150, 186)]);
 
-    expect(selects(chart, id, 160, 187)).toBe(true);
-    expect(selects(chart, id, 152, 194)).toBe(false);
+  it('is as wide on each side of its middle line as its third anchor is from it', () => {
+    const chart = chartWithTools();
+    const id = rectangle(chart);
+
+    expect(selects(chart, id, 160, 184)).toBe(true);
+    expect(selects(chart, id, 160, 176)).toBe(true);
+    expect(selects(chart, id, 160, 190)).toBe(false);
+    expect(selects(chart, id, 160, 170)).toBe(false);
     chart.drawings.update(id, { style: { fill: false } });
-    expect(selects(chart, id, 160, 187)).toBe(false);
+    expect(selects(chart, id, 160, 184)).toBe(false);
+  });
+
+  it('is widened by a corner, and turned by an end at its width as the screen shows it', () => {
+    const chart = chartWithTools();
+    const id = rectangle(chart);
+    chart.select({ kind: 'drawing', id });
+    const pixel = (anchor: { time: number; price: number }): [number, number] => [
+      chart.timeScale.timeToX(anchor.time) ?? Number.NaN,
+      chart.priceScale().priceToY(anchor.price) ?? Number.NaN
+    ];
+    /** How far the third anchor is from the middle line, on screen. */
+    const half = () => {
+      const [a, b, c] = (chart.drawings.get(id)?.points ?? []).map(pixel);
+      const [ax, ay] = a ?? [0, 0];
+      const [bx, by] = b ?? [0, 0];
+      const [cx, cy] = c ?? [0, 0];
+      return Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)) / Math.hypot(bx - ax, by - ay);
+    };
+
+    // A corner, from 186 at bar 170 to 188: wider on both sides.
+    drag(chart, at(chart, 170, 186), at(chart, 170, 188));
+    expect(selects(chart, id, 160, 187)).toBe(true);
+    expect(selects(chart, id, 160, 173)).toBe(true);
+    const wide = half();
+
+    // The end at bar 170 stretched on to 175, then turned up: as wide as before.
+    chart.select({ kind: 'drawing', id });
+    drag(chart, at(chart, 170, 180), at(chart, 175, 180));
+    expect(chart.drawings.get(id)?.points[1]?.time).toBe(T0 + 175 * MINUTE);
+    expect(half()).toBeCloseTo(wide, 0);
+    chart.select({ kind: 'drawing', id });
+    drag(chart, at(chart, 175, 180), at(chart, 172, 192));
+    expect(chart.drawings.get(id)?.points[1]?.time).toBe(T0 + 172 * MINUTE);
+    expect(half()).toBeCloseTo(wide, 0);
   });
 });
 

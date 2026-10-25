@@ -8,6 +8,7 @@ import type {
   DrawingHandle,
   DrawingHit,
   DrawingPaintContext,
+  DrawingPoint,
   DrawingTypeDefinition
 } from '../types';
 import { paintTextBlock } from './labels';
@@ -227,26 +228,39 @@ export const triangle: DrawingTypeDefinition<Anchors<3>> = {
   bounds: (geometry) => boundsOf(geometry.points)
 };
 
-/**
- * The corners of a rectangle with its first side from `a` to `b`, as wide as `c` is from the line
- * through them, on the side of `c`.
- */
-function rotatedCorners([a, b, c]: readonly [Point, Point, Point]): Point[] {
+/** Half the width of a rotated rectangle: how far `c` is from its middle line through `a` and `b`. */
+function halfWidth(a: Point, b: Point, c: Point): number {
   const length = Math.hypot(b.x - a.x, b.y - a.y);
+  return length === 0
+    ? Math.hypot(c.x - a.x, c.y - a.y)
+    : Math.abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) / length;
+}
 
-  if (length === 0) {
-    return [a, b, b, a];
-  }
-
-  const normal = { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
-  const depth = (c.x - a.x) * normal.x + (c.y - a.y) * normal.y;
-  const shift = { x: normal.x * depth, y: normal.y * depth };
-  return [a, b, { x: b.x + shift.x, y: b.y + shift.y }, { x: a.x + shift.x, y: a.y + shift.y }];
+/** Where `half` from `from` square to the line from `from` to `to` is, on its left. */
+function aside(from: Point, to: Point, half: number): Point {
+  const length = Math.hypot(to.x - from.x, to.y - from.y);
+  return length === 0
+    ? from
+    : {
+        x: from.x - ((to.y - from.y) / length) * half,
+        y: from.y + ((to.x - from.x) / length) * half
+      };
 }
 
 /**
- * A rectangle at any angle, as along a sloping channel or a flag: its first side from the first
- * anchor to the second, as wide as the third anchor is from that side, filled.
+ * The corners of a rectangle along its middle line from `a` to `b`, as wide on each side as `c`
+ * is from that line: around from the corner beside `a`.
+ */
+function rotatedCorners([a, b, c]: readonly [Point, Point, Point]): Point[] {
+  const half = halfWidth(a, b, c);
+  return [aside(a, b, half), aside(b, a, -half), aside(b, a, half), aside(a, b, -half)];
+}
+
+/**
+ * A rectangle at any angle, as along a sloping channel or a flag: its middle line from the first
+ * anchor to the second, the middles of its ends, and as wide on each side as the third anchor is
+ * from it, filled. Its handles are those ends and its four corners: an end turns or stretches it
+ * at its width, as the screen shows it; a corner widens or narrows it on both sides.
  */
 export const rotatedRectangle: DrawingTypeDefinition<Anchors<3>> = {
   type: 'rotated-rectangle',
@@ -268,5 +282,35 @@ export const rotatedRectangle: DrawingTypeDefinition<Anchors<3>> = {
     const corners = rotatedCorners(geometry.points);
     return shapeHit(point, segmentsOf(corners, true), corners, tolerance, geometry.style.fill);
   },
-  bounds: (geometry) => boundsOf([...rotatedCorners(geometry.points), ...geometry.points])
+  bounds: (geometry) => boundsOf(rotatedCorners(geometry.points)),
+  handles: (geometry) => {
+    const [a, b] = geometry.points;
+    return [
+      { id: '0', ...a },
+      { id: '1', ...b },
+      ...rotatedCorners(geometry.points).map((corner, index) => ({
+        id: `corner-${String(index)}`,
+        ...corner
+      }))
+    ];
+  },
+  moveHandle: ([a, b, c], handle, to, space) => {
+    // A corner sets the width: as far from the middle line as it is dragged.
+    if (handle.startsWith('corner-')) {
+      return [a, b, to];
+    }
+
+    // An end keeps the width, measured as the screen shows it, as the line turns.
+    const flat = (point: DrawingPoint): Point => ({
+      x: space.barIndex(point.time),
+      y: space.toScale(point.price) * space.unitHeight
+    });
+    const [from, until] = handle === '0' ? [to, b] : [a, to];
+    const side = aside(flat(from), flat(until), halfWidth(flat(a), flat(b), flat(c)));
+    const width = { time: space.timeAt(side.x), price: space.fromScale(side.y / space.unitHeight) };
+    return Number.isFinite(width.time) && Number.isFinite(width.price)
+      ? [from, until, width]
+      : [from, until, c];
+  },
+  axisMarks: ([a, b]) => ({ prices: [a.price, b.price], times: [a.time, b.time] })
 };

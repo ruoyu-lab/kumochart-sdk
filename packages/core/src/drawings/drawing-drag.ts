@@ -4,7 +4,7 @@ import type { PaneFrame } from '../render/frame';
 import { anchorAt, magnetFor, placeable } from './anchoring';
 import type { DrawingEntry, DrawingSnapshot, DrawingStore } from './drawing-store';
 import { handleOf, moveHandle, pivotFor } from './handles';
-import { LINEAR_SCALE, LOG_SCALE, type BarPositions } from './levels';
+import { LINEAR_SCALE, LOG_SCALE } from './levels';
 import { drawingOptions } from './options';
 import { styleOf } from './painting';
 import { local } from './tool';
@@ -28,12 +28,17 @@ export interface DragHost {
   cancelled(): void;
 }
 
-/** The space the drawings of a pane are drawn in: its scale, and the positions of the bars. */
-function spaceOf(bars: BarPositions, pane: PaneFrame): DrawingSpace {
+/**
+ * The space the drawings of a pane are drawn in: its scale, the positions of the bars, and how
+ * tall a unit of the scale is against the width of a bar.
+ */
+function spaceOf({ bars, timeScale }: ObjectContext, pane: PaneFrame): DrawingSpace {
+  const unit = Math.abs(pane.scale.yToScale(0) - pane.scale.yToScale(1));
   return {
     ...(pane.scale.mode === 'log' ? LOG_SCALE : LINEAR_SCALE),
     barIndex: (time) => bars.logicalIndexOf(time),
-    timeAt: (index) => bars.timeOfLogicalIndex(index)
+    timeAt: (index) => bars.timeOfLogicalIndex(index),
+    unitHeight: unit > 0 ? 1 / unit / timeScale.barSpacing : 1
   };
 }
 
@@ -137,7 +142,7 @@ export function beginDrawingDrag(
                 magnet: magnetFor(drawingOptions(current.options).magnet, held),
                 pivot: held.shift ? pivotFor(entry.definition, original, handle) : null
               }),
-              spaceOf(current.bars, pane),
+              spaceOf(current, pane),
               styleOf(current, entry)
             );
 

@@ -309,6 +309,11 @@ export interface DrawingSpace extends LevelScale {
   barIndex(time: number): number;
   /** Time at a continuous bar index, the inverse of `barIndex`. */
   timeAt(index: number): number;
+  /**
+   * How tall a unit of the scale is on screen, in widths of a bar: what keeps angles and lengths
+   * as the screen shows them, as a rotated rectangle keeps its width as it turns.
+   */
+  readonly unitHeight: number;
 }
 
 /** A rectangle in plot coordinates. */

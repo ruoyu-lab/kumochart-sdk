@@ -19,8 +19,9 @@ The packages of KumoChart share one version. Each release lists what changed for
   - `elliott-triangle` (A to E), `elliott-double-combo` (W, X, Y) and `elliott-triple-combo` (W, X, Y, X, Z), labelled in the notation of their degree as the impulse and the correction are.
   - `cyclic-lines`, vertical lines repeating the span between the anchors on to the right edge, to time cycles.
   - `highlighter`, a wide see-through freehand stroke drawn while the button is held, as the brush is.
-  - `rotated-rectangle`, a rectangle at any angle, along a sloping channel or a flag.
+  - `rotated-rectangle`, a rectangle at any angle, along a sloping channel or a flag: its middle line between the first two anchors, as wide on each side as the third is from it, with handles at the ends of that line, which turn it at its width, and at its corners, which widen it.
   - `arrow-mark-up` and `arrow-mark-down`, arrows under or above a point in the colors of up and down, with a text of their own.
+- `DrawingSpace.unitHeight`, how tall a unit of the scale is on screen in widths of a bar, for `moveHandle()` to keep angles and lengths as the screen shows them.
 
 ## 1.0.0-beta.3
 
