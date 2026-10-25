@@ -124,12 +124,15 @@ export class TimeScale {
     return Math.abs(this.offset - this.realTimeOffset()) < 1e-6;
   }
 
-  /** Adapts the view to a new bar count. */
-  setBarCount(count: number, change: 'reset' | 'prepend' | 'tail'): void {
+  /**
+   * Adapts the view to a new bar count: `reset` goes back to the real-time position; `replace`, for
+   * bars replaced, keeps the latest bar where it is from the right edge of the plot.
+   */
+  setBarCount(count: number, change: 'reset' | 'replace' | 'prepend' | 'tail'): void {
     const previous = this.count;
     this.count = count;
 
-    if (change === 'reset') {
+    if (change === 'reset' || (change === 'replace' && previous === 0)) {
       this.offset = this.realTimeOffset();
       this.following = true;
     } else if (change === 'tail' && count > previous && !this.following && previous > 0) {

@@ -23,8 +23,9 @@ export interface DataSetOptions {
 export interface DataApi {
   /**
    * Replaces the source bars. Bars must be sorted by strictly ascending time. The view stays
-   * where it is in time, at its zoom: following the latest bar, it follows the new one; looking
-   * back at history, the time at the right edge of the plot stays there, as far as the bars reach.
+   * where it is, at its zoom: following the latest bar, the new latest bar shows where the old one
+   * did; looking back at history, the time at the right edge of the plot stays there, as far as
+   * the bars reach.
    */
   set(bars: readonly BarInput[], options?: DataSetOptions): void;
   /**

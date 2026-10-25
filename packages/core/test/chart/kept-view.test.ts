@@ -48,6 +48,27 @@ describe('the view as the bars are replaced', () => {
     expect(chart.timeScale.barSpacing()).toBe(12);
   });
 
+  it('keeps the latest bar where it is on screen, with room after it, as the bars change', () => {
+    const chart = createTestChart();
+    chart.data.set(createBars(600), { interval: '1m' });
+    chart.timeScale.setBarSpacing(12);
+    // The latest bar in the middle of the plot, the room after it left for what comes.
+    chart.timeScale.scrollToIndex(599, 'center');
+    const latestX = () => chart.timeScale.indexToX(chart.data.length - 1);
+    const x = latestX();
+
+    expect(chart.timeScale.isFollowing()).toBe(true);
+
+    chart.data.setTimeframe('5m');
+    expect(latestX()).toBe(x);
+    chart.data.set(createBars(900, T0 + 300 * MINUTE), { interval: '1m' });
+    expect(latestX()).toBe(x);
+    chart.transforms.set({ type: 'heikin-ashi' });
+    expect(latestX()).toBe(x);
+    expect(chart.timeScale.isFollowing()).toBe(true);
+    expect(chart.timeScale.barSpacing()).toBe(12);
+  });
+
   it('keeps the time across timeframes, in the bar of the timeframe that holds it', () => {
     const chart = scrolledBack();
     chart.data.setTimeframe('1h');

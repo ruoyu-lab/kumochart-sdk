@@ -7,7 +7,7 @@ The packages of KumoChart share one version. Each release lists what changed for
 **Fixes**
 
 - A drawing dragged while the wheel zooms or scrolls the chart stays under the pointer: dragged as a whole it drifted by as much as the view moved, and a handle or a drawing being placed waited for the pointer to move again.
-- Replacing the bars, as for another symbol with `data.set()`, switching the timeframe with `data.setTimeframe()`, the transform with `transforms.set()` or the calendar with `applyOptions()`, no longer scrolls the chart back to the latest bar. The view stays where it was in time, at its zoom: following the latest bar, it follows the new one; looking back at history, the time at the right edge of the plot stays there. A time before the new bars shows the oldest of them, which `loadMore` asks to extend.
+- Replacing the bars, as for another symbol with `data.set()`, switching the timeframe with `data.setTimeframe()`, the transform with `transforms.set()` or the calendar with `applyOptions()`, no longer scrolls the chart back to the latest bar. The view stays where it was, at its zoom: following the latest bar, the new latest bar shows where the old one did, as far from the right edge; looking back at history, the time at the right edge of the plot stays there. A time before the new bars shows the oldest of them, which `loadMore` asks to extend.
 
 **Added**
 

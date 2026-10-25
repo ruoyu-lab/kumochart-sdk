@@ -315,7 +315,7 @@ export class ChartCore {
 
     if (rebucketed) {
       // Bars cut by another calendar, as of another symbol, keep the view where it is in time.
-      this.timeScale.setBarCount(this.bars.length, 'reset');
+      this.timeScale.setBarCount(this.bars.length, 'replace');
       this.placeRightEdge(kept);
       this.onBarsChanged({ kind: 'reset' });
     } else if (this.market.tradingCalendar() !== calendar) {
@@ -398,8 +398,9 @@ export class ChartCore {
   /**
    * Runs a data operation and lets the time scale, alerts and painting follow the bars. Series
    * may change without the main bars, so the chart repaints either way. Bars replaced, as by
-   * another symbol, timeframe or transform, keep the view where it is in time unless it follows
-   * the latest bar: the time at the right edge of the plot stays there, as far as the bars reach.
+   * another symbol, timeframe or transform, keep the view where it is: following the latest bar,
+   * the new latest bar shows where the old one did; else the time at the right edge of the plot
+   * stays there, as far as the bars reach.
    */
   private changeData<T>(mode: 'reset' | 'replace' | 'prepend' | 'tail', operation: () => T): T {
     const revision = this.bars.revision;
@@ -408,7 +409,7 @@ export class ChartCore {
     const change = this.bars.changesSince(revision);
 
     if (change) {
-      this.timeScale.setBarCount(this.bars.length, mode === 'replace' ? 'reset' : mode);
+      this.timeScale.setBarCount(this.bars.length, mode);
       this.placeRightEdge(kept);
 
       this.onBarsChanged(mode === 'prepend' ? { kind: 'reset' } : change);
