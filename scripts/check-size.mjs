@@ -79,10 +79,10 @@ const APPS = [
   },
   {
     // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB;
-    // the thirteen drawing types after the review 1.3 kB.
+    // the thirteen drawing types after the review 1.5 kB.
     name: 'the core with every drawing type',
     code: `export { createChart } from 'core'; export { drawings, allDrawings } from 'core/drawings';`,
-    gzip: 76
+    gzip: 76.5
   },
   {
     // The price ticks the axis labels cover, and the transform kept in saved states, add 0.1 kB.

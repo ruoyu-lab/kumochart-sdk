@@ -1,7 +1,14 @@
 import { font } from '../../canvas/canvas';
 import { withAlpha } from '../../canvas/color';
 import type { Point } from '../../interaction/types';
-import { boundsOf, cornersOf, extendSegment, insidePolygon, type Segment } from '../geometry';
+import {
+  boundsOf,
+  cornersOf,
+  extendSegment,
+  insidePolygon,
+  insideRect,
+  type Segment
+} from '../geometry';
 import type {
   Anchors,
   DrawingBounds,
@@ -424,12 +431,11 @@ export function gannAngleText(ratio: number): string {
   return ratio >= 1 ? `${ratioText(ratio)}×1` : `1×${ratioText(Math.round(100 / ratio) / 100)}`;
 }
 
-/** An angle of a fan: its ray from the first anchor, and where it leaves the box of the anchors. */
+/** An angle of a fan, with its ray from the first anchor to the edge of the plot. */
 interface GannAngle {
   readonly ratio: number;
   readonly color: string;
   readonly ray: Segment;
-  readonly edge: Point;
 }
 
 function gannFanOf(geometry: DrawingGeometry<Anchors<2>>): GannAngle[] {
@@ -453,16 +459,66 @@ function gannFanOf(geometry: DrawingGeometry<Anchors<2>>): GannAngle[] {
       return {
         ratio: value,
         color,
-        ray: extendSegment(origin, edge, geometry.width, geometry.height, 'ray'),
-        edge
+        ray: extendSegment(origin, edge, geometry.width, geometry.height, 'ray')
       };
     });
 }
 
+/** Where the ray from `from` through `to` leaves the plot, if it crosses it at all. */
+function plotExit(from: Point, to: Point, width: number, height: number): Point | null {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const across = dx > 0 ? (width - from.x) / dx : dx < 0 ? -from.x / dx : Infinity;
+  const down = dy > 0 ? (height - from.y) / dy : dy < 0 ? -from.y / dy : Infinity;
+  const along = Math.min(across, down);
+  const exit = { x: from.x + dx * along, y: from.y + dy * along };
+  return along > 0 && insideRect(exit, { x: 0, y: 0 }, { x: width, y: height }, 0.5) ? exit : null;
+}
+
+/**
+ * Labels a ray where it leaves the plot, inside it and clear of the ray: on a side, above the ray
+ * as it rises to it, below as it falls; at the top or the bottom, beside it on the side it leans
+ * to, else the other where the plot ends.
+ */
+function paintRayLabel(
+  ctx: CanvasRenderingContext2D,
+  geometry: DrawingGeometry,
+  [from, through]: Segment,
+  text: string
+): void {
+  const { width, height } = geometry;
+  const to = plotExit(from, through, width, height);
+
+  if (!to) {
+    return;
+  }
+
+  const rising = to.y < from.y;
+
+  if (to.x <= 0.5 || to.x >= width - 0.5) {
+    const right = to.x >= width - 0.5;
+    ctx.textAlign = right ? 'right' : 'left';
+    ctx.textBaseline = rising ? 'bottom' : 'top';
+    ctx.fillText(
+      text,
+      to.x + (right ? -LABEL_GAP : LABEL_GAP),
+      to.y + (rising ? -1 : 1) * LABEL_GAP
+    );
+    return;
+  }
+
+  const top = to.y <= height / 2;
+  const room = geometry.measureText(text) + LABEL_GAP;
+  const after = to.x >= from.x ? to.x + room <= width : to.x - room < 0;
+  ctx.textAlign = after ? 'left' : 'right';
+  ctx.textBaseline = top ? 'top' : 'bottom';
+  ctx.fillText(text, to.x + (after ? LABEL_GAP : -LABEL_GAP), to.y + (top ? 1 : -1) * LABEL_GAP);
+}
+
 /**
  * A Gann fan: rays from the first anchor at Gann's angles, 8×1 to 1×8, the 1×1 through the
- * second anchor, each labelled where it leaves the box of the anchors, and the wedges between
- * them filled. Alerts watch each ray, by its angle, as `2×1`.
+ * second anchor, each labelled where it leaves the plot, where the rays are furthest apart, and
+ * the wedges between them filled. Alerts watch each ray, by its angle, as `2×1`.
  */
 export const gannFan: DrawingTypeDefinition<Anchors<2>> = {
   type: 'gann-fan',
@@ -488,24 +544,11 @@ export const gannFan: DrawingTypeDefinition<Anchors<2>> = {
       strokeLine(context, ray, { color });
     }
 
-    // The flatter angles labelled beyond the far side of the box, the steeper above or below it.
-    const [, corner] = geometry.points;
-    const right = corner.x >= origin.x;
-    const up = corner.y <= origin.y;
     setLabelFont(ctx, geometry);
 
-    for (const { ratio, color, edge } of angles) {
+    for (const { ratio, color, ray } of angles) {
       ctx.fillStyle = color;
-
-      if (ratio <= 1) {
-        ctx.textAlign = right ? 'left' : 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(gannAngleText(ratio), edge.x + (right ? LABEL_GAP : -LABEL_GAP), edge.y);
-      } else {
-        ctx.textAlign = 'center';
-        ctx.textBaseline = up ? 'bottom' : 'top';
-        ctx.fillText(gannAngleText(ratio), edge.x, edge.y + (up ? -LABEL_GAP : LABEL_GAP));
-      }
+      paintRayLabel(ctx, geometry, ray, gannAngleText(ratio));
     }
   },
   hitTest: (geometry, point, tolerance) => {
@@ -524,17 +567,9 @@ export const gannFan: DrawingTypeDefinition<Anchors<2>> = {
       (geometry.style.fill && wedges.some((area) => insidePolygon(point, area)) ? bodyHit : null)
     );
   },
-  bounds: (geometry) => {
-    const angles = gannFanOf(geometry);
-    const reach = Math.max(
-      0,
-      ...angles.map(({ ratio }) => geometry.measureText(gannAngleText(ratio)) + LABEL_GAP)
-    );
-    return boundsOf(
-      [...geometry.points, ...angles.flatMap(({ ray }) => ray)],
-      Math.max(reach, geometry.style.fontSize)
-    );
-  },
+  // The labels lie inside the plot, by the ends of the rays.
+  bounds: (geometry) =>
+    boundsOf([...geometry.points, ...gannFanOf(geometry).flatMap(({ ray }) => ray)]),
   levels: ([origin, corner], scale, style, { barIndex, timeAt }) => {
     const from = scale.toScale(origin.price);
     const to = scale.toScale(corner.price);

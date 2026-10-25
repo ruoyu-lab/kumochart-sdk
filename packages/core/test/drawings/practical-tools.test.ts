@@ -170,6 +170,18 @@ describe('Gann fan', () => {
 
     expect(objectTexts(chart)).toEqual(expect.arrayContaining(keys));
     expect(chart.drawings.levels(id)).toEqual(keys);
+    // Each where its ray leaves the plot, inside the chart, rather than off past the edge.
+    const canvas = chart.element.querySelector<HTMLCanvasElement>('canvas[data-layer="objects"]');
+    const labels = (canvas ? canvasCalls(canvas) : []).filter(
+      (call) => call.name === 'fillText' && keys.includes(String(call.args[0]))
+    );
+    expect(labels.length).toBeGreaterThanOrEqual(keys.length);
+    for (const { args } of labels) {
+      expect(Number(args[1])).toBeGreaterThanOrEqual(0);
+      expect(Number(args[1])).toBeLessThanOrEqual(800);
+      expect(Number(args[2])).toBeGreaterThanOrEqual(0);
+      expect(Number(args[2])).toBeLessThanOrEqual(500);
+    }
     expect(gannAngleText(0.333)).toBe('1×3');
     expect(gannAngleText(1.5)).toBe('1.5×1');
   });
