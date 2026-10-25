@@ -14,7 +14,8 @@ import type { ChartCore } from '../chart-core';
 export interface TransformsApi {
   /**
    * Builds the displayed bars with a transform, e.g. `{ type: 'renko', params: { box: 50 } }`,
-   * or shows the bars of the timeframe again with `null`.
+   * or shows the bars of the timeframe again with `null`. The view stays where it is in time, as
+   * with `data.set()`.
    */
   set(transform: BarTransformInput | null): void;
   /**

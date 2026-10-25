@@ -153,6 +153,12 @@ export class TimeScale {
     this.following = true;
   }
 
+  /** Puts the logical position `index` at the right edge of the plot, as far as the bars go. */
+  placeRightEdge(index: number): void {
+    this.pending = null;
+    this.placeIndexAt(index, this.width);
+  }
+
   scrollToIndex(index: number, align: ViewAlign): void {
     this.sized(() => {
       const anchorX =

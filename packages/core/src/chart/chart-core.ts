@@ -295,6 +295,7 @@ export class ChartCore {
     const next = resolveOptions(previous, patch, this.optionSections);
     this.seriesTypes.require(next.mainSeries.type);
     const calendar = this.market.tradingCalendar();
+    const kept = this.rightEdgeTime();
     // The market data goes first: it is the part that can still fail.
     const rebucketed = this.market.configure(next);
     this.currentOptions = next;
@@ -313,7 +314,9 @@ export class ChartCore {
     this.panes.configure(next.panes.defaultHeight, next.priceScale.margins);
 
     if (rebucketed) {
+      // Bars cut by another calendar, as of another symbol, keep the view where it is in time.
       this.timeScale.setBarCount(this.bars.length, 'reset');
+      this.placeRightEdge(kept);
       this.onBarsChanged({ kind: 'reset' });
     } else if (this.market.tradingCalendar() !== calendar) {
       // The same bars, but indicators that follow the calendar, such as VWAP, change.
@@ -340,7 +343,7 @@ export class ChartCore {
   }
 
   setData(bars: readonly BarInput[], interval: IntervalInput | undefined): void {
-    this.changeData('reset', () => {
+    this.changeData('replace', () => {
       this.market.set(bars, interval);
     });
   }
@@ -370,13 +373,13 @@ export class ChartCore {
   }
 
   setTimeframe(timeframe: IntervalInput | null): void {
-    this.changeData('reset', () => {
+    this.changeData('replace', () => {
       this.market.setTimeframe(timeframe);
     });
   }
 
   setTransform(transform: BarTransformInput | null): void {
-    this.changeData('reset', () => {
+    this.changeData('replace', () => {
       this.market.setTransform(transform);
     });
   }
@@ -394,21 +397,45 @@ export class ChartCore {
 
   /**
    * Runs a data operation and lets the time scale, alerts and painting follow the bars. Series
-   * may change without the main bars, so the chart repaints either way.
+   * may change without the main bars, so the chart repaints either way. Bars replaced, as by
+   * another symbol, timeframe or transform, keep the view where it is in time unless it follows
+   * the latest bar: the time at the right edge of the plot stays there, as far as the bars reach.
    */
-  private changeData<T>(mode: 'reset' | 'prepend' | 'tail', operation: () => T): T {
+  private changeData<T>(mode: 'reset' | 'replace' | 'prepend' | 'tail', operation: () => T): T {
     const revision = this.bars.revision;
+    const kept = mode === 'replace' ? this.rightEdgeTime() : null;
     const result = operation();
     const change = this.bars.changesSince(revision);
 
     if (change) {
-      this.timeScale.setBarCount(this.bars.length, mode);
+      this.timeScale.setBarCount(this.bars.length, mode === 'replace' ? 'reset' : mode);
+      this.placeRightEdge(kept);
+
       this.onBarsChanged(mode === 'prepend' ? { kind: 'reset' } : change);
     } else {
       this.invalidate();
     }
 
     return result;
+  }
+
+  /** Puts a time kept from before the bars changed back at the right edge, as far as they reach. */
+  private placeRightEdge(time: number | null): void {
+    const index = time === null ? Number.NaN : this.bars.logicalIndexOf(time);
+
+    if (Number.isFinite(index)) {
+      this.timeScale.placeRightEdge(index);
+    }
+  }
+
+  /** The time at the right edge of the plot, or `null` while the view follows the latest bar. */
+  private rightEdgeTime(): number | null {
+    if (this.timeScale.isFollowing() || this.bars.length === 0 || this.timeScale.plotWidth === 0) {
+      return null;
+    }
+
+    const time = this.bars.timeOfLogicalIndex(this.timeScale.rightEdge());
+    return Number.isFinite(time) ? time : null;
   }
 
   /** Creates a pane for an indicator or series placed in `new`; returns its id. */

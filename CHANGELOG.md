@@ -4,10 +4,14 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 ## Unreleased
 
+**Fixes**
+
+- Replacing the bars, as for another symbol with `data.set()`, switching the timeframe with `data.setTimeframe()`, the transform with `transforms.set()` or the calendar with `applyOptions()`, no longer scrolls the chart back to the latest bar. The view stays where it was in time, at its zoom: following the latest bar, it follows the new one; looking back at history, the time at the right edge of the plot stays there. A time before the new bars shows the oldest of them, which `loadMore` asks to extend.
+
 **Added**
 
 - Thirteen drawing types, each in `allDrawings` and on its own for applications that pick a few:
-  - `info-line`, a trend line showing the change of value and its percentage, the bars, the time and its angle between its anchors in a box by its second anchor.
+  - `info-line`, a trend line showing the change of value and its percentage, the bars, the time and its angle between its anchors in a box by its middle.
   - `schiff-pitchfork` and `modified-schiff-pitchfork`, pitchforks whose median line starts halfway up the handle, in value alone or in time and value, for trends too steep for Andrews' fork.
   - `gann-fan`, rays from the first anchor at Gann's angles, 8×1 to 1×8, the 1×1 through the second anchor, alerts watching each by its angle, as `2×1`.
   - `abcd-pattern`, the harmonic ABCD with the retracements of BC and CD.

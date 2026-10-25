@@ -21,7 +21,11 @@ export interface DataSetOptions {
  * the chart never mutates them.
  */
 export interface DataApi {
-  /** Replaces the source bars. Bars must be sorted by strictly ascending time. */
+  /**
+   * Replaces the source bars. Bars must be sorted by strictly ascending time. The view stays
+   * where it is in time, at its zoom: following the latest bar, it follows the new one; looking
+   * back at history, the time at the right edge of the plot stays there, as far as the bars reach.
+   */
   set(bars: readonly BarInput[], options?: DataSetOptions): void;
   /**
    * Streams source bars: a bar with the time of the last bar replaces it, newer bars are
@@ -53,7 +57,8 @@ export interface DataApi {
   timeframe(): Interval | null;
   /**
    * Displays the source bars aggregated to a coarser timeframe, or at the source resolution with
-   * `null`. Needs a source interval; the timeframe must be built from whole source bars.
+   * `null`. Needs a source interval; the timeframe must be built from whole source bars. The view
+   * stays where it is in time, as with `set()`.
    */
   setTimeframe(timeframe: IntervalInput | null): void;
   /** Number of displayed bars. */

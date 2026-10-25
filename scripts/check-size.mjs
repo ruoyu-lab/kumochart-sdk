@@ -28,8 +28,8 @@ const BUDGETS = [
   // timeframe of their own (1.5 kB). The words of the indicators are a script of their own.
   // Thirteen drawing types after it (the info line, Schiff pitchforks, the Gann fan, the ABCD,
   // three Elliott waves, cyclic lines, the highlighter, the rotated rectangle and the arrow
-  // marks) add 1.5 kB.
-  { file: 'packages/core/dist/kumochart.iife.js', gzip: 114.5 },
+  // marks) add 1.5 kB; the view kept in time as bars are replaced 0.2 kB.
+  { file: 'packages/core/dist/kumochart.iife.js', gzip: 115 },
   { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 6.5 },
   { file: 'packages/vue/dist/index.js', gzip: 3 },
   { file: 'packages/react/dist/index.js', gzip: 3 }
@@ -126,10 +126,10 @@ const APPS = [
     // the price ticks the axis labels cover and the transform kept in saved states 0.1 kB; the
     // volume profiles module and the fixed range volume profile drawing type 3.1 kB, to 102.9 kB;
     // the review after the first release, as for the script for pages without a bundler, 111 kB;
-    // the thirteen drawing types after it 1.5 kB.
+    // the thirteen drawing types after it 1.5 kB; the view kept in time as bars are replaced 0.2 kB.
     name: 'everything',
     code: `export { createChart } from 'core'; export { allModules } from 'core/all';`,
-    gzip: 113.5
+    gzip: 114
   },
   {
     // MACD picks EMAs or SMAs, which brings the averages to pick from: 8.5 kB; the checks of a
