@@ -94,7 +94,25 @@ export type PlotJob =
       readonly size: number;
       /** Canvas font of the text. */
       readonly font: string;
+    }
+  | {
+      readonly kind: 'labels';
+      readonly labels: readonly PlotLabel[];
+      /** Canvas font of the texts. */
+      readonly font: string;
+      /** From the top of a line of text to the top of the next. */
+      readonly lineHeight: number;
     };
+
+/** A text by a point of the plot, over it or under it; lines are split at `\n`. */
+export interface PlotLabel {
+  /** In plot coordinates. */
+  readonly x: number;
+  readonly y: number;
+  readonly text: string;
+  readonly above: boolean;
+  readonly color: string;
+}
 
 export interface PriceLabel {
   readonly y: number;

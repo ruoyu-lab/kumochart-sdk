@@ -66,12 +66,14 @@ export const ja: IndicatorWords = {
     CKSTOP: 'シャンデ・クロール・ストップ',
     VORTEX: 'ボルテックス指標',
     PIVOTHL: 'ピボット高値・安値',
-    MIKE: 'MIKE 支持・抵抗線'
+    MIKE: 'MIKE 支持・抵抗線',
+    ZIGZAG: 'ジグザグ'
   },
   labels: {
     '%D Smoothing': '%D の平滑化',
     '%K Length': '%K 期間',
     '%K Smoothing': '%K の平滑化',
+    Absolute: '値幅',
     'ADX Smoothing': 'ADX の平滑化',
     'Anchor Period': 'リセット周期',
     'Aroon Down': 'アルーン・ダウン',
@@ -106,11 +108,15 @@ export const ja: IndicatorWords = {
     Decennially: '10 年ごと',
     'DI Length': 'DI の期間',
     Displacement: '遅行スパン',
+    'Display cumulative volume': '累積出来高を表示',
+    'Display reversal price': '反転価格を表示',
+    'Display reversal price change': '反転時の価格変化を表示',
     Divisor: '除数',
     'Down fractal': '下降フラクタル',
     'Down Trend': '下降トレンド',
     'ER length': '効率レシオの期間',
     Exponential: '指数移動平均',
+    'Extend to last bar': '最新の足まで延長',
     Factor: '倍率',
     Fast: '短期',
     'Fast length': '短期の期間',
@@ -168,11 +174,14 @@ export const ja: IndicatorWords = {
     'Pivot High': 'ピボット高値',
     'Pivot High Left': '高値の左側の本数',
     'Pivot High Right': '高値の右側の本数',
+    'Pivot legs': 'ピボットの深さ',
     'Pivot Low': 'ピボット安値',
     'Pivot Low Left': '安値の左側の本数',
     'Pivot Low Right': '安値の右側の本数',
     'Pivots timeframe': 'ピボットの時間枠',
     PL: '前期安値',
+    'Price change': '価格変化の表示',
+    'Price deviation for reversals (%)': '反転に必要な価格乖離 (%)',
     Quarter: '四半期ごと',
     Quarterly: '四半期',
     Quinquennially: '5 年ごと',
@@ -221,6 +230,7 @@ export const ja: IndicatorWords = {
     Weekly: '週次',
     Woodie: 'ウッディ',
     Year: '毎年',
-    Yearly: '年次'
+    Yearly: '年次',
+    'Zig Zag': 'ジグザグ'
   }
 };

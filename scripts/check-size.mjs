@@ -29,8 +29,10 @@ const BUDGETS = [
   // Thirteen drawing types after it (the info line, Schiff pitchforks, the Gann fan, the ABCD,
   // three Elliott waves, cyclic lines, the highlighter, the rotated rectangle and the arrow
   // marks) add 1.5 kB; the fixes of the view, the drags and the crosshair after them 0.5 kB.
-  { file: 'packages/core/dist/kumochart.iife.js', gzip: 115.5 },
-  { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 6.5 },
+  // Twelve trend and band indicators (DEMA to the zigzag), the zigzag plot with its labels and
+  // markers that write their value took it from 114.6 to 118.7 kB; their words 1.3 kB.
+  { file: 'packages/core/dist/kumochart.iife.js', gzip: 119 },
+  { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 7.5 },
   { file: 'packages/vue/dist/index.js', gzip: 3 },
   { file: 'packages/react/dist/index.js', gzip: 3 }
 ];
@@ -69,15 +71,18 @@ const APPS = [
     code: `export { createChart } from 'core'; export { indicators, allIndicators } from 'core/indicators';`,
     // The averages to pick from, the moving average of an oscillator and the new options of the
     // types took it from 60.4 to 61.4 kB; the indicators of a timeframe of their own add 1.5 kB,
-    // their words in the chart's language 0.3 kB.
-    gzip: 69
+    // their words in the chart's language 0.3 kB. Twelve trend and band indicators, the zigzag
+    // plot and markers that write their value took it from 68.4 to 72.6 kB.
+    gzip: 73
   },
   {
     // Only the three definitions go in, 50.5 kB; MACD picks its averages and RSI has its own
-    // moving average with bands since, 52.4 kB.
+    // moving average with bands since, 52.4 kB. The zigzag plot, which any definition can draw,
+    // its labels and their checks, and markers that write their value took it from 59.6 to
+    // 61.4 kB.
     name: 'the core with MA, MACD and RSI',
     code: `export { createChart } from 'core'; export { indicators, MA, MACD, RSI } from 'core/indicators';`,
-    gzip: 60
+    gzip: 61.7
   },
   {
     // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB;
@@ -129,17 +134,19 @@ const APPS = [
     // volume profiles module and the fixed range volume profile drawing type 3.1 kB, to 102.9 kB;
     // the review after the first release, as for the script for pages without a bundler, 111 kB;
     // the thirteen drawing types after it 1.5 kB; the fixes of the view, the drags and the
-    // crosshair after them 0.5 kB.
+    // crosshair after them 0.5 kB. Twelve trend and band indicators, the zigzag plot and markers
+    // that write their value, from 113.7 to 117.8 kB.
     name: 'everything',
     code: `export { createChart } from 'core'; export { allModules } from 'core/all';`,
-    gzip: 114.5
+    gzip: 118.3
   },
   {
     // MACD picks EMAs or SMAs, which brings the averages to pick from: 8.5 kB; the checks of a
-    // definition alike with a chart and without, 9.2 kB.
+    // definition alike with a chart and without, 9.2 kB; the checks of zigzag plots and of
+    // markers writing their value, 9.6 kB.
     name: 'MACD computed without a chart',
     code: `export { computeIndicator, MACD } from 'core/indicators';`,
-    gzip: 9.5
+    gzip: 9.8
   },
   {
     // One way to write a level, and the anchors a type has, typed: 7.9 kB.

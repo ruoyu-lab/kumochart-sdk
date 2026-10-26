@@ -40,7 +40,8 @@ export { ENVELOPE, MIKE } from './definitions/envelopes';
 export { DEMA, LSMA, MCGINLEY, RIBBON, TEMA } from './definitions/smoothers';
 export type { RibbonParams } from './definitions/smoothers';
 export { CKSTOP, VSTOP } from './definitions/stops';
-export { PIVOTHL } from './definitions/swings';
+export { PIVOTHL, ZIGZAG } from './definitions/swings';
+export type { ZigzagParams } from './definitions/swings';
 export { VORTEX } from './definitions/vortex';
 export { computeIndicator, createIndicatorCalculator } from './headless';
 export type { IndicatorCalculator, IndicatorCalculatorOptions } from './headless';
@@ -63,5 +64,6 @@ export type {
   IndicatorValue,
   ParamOption,
   ParamSpec,
-  ParamValues
+  ParamValues,
+  ZigzagLabels
 } from './types';

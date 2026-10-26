@@ -96,8 +96,49 @@ export type IndicatorPlot =
       /** Half the width of the shape in CSS pixels, as for chart markers. Default `5`. */
       readonly size?: number;
     }
+  /**
+   * A zigzag through pivots, such as the swings of the price: the values of output `high` are its
+   * highs and those of output `low` its lows, each drawn on its bar. Taken in the order of their
+   * bars, a high before a low on the same bar, each run of highs (or of lows) gives the line one
+   * pivot, the last of the run: a pivot replaces the one before it until one of the other side
+   * comes. So the values are those known on each bar, never changed later, and the line moves its
+   * last pivot as later values come.
+   */
+  | {
+      readonly kind: 'zigzag';
+      /** The key of the output of the highs. */
+      readonly high: string;
+      /** The key of the output of the lows. */
+      readonly low: string;
+      /** Draws on from the last pivot to this output's value on the latest bar. Default `false`. */
+      readonly extend?: boolean;
+      /** Writes by each pivot, over a high and under a low, what is picked. Default: nothing. */
+      readonly labels?: ZigzagLabels;
+      readonly style?: LineStyle;
+      /** Width in CSS pixels, from 0.5 to 10, default 1.25, unless the user sets one. */
+      readonly width?: number;
+    }
   /** Not drawn; only shown in the legend and available to alerts. */
   | { readonly kind: 'hidden' };
+
+/**
+ * What the labels of a `zigzag` write by each pivot, in the theme's up color over a high and in
+ * its down color under a low: on the first line its price and its change from the pivot before,
+ * on the second the volume of the bars after that pivot through this one (from the first bar
+ * for the first pivot). The end of an extended line has its label too.
+ */
+export interface ZigzagLabels {
+  /** The price, as the indicator formats its values. */
+  readonly price?: boolean;
+  /**
+   * The change from the pivot before, in parentheses, signed: as a price (`absolute`) or in
+   * percent of the pivot before (`percent`); `null` (default) for none. The first pivot has
+   * none before it: its change is 0.
+   */
+  readonly change?: 'absolute' | 'percent' | null;
+  /** The volume, in few characters such as `1.25M`. */
+  readonly volume?: boolean;
+}
 
 export interface IndicatorOutput {
   readonly key: string;

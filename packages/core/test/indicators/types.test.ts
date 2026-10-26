@@ -95,7 +95,8 @@ const DEFAULT_OUTPUTS: [type: string, keys: string[]][] = [
   ['CKSTOP', ['stopLong', 'stopShort']],
   ['VORTEX', ['viPlus', 'viMinus']],
   ['PIVOTHL', ['pivotHigh', 'pivotLow']],
-  ['MIKE', ['stor', 'midr', 'wekr', 'weks', 'mids', 'stos']]
+  ['MIKE', ['stor', 'midr', 'wekr', 'weks', 'mids', 'stos']],
+  ['ZIGZAG', ['zigZag', 'high', 'low']]
 ];
 
 const TYPES = DEFAULT_OUTPUTS.map(([type]) => type);

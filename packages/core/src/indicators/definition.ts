@@ -4,15 +4,25 @@ import { fail } from '../utils/errors';
 import {
   checkArray,
   checkBoolean,
+  checkFields,
   checkNumber,
   checkObject,
   checkOneOf,
   checkString
 } from '../utils/validate';
 import { LINE_STYLES } from '../options/types';
-import type { IndicatorDefinition, IndicatorFill, IndicatorOutput } from './types';
+import type { IndicatorDefinition, IndicatorFill, IndicatorOutput, IndicatorPlot } from './types';
 
-const PLOT_KINDS = ['line', 'segments', 'box', 'histogram', 'columns', 'marker', 'hidden'] as const;
+const PLOT_KINDS = [
+  'line',
+  'segments',
+  'box',
+  'histogram',
+  'columns',
+  'marker',
+  'zigzag',
+  'hidden'
+] as const;
 
 /** Checks that `name` of a definition is a function. */
 function checkFunction(definition: object, name: string): void {
@@ -98,6 +108,39 @@ export function checkFills(
   });
 }
 
+/** Checks a `zigzag` plot of `label`, among outputs of the `keys`. */
+function checkZigzag(
+  plot: Extract<IndicatorPlot, { kind: 'zigzag' }>,
+  label: string,
+  keys: ReadonlySet<string>
+): void {
+  for (const side of ['high', 'low'] as const) {
+    if (!keys.has(plot[side])) {
+      fail(`The zigzag of ${label} takes its ${side}s from "${plot[side]}", which is no output.`);
+    }
+  }
+
+  if (plot.extend !== undefined) {
+    checkBoolean(`${label}: extend`, plot.extend);
+  }
+
+  if (plot.labels !== undefined) {
+    checkFields(`${label}: labels`, plot.labels, ['price', 'change', 'volume']);
+
+    if (plot.labels.price !== undefined) {
+      checkBoolean(`${label}: labels.price`, plot.labels.price);
+    }
+
+    if (plot.labels.change !== undefined && plot.labels.change !== null) {
+      checkOneOf(`${label}: labels.change`, plot.labels.change, ['absolute', 'percent']);
+    }
+
+    if (plot.labels.volume !== undefined) {
+      checkBoolean(`${label}: labels.volume`, plot.labels.volume);
+    }
+  }
+}
+
 /** Checks the outputs a definition produces for one set of parameters. */
 export function checkOutputs(outputs: readonly IndicatorOutput[], type: string): void {
   checkArray(`outputs of "${type}"`, outputs);
@@ -137,12 +180,18 @@ export function checkOutputs(outputs: readonly IndicatorOutput[], type: string):
       checkOneOf(`${label}: themeColor`, themeColor, ['up', 'down']);
     }
 
-    if ((plot.kind === 'line' || plot.kind === 'segments') && plot.style !== undefined) {
+    const stroked = plot.kind === 'line' || plot.kind === 'segments' || plot.kind === 'zigzag';
+
+    if (stroked && plot.style !== undefined) {
       checkOneOf(`${label}: style`, plot.style, LINE_STYLES);
     }
 
-    if ((plot.kind === 'line' || plot.kind === 'segments') && plot.width !== undefined) {
+    if (stroked && plot.width !== undefined) {
       checkNumber(`${label}: width`, plot.width, { min: 0.5, max: 10 });
+    }
+
+    if (plot.kind === 'zigzag') {
+      checkZigzag(plot, label, keys);
     }
 
     if (plot.kind === 'histogram') {

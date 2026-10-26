@@ -66,12 +66,14 @@ export const zh: IndicatorWords = {
     CKSTOP: '钱德克罗止损',
     VORTEX: '涡旋指标',
     PIVOTHL: '高低枢轴点',
-    MIKE: '麦克支撑压力'
+    MIKE: '麦克支撑压力',
+    ZIGZAG: '之字转向'
   },
   labels: {
     '%D Smoothing': '%D 平滑',
     '%K Length': '%K 周期',
     '%K Smoothing': '%K 平滑',
+    Absolute: '绝对值',
     'ADX Smoothing': 'ADX 平滑',
     'Anchor Period': '重新计算',
     'Aroon Down': '阿隆下降线',
@@ -106,11 +108,15 @@ export const zh: IndicatorWords = {
     Decennially: '每十年',
     'DI Length': 'DI 周期',
     Displacement: '位移',
+    'Display cumulative volume': '显示累计成交量',
+    'Display reversal price': '显示拐点价格',
+    'Display reversal price change': '显示拐点涨跌',
     Divisor: '除数',
     'Down fractal': '向下分形',
     'Down Trend': '下降趋势',
     'ER length': '效率比周期',
     Exponential: '指数均线',
+    'Extend to last bar': '延伸到最新 K 线',
     Factor: '倍数',
     Fast: '快线周期',
     'Fast length': '快线周期',
@@ -168,11 +174,14 @@ export const zh: IndicatorWords = {
     'Pivot High': '枢轴高点',
     'Pivot High Left': '高点左侧 K 线数',
     'Pivot High Right': '高点右侧 K 线数',
+    'Pivot legs': '拐点深度',
     'Pivot Low': '枢轴低点',
     'Pivot Low Left': '低点左侧 K 线数',
     'Pivot Low Right': '低点右侧 K 线数',
     'Pivots timeframe': '枢轴周期',
     PL: '前低',
+    'Price change': '涨跌显示',
+    'Price deviation for reversals (%)': '拐点偏离 (%)',
     Quarter: '每季',
     Quarterly: '每季',
     Quinquennially: '每五年',
@@ -221,6 +230,7 @@ export const zh: IndicatorWords = {
     Weekly: '每周',
     Woodie: '伍迪',
     Year: '每年',
-    Yearly: '每年'
+    Yearly: '每年',
+    'Zig Zag': '之字线'
   }
 };

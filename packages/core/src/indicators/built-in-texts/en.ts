@@ -63,6 +63,7 @@ export const en: IndicatorWords = {
     CKSTOP: 'Chande Kroll stop',
     VORTEX: 'Vortex indicator',
     PIVOTHL: 'Pivot points high low',
-    MIKE: 'MIKE support and resistance'
+    MIKE: 'MIKE support and resistance',
+    ZIGZAG: 'Zig Zag'
   }
 };

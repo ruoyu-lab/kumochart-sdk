@@ -66,12 +66,14 @@ export const ko: IndicatorWords = {
     CKSTOP: '샹드 크롤 스톱',
     VORTEX: '보텍스 지표',
     PIVOTHL: '피벗 고점·저점',
-    MIKE: 'MIKE 지지·저항선'
+    MIKE: 'MIKE 지지·저항선',
+    ZIGZAG: '지그재그'
   },
   labels: {
     '%D Smoothing': '%D 평활',
     '%K Length': '%K 기간',
     '%K Smoothing': '%K 평활',
+    Absolute: '절대값',
     'ADX Smoothing': 'ADX 평활',
     'Anchor Period': '초기화 주기',
     'Aroon Down': '아룬 다운',
@@ -106,11 +108,15 @@ export const ko: IndicatorWords = {
     Decennially: '10년마다',
     'DI Length': 'DI 기간',
     Displacement: '후행스팬',
+    'Display cumulative volume': '누적 거래량 표시',
+    'Display reversal price': '반전 가격 표시',
+    'Display reversal price change': '반전 가격 변화 표시',
     Divisor: '제수',
     'Down fractal': '하락 프랙탈',
     'Down Trend': '하락 추세',
     'ER length': '효율 비율 기간',
     Exponential: '지수 이동평균',
+    'Extend to last bar': '마지막 봉까지 연장',
     Factor: '배수',
     Fast: '단기',
     'Fast length': '단기 기간',
@@ -168,11 +174,14 @@ export const ko: IndicatorWords = {
     'Pivot High': '피벗 고점',
     'Pivot High Left': '고점 왼쪽 봉 수',
     'Pivot High Right': '고점 오른쪽 봉 수',
+    'Pivot legs': '피벗 깊이',
     'Pivot Low': '피벗 저점',
     'Pivot Low Left': '저점 왼쪽 봉 수',
     'Pivot Low Right': '저점 오른쪽 봉 수',
     'Pivots timeframe': '피벗 기간',
     PL: '이전 저가',
+    'Price change': '가격 변화 표시',
+    'Price deviation for reversals (%)': '반전 가격 편차 (%)',
     Quarter: '분기마다',
     Quarterly: '분기별',
     Quinquennially: '5년마다',
@@ -221,6 +230,7 @@ export const ko: IndicatorWords = {
     Weekly: '주별',
     Woodie: '우디',
     Year: '매년',
-    Yearly: '연별'
+    Yearly: '연별',
+    'Zig Zag': '지그재그'
   }
 };
