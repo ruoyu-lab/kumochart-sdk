@@ -24,9 +24,23 @@ export {
   STOCHRSI,
   WR
 } from './definitions/momentum';
+export {
+  AO,
+  BOP,
+  CMO,
+  COPPOCK,
+  CRSI,
+  KST,
+  PPO,
+  RVGI,
+  SMI,
+  TSI,
+  UO
+} from './definitions/oscillators';
 export { ADR, PIVOTS, PREVHLC } from './definitions/periods';
 export { DEFAULT_SESSIONS, SESSIONS, sessionsIndicator } from './definitions/sessions';
 export type { SessionRange } from './definitions/sessions';
+export { ASI, CR } from './definitions/strength';
 export { AROON, CHANDELIER, DMA, DMI, ICHIMOKU, SAR, SUPERTREND, TRIX } from './definitions/trend';
 export { ATR, CHOP, STD } from './definitions/volatility';
 export { CMF, EMV, MFI, OBV, VOL, VR, VWAP } from './definitions/volume';

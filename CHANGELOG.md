@@ -8,6 +8,17 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 - A histogram colored by its change (`colorBy: 'change'`) draws a column that stays level with the one before in the down color, as one that fell; it took the up color.
 
+**Added**
+
+- Thirteen oscillators, each in `allIndicators` and on its own for applications that pick a few:
+  - `AO`, the awesome oscillator, in columns that take the up color where it rose and the down color where it fell or stayed.
+  - `PPO`, the percentage price oscillator, of simple or exponential averages.
+  - `CMO`, the Chande momentum oscillator; `UO`, the ultimate oscillator; `BOP`, the balance of power.
+  - `KST` (know sure thing) and `TSI` (true strength index), each with its signal line; `COPPOCK`, the Coppock curve.
+  - `SMI`, the stochastic momentum index, with its EMA; `RVGI`, the relative vigor index, with its signal line.
+  - `CRSI`, Connors RSI: the mean of RSI, the RSI of the streak of rises and falls, and the percent rank of the change.
+  - `ASI` (振动升降指标) with its average `ASIT`, and `CR` (能量指标) with its four averages, each that of a few bars before, as in Chinese charting software.
+
 ## 1.0.0-beta.4
 
 **Breaking**

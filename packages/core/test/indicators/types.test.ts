@@ -84,7 +84,20 @@ const DEFAULT_OUTPUTS: [type: string, keys: string[]][] = [
       'newYorkLow',
       'newYorkDay'
     ]
-  ]
+  ],
+  ['AO', ['ao']],
+  ['PPO', ['ppo']],
+  ['CMO', ['chandeMo']],
+  ['UO', ['uo']],
+  ['KST', ['kst', 'signalLine']],
+  ['COPPOCK', ['coppockCurve']],
+  ['TSI', ['trueStrengthIndex', 'signalLine']],
+  ['SMI', ['smi', 'smiBasedEma']],
+  ['RVGI', ['rvgi', 'signalLine']],
+  ['BOP', ['bop']],
+  ['CRSI', ['crsi']],
+  ['ASI', ['asi', 'asit']],
+  ['CR', ['cr', 'ma10', 'ma20', 'ma40', 'ma62']]
 ];
 
 const TYPES = DEFAULT_OUTPUTS.map(([type]) => type);
