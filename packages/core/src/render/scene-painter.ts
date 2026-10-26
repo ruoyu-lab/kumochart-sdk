@@ -84,7 +84,7 @@ function paintJob(
       paintMarkers(ctx, job);
       return;
     case 'labels':
-      paintLabels(ctx, job);
+      paintLabels(ctx, job, pane.plot.width);
       return;
   }
 }
@@ -92,16 +92,26 @@ function paintJob(
 /** Space between a label and its point. */
 const LABEL_GAP = 4;
 
-/** Each text centered over its point, its last line nearest it, or under it, its first nearest. */
+/**
+ * Each text centered over its point, its last line nearest it, or under it, its first nearest;
+ * those of points in the plot are moved in from its edges to be read whole.
+ */
 function paintLabels(
   ctx: CanvasRenderingContext2D,
-  job: Extract<PlotJob, { kind: 'labels' }>
+  job: Extract<PlotJob, { kind: 'labels' }>,
+  width: number
 ): void {
   ctx.font = job.font;
   ctx.textAlign = 'center';
 
   for (const { x, y, text, above, color } of job.labels) {
+    if (x < 0 || x > width) {
+      continue;
+    }
+
     const lines = text.split('\n');
+    const half = Math.max(...lines.map((line) => ctx.measureText(line).width)) / 2;
+    const center = Math.min(Math.max(x, half), width - half);
     ctx.fillStyle = color;
     ctx.textBaseline = above ? 'bottom' : 'top';
 
@@ -109,7 +119,7 @@ function paintLabels(
       const offset = above
         ? -LABEL_GAP - (lines.length - 1 - index) * job.lineHeight
         : LABEL_GAP + index * job.lineHeight;
-      ctx.fillText(line, x, y + offset);
+      ctx.fillText(line, center, y + offset);
     });
   }
 }

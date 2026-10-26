@@ -225,7 +225,7 @@ export const ZIGZAG: IndicatorDefinition<ZigzagParams> = {
   pane: 'main',
   precision: 'price',
   params: {
-    deviation: { default: 5, min: 0.00001, max: 100, label: 'Price deviation for reversals (%)' },
+    deviation: { default: 5, min: 0.01, max: 100, label: 'Price deviation for reversals (%)' },
     depth: { default: 10, min: 2, max: 1000, integer: true, label: 'Pivot legs' },
     extend: switchParam(true, 'Extend to last bar', false),
     showPrice: switchParam(true, 'Display reversal price', false),

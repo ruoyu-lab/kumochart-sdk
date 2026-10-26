@@ -334,6 +334,15 @@ describe('zigzags', () => {
       [theme.down, 'top'],
       [theme.down, 'top']
     ]);
+
+    // At the right edge of the plot, the label of the latest bar moves in to be read whole; one
+    // of a pivot out of view is not written.
+    chart.timeScale.setVisibleLogicalRange({ from: 6, to: 29.5 });
+    const width = chart.layout().panes[0]?.plot.width ?? 0;
+    const edge = written(chart).filter((each) => each.text.startsWith('101.00'));
+    // The test canvas measures six pixels a character.
+    expect(edge.map((each) => each.x)).toEqual([width - (6 * '101.00 (+6.00)'.length) / 2]);
+    expect(written(chart).some((each) => each.text.startsWith('112.00'))).toBe(false);
   });
 
   it('label in percent, or only what is picked', () => {
