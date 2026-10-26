@@ -2,6 +2,12 @@
 
 The packages of KumoChart share one version. Each release lists what changed for those who use them.
 
+## Unreleased
+
+**Breaking**
+
+- A histogram colored by its change (`colorBy: 'change'`) draws a column that stays level with the one before in the down color, as one that fell; it took the up color.
+
 ## 1.0.0-beta.4
 
 **Breaking**

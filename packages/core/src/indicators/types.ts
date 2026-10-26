@@ -60,8 +60,9 @@ export type IndicatorPlot =
       readonly group?: string;
     }
   /**
-   * Columns from zero in the theme's up and down colors by the sign of the value, its change, or
-   * the bar direction; all in the color of the output when it has one, fixed or set.
+   * Columns from zero in the theme's up and down colors by the sign of the value (down below 0),
+   * its change (down where it fell or stayed, up where it rose and on the first value), or the bar
+   * direction; all in the color of the output when it has one, fixed or set.
    */
   | { readonly kind: 'histogram'; readonly colorBy: 'sign' | 'change' | 'bar' }
   /**

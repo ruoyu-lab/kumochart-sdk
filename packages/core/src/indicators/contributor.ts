@@ -398,7 +398,8 @@ function columnRises(
     case 'sign':
       return read(index) >= 0;
     case 'change':
-      return !(read(index) < before(index));
+      // Up where it rose, and on the first value; down where it fell or stayed.
+      return !(read(index) <= before(index));
   }
 }
 
