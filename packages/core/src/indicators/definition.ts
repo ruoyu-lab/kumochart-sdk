@@ -19,6 +19,7 @@ const PLOT_KINDS = [
   'box',
   'histogram',
   'columns',
+  'candles',
   'marker',
   'zigzag',
   'hidden'
@@ -204,6 +205,16 @@ export function checkOutputs(outputs: readonly IndicatorOutput[], type: string):
 
     if (plot.kind === 'box' && plot.group !== undefined && !keys.has(plot.group)) {
       fail(`The boxes of ${label} are told apart by "${plot.group}", which is no output.`);
+    }
+
+    if (plot.kind === 'candles') {
+      for (const part of ['open', 'high', 'low'] as const) {
+        if (!keys.has(plot[part])) {
+          fail(
+            `The candles of ${label} take their ${part} from "${plot[part]}", which is no output.`
+          );
+        }
+      }
     }
 
     if (plot.kind === 'columns') {

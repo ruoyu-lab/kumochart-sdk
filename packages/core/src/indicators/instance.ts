@@ -1,5 +1,5 @@
 import type { BarStore } from '../data/bar-store';
-import type { Bar, PriceSource } from '../data/types';
+import type { Bar, BarChange, PriceSource } from '../data/types';
 import { sameInterval } from '../feed/interval';
 import { fail } from '../utils/errors';
 import { checkNumber, checkObject } from '../utils/validate';
@@ -185,8 +185,9 @@ function sameContext(left: IndicatorContext, right: IndicatorContext | null): bo
 /**
  * Values of one indicator over the bars of its basis, such as the displayed bars, or over another
  * indicator's output, on that one's bars. Recomputes from scratch when the bars (or the upstream
- * indicator, or the basis, or the context) are reset or change before the last bar computed, and
- * otherwise resumes from a checkpoint taken before the last bar, so a tick costs one step.
+ * indicator, or the basis, or the context) are reset or change before the last bar computed, or
+ * when it is refreshed from an earlier bar, and otherwise resumes from a checkpoint taken before
+ * the last bar, so a tick costs one step.
  */
 export class IndicatorSeries {
   private columns: Float64Array[];
@@ -199,7 +200,12 @@ export class IndicatorSeries {
   private rebuilds = 0;
   /** Counts the times the values changed, so what is worked out of them knows to again. */
   private changes = 0;
-  private upstreamSeen: { series: IndicatorSeries; rebuilds: number } | null = null;
+  /** Counts the times the last bar was computed again, so downstream indicators follow. */
+  private resumes = 0;
+  private upstreamSeen: { series: IndicatorSeries; rebuilds: number; resumes: number } | null =
+    null;
+  /** The time from whose bar on the values are to be computed again, as `refresh()` asked. */
+  private refreshFrom: number | null = null;
   private contextSeen: IndicatorContext | null = null;
   /** The bars the values were last computed on. */
   private current: IndicatorBasis;
@@ -232,12 +238,19 @@ export class IndicatorSeries {
         (upstream.series !== this.upstreamSeen?.series ||
           upstream.series.rebuilds !== this.upstreamSeen.rebuilds));
     const store = basis.bars;
-    const change = rebuilt ? { kind: 'reset' as const } : store.changesSince(this.revision);
+    const change = rebuilt
+      ? { kind: 'reset' as const }
+      : this.refreshed(store, upstream, store.changesSince(this.revision));
     this.current = basis;
     this.contextSeen = context;
+    this.refreshFrom = null;
 
     if (upstream) {
-      this.upstreamSeen = { series: upstream.series, rebuilds: upstream.series.rebuilds };
+      this.upstreamSeen = {
+        series: upstream.series,
+        rebuilds: upstream.series.rebuilds,
+        resumes: upstream.series.resumes
+      };
     }
 
     if (!change) {
@@ -255,6 +268,7 @@ export class IndicatorSeries {
       this.run(store, 0, count, upstream);
     } else {
       this.stream = this.checkpoint.clone();
+      this.resumes += 1;
       this.run(store, this.computedCount - 1, count, upstream);
     }
 
@@ -284,6 +298,43 @@ export class IndicatorSeries {
    */
   indexOf(column: number, index: number): number {
     return this.current.indexOf(index + this.shift(column));
+  }
+
+  /**
+   * Computes the values again from the bar holding time `from` on, at the next sync: only the
+   * last bar from it, the whole series from an earlier one. Returns whether it reaches before
+   * the last bar computed.
+   */
+  refresh(from: number): boolean {
+    this.refreshFrom = Math.min(this.refreshFrom ?? Number.POSITIVE_INFINITY, from);
+    const { bars } = this.current;
+    return bars.lowerBound(from + 1) - 1 < this.computedCount - 1;
+  }
+
+  /**
+   * The change of the bars, with the bars a refresh asked for and the last bar where the upstream
+   * indicator computed its own again: from the bar holding the time asked for.
+   */
+  private refreshed(
+    store: BarStore,
+    upstream: { readonly series: IndicatorSeries } | null,
+    change: BarChange | null
+  ): BarChange | null {
+    const froms: number[] = [];
+
+    if (this.refreshFrom !== null) {
+      froms.push(Math.max(0, store.lowerBound(this.refreshFrom + 1) - 1));
+    }
+
+    if (upstream && upstream.series.resumes !== this.upstreamSeen?.resumes) {
+      froms.push(Math.max(0, this.computedCount - 1));
+    }
+
+    if (froms.length === 0 || change?.kind === 'reset') {
+      return change;
+    }
+
+    return { kind: 'tail', from: Math.min(change?.from ?? Number.POSITIVE_INFINITY, ...froms) };
   }
 
   /** Value of output `column` computed on bar `index` of its bars; `NaN` when absent. */

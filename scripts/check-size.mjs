@@ -32,8 +32,9 @@ const BUDGETS = [
   // Thirty-seven indicators (twelve of trend, averages and bands from DEMA to the zigzag,
   // thirteen oscillators from AO to CR, twelve of volume and volatility from A/D to %B), the
   // zigzag plot with its labels and markers that write their value took it from 114.6 to 122.9 kB;
-  // their words in four languages took the script of the words from 6.1 to 9.4 kB.
-  { file: 'packages/core/dist/kumochart.iife.js', gzip: 123.5 },
+  // their words in four languages took the script of the words from 6.1 to 9.4 kB. Outputs drawn as
+  // candles and `refresh()` for calculators reading data besides the bars, to 123.5 kB.
+  { file: 'packages/core/dist/kumochart.iife.js', gzip: 124 },
   { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 9.8 },
   { file: 'packages/vue/dist/index.js', gzip: 3 },
   { file: 'packages/react/dist/index.js', gzip: 3 }
@@ -74,17 +75,18 @@ const APPS = [
     // The averages to pick from, the moving average of an oscillator and the new options of the
     // types took it from 60.4 to 61.4 kB; the indicators of a timeframe of their own add 1.5 kB,
     // their words in the chart's language 0.3 kB. Thirty-seven indicators, the zigzag plot and
-    // markers that write their value took it from 68.4 to 76.7 kB.
-    gzip: 77.2
+    // markers that write their value took it from 68.4 to 76.7 kB; outputs drawn as candles and
+    // `refresh()` for calculators reading data besides the bars to 77.3 kB.
+    gzip: 77.8
   },
   {
     // Only the three definitions go in, 50.5 kB; MACD picks its averages and RSI has its own
     // moving average with bands since, 52.4 kB. The zigzag plot, which any definition can draw,
     // its labels and their checks, and markers that write their value took it from 59.6 to
-    // 61.5 kB.
+    // 61.5 kB; outputs drawn as candles and `refresh()` to 62.1 kB.
     name: 'the core with MA, MACD and RSI',
     code: `export { createChart } from 'core'; export { indicators, MA, MACD, RSI } from 'core/indicators';`,
-    gzip: 62
+    gzip: 62.6
   },
   {
     // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB;
@@ -139,10 +141,11 @@ const APPS = [
     // the review after the first release, as for the script for pages without a bundler, 111 kB;
     // the thirteen drawing types after it 1.5 kB; the fixes of the view, the drags and the
     // crosshair after them 0.5 kB. Thirty-seven indicators, the zigzag plot and markers that
-    // write their value, from 113.7 to 122.0 kB.
+    // write their value, from 113.7 to 122.0 kB; outputs drawn as candles and `refresh()` to
+    // 122.6 kB.
     name: 'everything',
     code: `export { createChart } from 'core'; export { allModules } from 'core/all';`,
-    gzip: 122.5
+    gzip: 123.1
   },
   {
     // MACD picks EMAs or SMAs, which brings the averages to pick from: 8.5 kB; the checks of a
