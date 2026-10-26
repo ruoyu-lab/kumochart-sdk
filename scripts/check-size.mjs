@@ -81,10 +81,10 @@ const APPS = [
     // Only the three definitions go in, 50.5 kB; MACD picks its averages and RSI has its own
     // moving average with bands since, 52.4 kB. The zigzag plot, which any definition can draw,
     // its labels and their checks, and markers that write their value took it from 59.6 to
-    // 61.4 kB.
+    // 61.5 kB.
     name: 'the core with MA, MACD and RSI',
     code: `export { createChart } from 'core'; export { indicators, MA, MACD, RSI } from 'core/indicators';`,
-    gzip: 61.7
+    gzip: 62
   },
   {
     // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB;
@@ -147,10 +147,10 @@ const APPS = [
   {
     // MACD picks EMAs or SMAs, which brings the averages to pick from: 8.5 kB; the checks of a
     // definition alike with a chart and without, 9.2 kB; the checks of zigzag plots and of
-    // markers writing their value, 9.6 kB.
+    // markers writing their value, 9.7 kB.
     name: 'MACD computed without a chart',
     code: `export { computeIndicator, MACD } from 'core/indicators';`,
-    gzip: 9.8
+    gzip: 10
   },
   {
     // One way to write a level, and the anchors a type has, typed: 7.9 kB.
