@@ -53,7 +53,9 @@ describe.each(DATA)('ASI and CR on %s', (_name, bars) => {
       [C, LC, O, ref(O, 1)],
       (close, lc, open, open1) => close - lc + (close - open) / 2 + lc - open1
     );
-    const SI = zip([X, R, AA, BB], (x, r, aa, bb) => divide(16 * x, r) * Math.max(aa, bb));
+    const SI = zip([X, R, AA, BB], (x, r, aa, bb) =>
+      r === 0 ? 0 : divide(16 * x, r) * Math.max(aa, bb)
+    );
     const asi = sum(SI, 26);
     const values = compute('ASI', bars);
     expectSame(values.asi, asi);
@@ -107,13 +109,16 @@ describe('ASI and CR by hand', () => {
     expectClose(compute('ASI', bars, { period: 2, signal: 1 }).asi ?? [], [N, N, 24, -1300 / 33]);
   });
 
-  it('has no swing where the bar and the one before never moved', () => {
+  it('swings 0 where the bar and the one before never moved', () => {
     const flat = rows([
       [10, 10, 10, 10],
       [10, 10, 10, 10],
-      [10, 10, 10, 10]
+      [10, 10, 10, 10],
+      [10, 12, 9, 11]
     ]);
-    expectClose(compute('ASI', flat, { period: 1, signal: 1 }).asi ?? [], [N, N, N]);
+    // Bar 3: AA 2, BB 1, CC 2, DD 0 → R = CC + DD / 4 = 2; X = 1 + 0.5 = 1.5; SI = 12 * 2 = 24.
+    expectClose(compute('ASI', flat, { period: 1, signal: 1 }).asi ?? [], [N, 0, 0, 24]);
+    expectClose(compute('ASI', flat, { period: 3, signal: 1 }).asi ?? [], [N, N, N, 24]);
   });
 
   it('compares each high and low with the middle of the bar before for CR', () => {

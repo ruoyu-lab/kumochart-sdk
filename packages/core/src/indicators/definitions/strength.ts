@@ -6,7 +6,7 @@ import { lineOutput, lineOutputs, periodParam, periodsParam, ratio } from './sha
 
 /**
  * The swing index of each bar against the one before, `NaN` on the first:
- * `SI = 16 * X / R * MAX(AA, BB)`, undefined where `R` is 0.
+ * `SI = 16 * X / R * MAX(AA, BB)`, 0 where `R` is 0, as where neither bar moved.
  */
 class SwingStep {
   constructor(
@@ -30,7 +30,8 @@ class SwingStep {
           ? bb + aa / 2 + dd / 4
           : cc + dd / 4;
     const x = bar.close - close + (bar.close - bar.open) / 2 + close - open;
-    return ratio(16 * x, r) * Math.max(aa, bb);
+    // `R` is 0 where neither bar moved, and `X` with it: no swing, rather than 0 / 0.
+    return r === 0 ? 0 : ((16 * x) / r) * Math.max(aa, bb);
   }
 
   clone(): SwingStep {
@@ -65,8 +66,9 @@ class AsiStream implements IndicatorStream {
  * REF(O, 1)|`; `R = AA + BB / 2 + DD / 4` where AA is the largest of AA, BB and CC, `BB + AA / 2 +
  * DD / 4` where BB is, else `CC + DD / 4`; `X = C - LC + (C - O) / 2 + LC - REF(O, 1)` and `SI =
  * 16 * X / R * MAX(AA, BB)`. `ASI = SUM(SI, M1)` and `ASIT = MA(ASI, M2)`. The first bar has no
- * swing, so ASI starts on bar `M1` and ASIT `M2 - 1` bars later; a bar where `R` is 0 has none,
- * and the sums over it neither.
+ * swing, so ASI starts on bar `M1` and ASIT `M2 - 1` bars later. A bar where `R` is 0, as where
+ * neither it nor the one before moved, swings 0: flat bars, common on short timeframes without
+ * trades, would otherwise leave ASI without values for `M1` bars.
  */
 export const ASI: IndicatorDefinition<{ period: number; signal: number }> = {
   type: 'ASI',
