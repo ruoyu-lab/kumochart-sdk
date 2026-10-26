@@ -1,6 +1,7 @@
 import type { ChartCore } from '../chart/chart-core';
 import { formatValue } from '../format/value-format';
 import { fail } from '../utils/errors';
+import { checkNumber } from '../utils/validate';
 import { indicatorColors, indicatorFormat, outputFormat, valueColor } from './contributor';
 import type { ChartIndicators } from './chart-indicators';
 import type { IndicatorLanguage } from './texts';
@@ -43,6 +44,14 @@ export interface IndicatorsApi {
    * one still forming on the latest bar.
    */
   valuesAt(id: string, index?: number): IndicatorValue[];
+  /**
+   * Computes an indicator again from the bar holding time `from` on, with the indicators reading
+   * it: for a calculator that reads data besides the bars, such as trades or funding rates it
+   * fetches, which is to be called whenever that data changes, as the chart cannot tell. From
+   * the latest bar, only that bar is computed again, as for a tick; from an earlier one, or
+   * without `from`, the whole indicator is. Throws for an unknown id.
+   */
+  refresh(id: string, from?: number): void;
   /** Adds an indicator type to this chart, named by its `type`. */
   register<P extends ParamValues>(definition: IndicatorDefinition<P>): void;
   /** Removes an indicator type. Fails while indicators of it are on the chart. */
@@ -116,6 +125,20 @@ export function createIndicatorsApi(
           value: Number.isNaN(value) ? null : value,
           text: formatValue(core.formatter, value, outputFormat(output, format))
         };
+      });
+    },
+    refresh: (id, from) => {
+      core.run(() => {
+        const entry = store.require(id);
+        const time =
+          from === undefined ? Number.NEGATIVE_INFINITY : checkNumber('refresh() from', from);
+
+        // Values computed again before the latest bar are no live move, which alerts would hear.
+        if (entry.series.refresh(time)) {
+          core.values.reset();
+        }
+
+        core.invalidate();
       });
     },
     register: (definition) => {
