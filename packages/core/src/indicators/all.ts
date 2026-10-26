@@ -22,6 +22,11 @@ import { AROON, CHANDELIER, DMA, DMI, ICHIMOKU, SAR, SUPERTREND, TRIX } from './
 import { ATR, CHOP, STD } from './definitions/volatility';
 import { CMF, EMV, MFI, OBV, VOL, VR, VWAP } from './definitions/volume';
 import { ALLIGATOR, FRACTALS } from './definitions/williams';
+import { ENVELOPE, MIKE } from './definitions/envelopes';
+import { DEMA, LSMA, MCGINLEY, RIBBON, TEMA } from './definitions/smoothers';
+import { CKSTOP, VSTOP } from './definitions/stops';
+import { PIVOTHL } from './definitions/swings';
+import { VORTEX } from './definitions/vortex';
 import type { IndicatorDefinition } from './types';
 
 /**
@@ -78,5 +83,16 @@ export const allIndicators: readonly IndicatorDefinition[] = [
   PIVOTS,
   PREVHLC,
   ADR,
-  SESSIONS
+  SESSIONS,
+  DEMA,
+  TEMA,
+  LSMA,
+  MCGINLEY,
+  RIBBON,
+  ENVELOPE,
+  VSTOP,
+  CKSTOP,
+  VORTEX,
+  PIVOTHL,
+  MIKE
 ];

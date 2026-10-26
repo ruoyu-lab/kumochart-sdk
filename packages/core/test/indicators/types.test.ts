@@ -84,7 +84,18 @@ const DEFAULT_OUTPUTS: [type: string, keys: string[]][] = [
       'newYorkLow',
       'newYorkDay'
     ]
-  ]
+  ],
+  ['DEMA', ['dema']],
+  ['TEMA', ['tema']],
+  ['LSMA', ['lsma']],
+  ['MCGINLEY', ['mcginley']],
+  ['RIBBON', ['ma1', 'ma2', 'ma3', 'ma4']],
+  ['ENVELOPE', ['basis', 'upper', 'lower']],
+  ['VSTOP', ['upTrend', 'downTrend']],
+  ['CKSTOP', ['stopLong', 'stopShort']],
+  ['VORTEX', ['viPlus', 'viMinus']],
+  ['PIVOTHL', ['pivotHigh', 'pivotLow']],
+  ['MIKE', ['stor', 'midr', 'wekr', 'weks', 'mids', 'stos']]
 ];
 
 const TYPES = DEFAULT_OUTPUTS.map(([type]) => type);

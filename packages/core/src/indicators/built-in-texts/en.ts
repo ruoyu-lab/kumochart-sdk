@@ -52,6 +52,17 @@ export const en: IndicatorWords = {
     PIVOTS: 'Pivot points',
     PREVHLC: 'Previous high, low and close',
     ADR: 'Average daily range',
-    SESSIONS: 'Trading sessions'
+    SESSIONS: 'Trading sessions',
+    DEMA: 'Double EMA',
+    TEMA: 'Triple EMA',
+    LSMA: 'Least squares moving average',
+    MCGINLEY: 'McGinley Dynamic',
+    RIBBON: 'Moving average ribbon',
+    ENVELOPE: 'Envelope',
+    VSTOP: 'Volatility stop',
+    CKSTOP: 'Chande Kroll stop',
+    VORTEX: 'Vortex indicator',
+    PIVOTHL: 'Pivot points high low',
+    MIKE: 'MIKE support and resistance'
   }
 };
