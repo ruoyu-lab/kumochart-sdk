@@ -32,11 +32,10 @@ function infoLineOf(geometry: DrawingGeometry<Anchors<2>>): InfoLine {
   const lineHeight = style.fontSize + LINE_GAP;
   const width = Math.max(...lines.map((line) => geometry.measureText(line))) + PADDING * 2;
   const height = lines.length * lineHeight - LINE_GAP + PADDING * 2;
-  // By the middle of the line, above it (right of an upright one), clear of it, inside the plot.
+  // By the middle of the line, below it (left of an upright one), clear of it, inside the plot.
   const length = Math.hypot(end.x - start.x, end.y - start.y);
-  const [nx, ny] =
-    length === 0 ? [0, -1] : [(start.y - end.y) / length, (end.x - start.x) / length];
-  const [ux, uy] = ny > 0 || (ny === 0 && nx < 0) ? [-nx, -ny] : [nx, ny];
+  const [nx, ny] = length === 0 ? [0, 1] : [(start.y - end.y) / length, (end.x - start.x) / length];
+  const [ux, uy] = ny < 0 || (ny === 0 && nx > 0) ? [-nx, -ny] : [nx, ny];
   const reach = (Math.abs(ux) * width + Math.abs(uy) * height) / 2 + GAP;
   const x = (start.x + end.x) / 2 + ux * reach - width / 2;
   const y = (start.y + end.y) / 2 + uy * reach - height / 2;
@@ -61,7 +60,7 @@ function infoLineOf(geometry: DrawingGeometry<Anchors<2>>): InfoLine {
 }
 
 /**
- * An info line: a trend line with its figures in a box by its middle, the change of value
+ * An info line: a trend line with its figures in a box under its middle, the change of value
  * and its percentage, the bars and the time between the anchors, and its angle on screen.
  */
 export const infoLine: DrawingTypeDefinition<Anchors<2>> = {

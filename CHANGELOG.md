@@ -18,7 +18,7 @@ The packages of KumoChart share one version. Each release lists what changed for
 **Added**
 
 - Thirteen drawing types, each in `allDrawings` and on its own for applications that pick a few:
-  - `info-line`, a trend line showing the change of value and its percentage, the bars, the time and its angle between its anchors in a box by its middle.
+  - `info-line`, a trend line showing the change of value and its percentage, the bars, the time and its angle between its anchors in a box under its middle.
   - `schiff-pitchfork` and `modified-schiff-pitchfork`, pitchforks whose median line starts halfway up the handle, in value alone or in time and value, for trends too steep for Andrews' fork.
   - `gann-fan`, rays from the first anchor at Gann's angles, 8×1 to 1×8, the 1×1 through the second anchor, alerts watching each by its angle, as `2×1`.
   - `abcd-pattern`, the harmonic ABCD with the retracements of BC and CD.

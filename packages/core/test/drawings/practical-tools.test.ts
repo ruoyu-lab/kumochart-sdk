@@ -131,7 +131,7 @@ describe('info line', () => {
     expect(texts.some((text) => /^-?\d+\.\d\d°$/.test(text))).toBe(true);
   });
 
-  it('shows its figures by the middle of the line, above it, selected there too', () => {
+  it('shows its figures by the middle of the line, below it, selected there too', () => {
     const chart = chartWithTools();
     const id = add(chart, 'info-line', [point(150, 180), point(160, 190)]);
     const canvas = chart.element.querySelector<HTMLCanvasElement>('canvas[data-layer="objects"]');
@@ -145,9 +145,9 @@ describe('info line', () => {
     const [mx, my] = at(chart, 155, 185);
     const [ex, ey] = at(chart, 160, 190);
 
-    // Nearer the middle than the second anchor, and above the line there.
+    // Nearer the middle than the second anchor, and below the line there.
     expect(Math.hypot(x - mx, y - my)).toBeLessThan(Math.hypot(x - ex, y - ey));
-    expect(y).toBeLessThan(my);
+    expect(y).toBeGreaterThan(my);
     expect(selects(chart, id, 155, 185)).toBe(true);
     expect(selectsAt(chart, id, x + 4, y + 4)).toBe(true);
     expect(chart.drawings.levels(id)).toEqual(['line']);
