@@ -146,6 +146,25 @@ describe('bar transforms', () => {
     expect(streamed(bars, transform)).toEqual(chart.data.toArray());
   });
 
+  it('builds kagi lines on a timeframe from history taken page after page as from all of it', () => {
+    const bars = swingBars(600);
+    const paged = createTestChart({ calendar: { timeZone: 'UTC' } });
+    paged.data.set(bars.slice(500), { interval: '1m' });
+    paged.data.setTimeframe('3m');
+    paged.transforms.set({ type: 'kagi' });
+
+    for (let end = 500; end > 0; end -= 50) {
+      paged.data.prepend(bars.slice(end - 50, end));
+    }
+
+    const atOnce = chartWith(bars);
+    atOnce.data.setTimeframe('3m');
+    atOnce.transforms.set({ type: 'kagi' });
+    expect(paged.data.length).toBeGreaterThan(10);
+    expect(paged.data.toArray()).toEqual(atOnce.data.toArray());
+    expect(paged.transforms.get()?.resolved).toEqual(atOnce.transforms.get()?.resolved);
+  });
+
   it.each([
     { type: 'renko', params: {}, size: 'box' },
     { type: 'renko', params: { source: 'ohlc' }, size: 'box' },

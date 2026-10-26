@@ -109,6 +109,23 @@ describe('BarStore', () => {
     expect(store.changesSince(revision)).toEqual({ kind: 'reset' });
   });
 
+  it('takes page after page of older bars, with newer ones in between', () => {
+    const all = createBars(520);
+    const { store, update, prepend } = feedOf(all.slice(500, 510));
+    let next = 510;
+
+    for (let page = 0; page < 50; page += 1) {
+      expect(prepend(all.slice(490 - page * 10, 500 - page * 10))).toBe(10);
+
+      if (page % 5 === 0) {
+        update([all[next] as BarInput]);
+        next += 1;
+      }
+    }
+
+    expect(store.toArray()).toEqual(all.map((bar) => parseBar(bar)));
+  });
+
   it('grows capacity across many appends', () => {
     const bars = createBars(1000);
     const { store, update } = feedOf([]);

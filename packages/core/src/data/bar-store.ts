@@ -1,6 +1,7 @@
 import { checkObject } from '../utils/validate';
 import { describeValue, fail } from '../utils/errors';
 import { ChangeLog } from './change-log';
+import { shiftStart, withRoom, type Column } from './columns';
 import { checkAscending } from './points';
 import { logicalIndex, logicalTime, typicalInterval } from './positions';
 import { toTime } from './time';
@@ -86,12 +87,12 @@ export function priceOf(bar: Bar, source: PriceSource): number {
  * derived data incrementally.
  */
 export class BarStore implements BarsView {
-  private times = new Float64Array(0);
-  private opens = new Float64Array(0);
-  private highs = new Float64Array(0);
-  private lows = new Float64Array(0);
-  private closes = new Float64Array(0);
-  private volumes = new Float64Array(0);
+  private times: Column = new Float64Array(0);
+  private opens: Column = new Float64Array(0);
+  private highs: Column = new Float64Array(0);
+  private lows: Column = new Float64Array(0);
+  private closes: Column = new Float64Array(0);
+  private volumes: Column = new Float64Array(0);
   private count = 0;
   private readonly changes = new ChangeLog();
   private cachedInterval: number | null = null;
@@ -277,27 +278,31 @@ export class BarStore implements BarsView {
 
   /** Inserts bars that are all older than the first bar; nothing happens for an empty list. */
   insertBefore(bars: readonly Bar[]): void {
-    if (!bars.length) {
-      return;
+    if (bars.length) {
+      this.replaceFirst(0, bars);
     }
+  }
 
-    const count = this.count;
-    const shift = (column: Float64Array): Float64Array<ArrayBuffer> => {
-      const next = new Float64Array(Math.max(16, count + bars.length));
-      next.set(column.subarray(0, count), bars.length);
-      return next;
-    };
+  /**
+   * Replaces the first `count` bars with `bars`, older than the bars after them, as a reset. The
+   * columns keep room in front of the first bar, so that older bars added page after page cost
+   * those bars alone, not a copy of every bar each time.
+   */
+  replaceFirst(count: number, bars: readonly Bar[]): void {
+    const shift = bars.length - count;
+    const kept = this.count;
+    const moved = (column: Column) => shiftStart(column, kept, shift);
 
-    this.times = shift(this.times);
-    this.opens = shift(this.opens);
-    this.highs = shift(this.highs);
-    this.lows = shift(this.lows);
-    this.closes = shift(this.closes);
-    this.volumes = shift(this.volumes);
+    this.times = moved(this.times);
+    this.opens = moved(this.opens);
+    this.highs = moved(this.highs);
+    this.lows = moved(this.lows);
+    this.closes = moved(this.closes);
+    this.volumes = moved(this.volumes);
     bars.forEach((bar, index) => {
       this.write(index, bar);
     });
-    this.count = count + bars.length;
+    this.count = kept + shift;
     this.markReset();
   }
 
@@ -321,23 +326,15 @@ export class BarStore implements BarsView {
   }
 
   private ensureCapacity(size: number): void {
-    if (size <= this.times.length) {
-      return;
-    }
+    const count = this.count;
+    const grown = (column: Column) => withRoom(column, count, size);
 
-    const capacity = Math.max(16, this.times.length * 2, size);
-    const grow = (source: Float64Array): Float64Array<ArrayBuffer> => {
-      const next = new Float64Array(capacity);
-      next.set(source.subarray(0, this.count));
-      return next;
-    };
-
-    this.times = grow(this.times);
-    this.opens = grow(this.opens);
-    this.highs = grow(this.highs);
-    this.lows = grow(this.lows);
-    this.closes = grow(this.closes);
-    this.volumes = grow(this.volumes);
+    this.times = grown(this.times);
+    this.opens = grown(this.opens);
+    this.highs = grown(this.highs);
+    this.lows = grown(this.lows);
+    this.closes = grown(this.closes);
+    this.volumes = grown(this.volumes);
   }
 
   private markReset(): void {

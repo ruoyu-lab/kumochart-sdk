@@ -10,6 +10,7 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 **Fixes**
 
+- Older bars added with `data.prepend()` or `series.prependData()` take the time of the bars they add, not of every bar the chart holds. Each page copied all the bars and built the bars of the timeframe again from all the source bars, so scrolling back through a long history stuttered more the further it went: most on bars built from many, as Kagi lines on a timeframe of minutes are, from hundreds of source bars each, which take page after page.
 - The crosshair follows the pointer while a trackpad's fling scrolls or zooms the chart. The wheel events of a fling tell where it began, and the crosshair stayed there, catching up with the pointer only once the fling ended.
 - A drawing dragged while the wheel zooms or scrolls the chart stays under the pointer: dragged as a whole it drifted by as much as the view moved, and a handle or a drawing being placed waited for the pointer to move again.
 - Replacing the bars, as for another symbol with `data.set()`, switching the timeframe with `data.setTimeframe()`, the transform with `transforms.set()` or the calendar with `applyOptions()`, no longer scrolls the chart back to the latest bar. The view stays where it was, at its zoom: following the latest bar, the new latest bar shows where the old one did, as far from the right edge; looking back at history, the time at the right edge of the plot stays there. A time before the new bars shows the oldest of them, which `loadMore` asks to extend.

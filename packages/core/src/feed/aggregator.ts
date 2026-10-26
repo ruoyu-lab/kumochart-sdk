@@ -1,4 +1,5 @@
 import { BarStore, parseBars } from '../data/bar-store';
+import { shiftStart, withRoom, type Column } from '../data/columns';
 import { checkAscending, planTail } from '../data/points';
 import { describeTime } from '../data/time';
 import type { Bar, BarChange, BarInput, ValuePoint, ValuePointInput } from '../data/types';
@@ -18,6 +19,8 @@ interface TimeStore<P> {
   assign(points: readonly P[]): void;
   replaceFrom(from: number, points: readonly P[]): void;
   insertBefore(points: readonly P[]): void;
+  /** Replaces the first `count` points with `points`, older than the points after them. */
+  replaceFirst(count: number, points: readonly P[]): void;
 }
 
 /** How points of one kind are parsed and merged into buckets. */
@@ -35,14 +38,14 @@ function noop(): void {
 
 /** Bucket start of every source point; `NaN` marks points the calendar drops. */
 class BucketColumn {
-  private values: Float64Array = new Float64Array(0);
+  private values: Column = new Float64Array(0);
   private count = 0;
 
   at(index: number): number {
     return this.values[index] ?? Number.NaN;
   }
 
-  assign(buckets: Float64Array): void {
+  assign(buckets: Column): void {
     this.values = buckets;
     this.count = buckets.length;
   }
@@ -54,23 +57,16 @@ class BucketColumn {
   /** Keeps the buckets before `from` and writes `buckets` after them. */
   writeFrom(from: number, buckets: Float64Array): void {
     const count = from + buckets.length;
-
-    if (count > this.values.length) {
-      const next = new Float64Array(Math.max(16, count, this.values.length * 2));
-      next.set(this.values.subarray(0, from));
-      this.values = next;
-    }
-
+    this.values = withRoom(this.values, from, count);
     this.values.set(buckets, from);
     this.count = count;
   }
 
+  /** Puts `buckets` before the first, in room kept in front of it as the bars keep it. */
   prepend(buckets: Float64Array): void {
-    const next = new Float64Array(buckets.length + this.count);
-    next.set(buckets);
-    next.set(this.values.subarray(0, this.count), buckets.length);
-    this.values = next;
-    this.count = next.length;
+    this.values = shiftStart(this.values, this.count, buckets.length);
+    this.values.set(buckets);
+    this.count += buckets.length;
   }
 
   /** The last bucket before `index` that is not dropped, or `-Infinity`. */
@@ -126,7 +122,7 @@ function bucketTimes(
   timeAt: (index: number) => number,
   bucketOf: (index: number, time: number) => number | null,
   floor: number
-): Float64Array {
+): Column {
   const buckets = new Float64Array(count);
   let previous = floor;
 
@@ -275,7 +271,7 @@ export class Feed<Input, P extends { readonly time: number }, S extends TimeStor
       commit: () => {
         this.source.insertBefore(older);
         this.buckets.prepend(buckets);
-        this.rebuild();
+        this.showOlder(older.length);
       }
     };
   }
@@ -422,6 +418,39 @@ export class Feed<Input, P extends { readonly time: number }, S extends TimeStor
 
   private rebuild(): void {
     this.display.assign(this.kind.aggregate(this.source, this.buckets, 0, this.limit()));
+  }
+
+  /**
+   * Shows the `added` source points inserted before the first: aggregated with the source points
+   * of the first displayed point, whose bucket they may share, in its place. The points after it
+   * stay as they are, so older history costs the points it adds, not every point again. Without a
+   * displayed point, as before the cutoff, the display is built anew.
+   */
+  private showOlder(added: number): void {
+    const display = this.display;
+
+    if (display.length === 0) {
+      this.rebuild();
+      return;
+    }
+
+    // A displayed point's time is its bucket, which only its own source points and dropped ones
+    // run through: the next bucket starts the points that stay.
+    const bucket = display.time(0);
+    const limit = this.limit();
+    let end = added;
+
+    while (end < limit) {
+      const next = this.buckets.at(end);
+
+      if (!Number.isNaN(next) && next !== bucket) {
+        break;
+      }
+
+      end += 1;
+    }
+
+    display.replaceFirst(1, this.kind.aggregate(this.source, this.buckets, 0, end));
   }
 
   /**

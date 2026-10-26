@@ -164,6 +164,40 @@ describe('timeframes', () => {
     expect(chart.data.length).toBe(12);
   });
 
+  it('builds history taken page after page as from the bars at once, pages ending inside a bar', () => {
+    // From 07:13: pages of seven bars end inside bars of five minutes, which they then share.
+    const all = createBars(200, T0 - 137 * MINUTE);
+    const chart = createTestChart({ calendar: { timeZone: 'UTC' } });
+    chart.data.set(all.slice(137), { interval: '1m' });
+    chart.data.setTimeframe('5m');
+
+    for (let end = 137; end > 0; end -= 7) {
+      chart.data.prepend(all.slice(Math.max(0, end - 7), end));
+    }
+
+    const atOnce = createTestChart({ calendar: { timeZone: 'UTC' } });
+    atOnce.data.set(all, { interval: '1m' });
+    atOnce.data.setTimeframe('5m');
+    expect(chart.data.source.length).toBe(200);
+    expect(chart.data.toArray()).toEqual(atOnce.data.toArray());
+  });
+
+  it('reads only the source bars of a history page and of the bar it joins', () => {
+    const fiveMinutes = (time: number) => Math.floor(time / (5 * MINUTE)) * 5 * MINUTE;
+    const all = createBars(10_012, T0 - 10 * MINUTE);
+    const feed = createBarFeed(fiveMinutes);
+    // From 09:32, in the bar of 09:30 that the page's last two bars join.
+    feed.planSet(all.slice(12), fiveMinutes)();
+    const reads = vi.spyOn(feed.source, 'high');
+    feed.planPrepend(all.slice(0, 12)).commit();
+
+    // The twelve bars added and the three of 09:30 after them, not the 10,000 bars of the source.
+    expect(reads.mock.calls.length).toBeLessThan(100);
+    const atOnce = createBarFeed(fiveMinutes);
+    atOnce.planSet(all, fiveMinutes)();
+    expect(feed.display.toArray()).toEqual(atOnce.display.toArray());
+  });
+
   it('updates the forming bar from source updates and opens new ones', () => {
     const { chart, bars } = minuteChart();
     chart.data.setTimeframe('5m');

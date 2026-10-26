@@ -1,5 +1,6 @@
 import { describeValue, fail } from '../utils/errors';
 import { checkObject } from '../utils/validate';
+import { shiftStart, withRoom, type Column } from './columns';
 import { toTime } from './time';
 import type { ValuePoint, ValuePointInput } from './types';
 
@@ -27,8 +28,8 @@ export function parseValuePoints(
 
 /** Time-sorted values of a value series; `NaN` marks gaps. Writes are trusted. */
 export class ValueStore {
-  private times = new Float64Array(0);
-  private values = new Float64Array(0);
+  private times: Column = new Float64Array(0);
+  private values: Column = new Float64Array(0);
   private count = 0;
 
   get length(): number {
@@ -84,30 +85,26 @@ export class ValueStore {
 
   /** Inserts points that are all older than the first point. */
   insertBefore(points: readonly ValuePoint[]): void {
-    const times = new Float64Array(points.length + this.count);
-    const values = new Float64Array(points.length + this.count);
+    this.replaceFirst(0, points);
+  }
+
+  /**
+   * Replaces the first `count` points with `points`, older than the points after them. The
+   * columns keep room in front of the first point, as the bars do.
+   */
+  replaceFirst(count: number, points: readonly ValuePoint[]): void {
+    const shift = points.length - count;
+    this.times = shiftStart(this.times, this.count, shift);
+    this.values = shiftStart(this.values, this.count, shift);
     points.forEach((point, index) => {
-      times[index] = point.time;
-      values[index] = point.value;
+      this.times[index] = point.time;
+      this.values[index] = point.value;
     });
-    times.set(this.times.subarray(0, this.count), points.length);
-    values.set(this.values.subarray(0, this.count), points.length);
-    this.times = times;
-    this.values = values;
-    this.count = times.length;
+    this.count += shift;
   }
 
   private grow(size: number): void {
-    if (size <= this.times.length) {
-      return;
-    }
-
-    const capacity = Math.max(16, size, this.times.length * 2);
-    const times = new Float64Array(capacity);
-    const values = new Float64Array(capacity);
-    times.set(this.times.subarray(0, this.count));
-    values.set(this.values.subarray(0, this.count));
-    this.times = times;
-    this.values = values;
+    this.times = withRoom(this.times, this.count, size);
+    this.values = withRoom(this.values, this.count, size);
   }
 }
