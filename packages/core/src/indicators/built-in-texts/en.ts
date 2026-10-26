@@ -64,6 +64,19 @@ export const en: IndicatorWords = {
     HV: 'Historical volatility',
     MASS: 'Mass index',
     BBW: 'Bollinger BandWidth',
-    BBP: 'Bollinger Bands %B'
+    BBP: 'Bollinger Bands %B',
+    AO: 'Awesome oscillator',
+    PPO: 'Percentage price oscillator',
+    CMO: 'Chande momentum oscillator',
+    UO: 'Ultimate oscillator',
+    KST: 'Know sure thing',
+    COPPOCK: 'Coppock curve',
+    TSI: 'True strength index',
+    SMI: 'Stochastic momentum index',
+    RVGI: 'Relative vigor index',
+    BOP: 'Balance of power',
+    CRSI: 'Connors RSI',
+    ASI: 'Accumulative swing index',
+    CR: 'Energy index'
   }
 };

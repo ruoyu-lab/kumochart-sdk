@@ -17,9 +17,23 @@ import {
   STOCHRSI,
   WR
 } from './definitions/momentum';
+import {
+  AO,
+  BOP,
+  CMO,
+  COPPOCK,
+  CRSI,
+  KST,
+  PPO,
+  RVGI,
+  SMI,
+  TSI,
+  UO
+} from './definitions/oscillators';
 import { ADR, PIVOTS, PREVHLC } from './definitions/periods';
 import { RVOL } from './definitions/relative-volume';
 import { SESSIONS } from './definitions/sessions';
+import { ASI, CR } from './definitions/strength';
 import { AROON, CHANDELIER, DMA, DMI, ICHIMOKU, SAR, SUPERTREND, TRIX } from './definitions/trend';
 import { ATR, CHOP, STD } from './definitions/volatility';
 import { CMF, EMV, MFI, OBV, VOL, VR, VWAP } from './definitions/volume';
@@ -93,5 +107,18 @@ export const allIndicators: readonly IndicatorDefinition[] = [
   HV,
   MASS,
   BBW,
-  BBP
+  BBP,
+  AO,
+  PPO,
+  CMO,
+  UO,
+  KST,
+  COPPOCK,
+  TSI,
+  SMI,
+  RVGI,
+  BOP,
+  CRSI,
+  ASI,
+  CR
 ];

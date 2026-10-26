@@ -106,6 +106,29 @@ describe('the colors of histograms', () => {
     expect(own).not.toContain(theme.volumeDown);
     expect(chart.indicators.valuesAt(volume)[0]?.color).toBe('#123456');
   });
+
+  it('take the down color by their change where a value fell or stayed', () => {
+    const chart = createTestChart({ locale: 'en-US' });
+    chart.data.set(barsFromCloses([10, 11, 11, 10, 12]));
+    chart.indicators.register({
+      type: 'CHANGES',
+      name: 'Changes',
+      pane: 'new',
+      precision: 2,
+      params: {},
+      outputs: () => [
+        { key: 'close', label: 'CLOSE', plot: { kind: 'histogram', colorBy: 'change' } }
+      ],
+      lookback: () => 1,
+      compute: (window) => [window.bar(0).close]
+    });
+    const id = chart.indicators.add({ type: 'CHANGES' });
+    const { theme } = chart.options();
+    const colors = [0, 1, 2, 3, 4].map((index) => chart.indicators.valuesAt(id, index)[0]?.color);
+
+    // The first rises from nothing.
+    expect(colors).toEqual([theme.up, theme.up, theme.down, theme.down, theme.up]);
+  });
 });
 
 describe('the widths of lines', () => {

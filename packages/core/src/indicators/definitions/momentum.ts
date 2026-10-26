@@ -103,7 +103,7 @@ export const MACD: IndicatorDefinition<{
  * Wilder's RSI: RMAs of the gains and the losses, each seeded with its mean over the first
  * `period` changes; 100 when nothing fell, 0 when nothing rose.
  */
-class WilderRsi implements BarStep {
+export class WilderRsi implements BarStep {
   constructor(
     private readonly period: number,
     private readonly previous = new Previous(),
@@ -296,7 +296,7 @@ export const CCI: IndicatorDefinition<{ period: number } & SmoothingParams> = {
 };
 
 /** Percent change from the value `period` bars back. */
-class RocStep implements Step {
+export class RocStep implements Step {
   constructor(
     period: number,
     private readonly history = new RingBuffer(period)
