@@ -52,6 +52,18 @@ export const en: IndicatorWords = {
     PIVOTS: 'Pivot points',
     PREVHLC: 'Previous high, low and close',
     ADR: 'Average daily range',
-    SESSIONS: 'Trading sessions'
+    SESSIONS: 'Trading sessions',
+    AD: 'Accumulation/distribution',
+    VO: 'Volume oscillator',
+    RVOL: 'Relative volume at time',
+    CHAIKINOSC: 'Chaikin oscillator',
+    EFI: 'Elder force index',
+    KVO: 'Klinger oscillator',
+    PVT: 'Price volume trend',
+    WVAD: "Williams' variable accumulation distribution",
+    HV: 'Historical volatility',
+    MASS: 'Mass index',
+    BBW: 'Bollinger BandWidth',
+    BBP: 'Bollinger Bands %B'
   }
 };

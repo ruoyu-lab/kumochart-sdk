@@ -17,14 +17,15 @@ export interface IndicatorCalculatorOptions {
   /** Price passed to the calculation; the type's default, `close` unless it sets another. */
   source?: PriceSource;
   /**
-   * The trading calendar of indicators that follow trading days, such as VWAP: the chart's
-   * `calendar` option made with `createCalendar()`. Default `createCalendar()`, the local zone.
+   * The trading calendar of indicators that follow trading days, such as VWAP and the relative
+   * volume at time: the chart's `calendar` option made with `createCalendar()`. Default
+   * `createCalendar()`, the local zone.
    */
   calendar?: Calendar;
   /**
    * The interval of the bars, as a chart has it: its timeframe, or the source interval. Indicators
-   * that follow it, such as the pivot points left to Auto, take it; `null` (default) for bars
-   * without one.
+   * that follow it, such as the pivot points left to Auto and the historical volatility, which it
+   * annualizes, take it; `null` (default) for bars without one.
    */
   interval?: IntervalInput | null;
 }

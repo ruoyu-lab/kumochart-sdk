@@ -2,6 +2,19 @@
 
 The packages of KumoChart share one version. Each release lists what changed for those who use them.
 
+## Unreleased
+
+**Added**
+
+- Twelve indicators, each in `allIndicators` and on its own for applications that pick a few:
+  - `AD`, accumulation/distribution: the running total of each bar's volume weighted by where its close lies in its range.
+  - `VO`, the volume oscillator: the short EMA of the volume against the long one, in percent.
+  - `RVOL`, relative volume at time: the volume of the trading day so far against its average at the same time of the days before, or of the bar against the bars at that time; by weeks, months, quarters or years too, following the chart's calendar.
+  - `CHAIKINOSC`, the Chaikin oscillator; `EFI`, Elder's force index; `KVO`, the Klinger oscillator with its signal line; `PVT`, the price volume trend.
+  - `WVAD`, Williams' variable accumulation distribution with its average, as in Chinese charting software.
+  - `HV`, historical volatility: the deviation of the log returns, annualized by the interval of the bars.
+  - `MASS`, the mass index; `BBW`, Bollinger BandWidth with its highest expansion and lowest contraction; `BBP`, Bollinger Bands %B.
+
 ## 1.0.0-beta.4
 
 **Breaking**

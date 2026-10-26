@@ -84,7 +84,19 @@ const DEFAULT_OUTPUTS: [type: string, keys: string[]][] = [
       'newYorkLow',
       'newYorkDay'
     ]
-  ]
+  ],
+  ['AD', ['accumulationDistribution']],
+  ['VO', ['volumeOsc']],
+  ['RVOL', ['relativeVolumeRatio', 'currentVolume', 'pastVolume']],
+  ['CHAIKINOSC', ['chaikinOscillator']],
+  ['EFI', ['elderForceIndex']],
+  ['KVO', ['klingerOscillator', 'signalLine']],
+  ['PVT', ['pvt']],
+  ['WVAD', ['wvad', 'mawvad']],
+  ['HV', ['hv']],
+  ['MASS', ['massIndex']],
+  ['BBW', ['bollingerBandWidth', 'highestExpansion', 'lowestContraction']],
+  ['BBP', ['bollingerBandsB']]
 ];
 
 const TYPES = DEFAULT_OUTPUTS.map(([type]) => type);

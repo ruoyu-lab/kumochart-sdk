@@ -8,6 +8,7 @@ export type { SavedIndicator } from './chart-indicators';
 export { allIndicators } from './all';
 export { ALMA, BBI, EMA, HMA, KAMA, MA, SMMA, VWMA, WMA } from './definitions/averages';
 export { BOLL, DC, KC } from './definitions/channels';
+export { BBP, BBW, HV, MASS } from './definitions/dispersion';
 export {
   BIAS,
   BRAR,
@@ -25,12 +26,14 @@ export {
   WR
 } from './definitions/momentum';
 export { ADR, PIVOTS, PREVHLC } from './definitions/periods';
+export { RVOL } from './definitions/relative-volume';
 export { DEFAULT_SESSIONS, SESSIONS, sessionsIndicator } from './definitions/sessions';
 export type { SessionRange } from './definitions/sessions';
 export { AROON, CHANDELIER, DMA, DMI, ICHIMOKU, SAR, SUPERTREND, TRIX } from './definitions/trend';
 export { ATR, CHOP, STD } from './definitions/volatility';
 export { CMF, EMV, MFI, OBV, VOL, VR, VWAP } from './definitions/volume';
 export type { VwapParams } from './definitions/volume';
+export { AD, CHAIKINOSC, EFI, KVO, PVT, VO, WVAD } from './definitions/volume-flow';
 export type { SmoothingParams } from './definitions/shared';
 export { movingAverage } from './definitions/shared';
 export type { AverageKind, BarStep } from './definitions/shared';

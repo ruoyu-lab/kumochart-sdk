@@ -1,5 +1,6 @@
 import { ALMA, BBI, EMA, HMA, KAMA, MA, SMMA, VWMA, WMA } from './definitions/averages';
 import { BOLL, DC, KC } from './definitions/channels';
+import { BBP, BBW, HV, MASS } from './definitions/dispersion';
 import {
   BIAS,
   BRAR,
@@ -17,10 +18,12 @@ import {
   WR
 } from './definitions/momentum';
 import { ADR, PIVOTS, PREVHLC } from './definitions/periods';
+import { RVOL } from './definitions/relative-volume';
 import { SESSIONS } from './definitions/sessions';
 import { AROON, CHANDELIER, DMA, DMI, ICHIMOKU, SAR, SUPERTREND, TRIX } from './definitions/trend';
 import { ATR, CHOP, STD } from './definitions/volatility';
 import { CMF, EMV, MFI, OBV, VOL, VR, VWAP } from './definitions/volume';
+import { AD, CHAIKINOSC, EFI, KVO, PVT, VO, WVAD } from './definitions/volume-flow';
 import { ALLIGATOR, FRACTALS } from './definitions/williams';
 import type { IndicatorDefinition } from './types';
 
@@ -78,5 +81,17 @@ export const allIndicators: readonly IndicatorDefinition[] = [
   PIVOTS,
   PREVHLC,
   ADR,
-  SESSIONS
+  SESSIONS,
+  AD,
+  VO,
+  RVOL,
+  CHAIKINOSC,
+  EFI,
+  KVO,
+  PVT,
+  WVAD,
+  HV,
+  MASS,
+  BBW,
+  BBP
 ];
