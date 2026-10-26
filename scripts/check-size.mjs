@@ -92,10 +92,12 @@ const APPS = [
     gzip: 77
   },
   {
-    // The price ticks the axis labels cover, and the transform kept in saved states, add 0.1 kB.
+    // The price ticks the axis labels cover, and the transform kept in saved states, add 0.1 kB;
+    // the scene's labels of points and texts of markers for each point, which indicators draw,
+    // took it from 61.8 to 62 kB.
     name: 'the core with trend and horizontal lines',
     code: `export { createChart } from 'core'; export { drawings, trendLine, horizontalLine } from 'core/drawings';`,
-    gzip: 62
+    gzip: 62.3
   },
   {
     name: 'the core with every chart type',
