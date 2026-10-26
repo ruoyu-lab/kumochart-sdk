@@ -299,7 +299,7 @@ function paintMarkers(
     ctx.fill();
   }
 
-  if (!text) {
+  if (text.length === 0) {
     return;
   }
 
@@ -310,9 +310,10 @@ function paintMarkers(
 
   for (let index = 0; index < points.count; index += 1) {
     const y = points.value(index);
+    const label = typeof text === 'string' ? text : (text[index] ?? '');
 
-    if (!Number.isNaN(y)) {
-      ctx.fillText(text, points.x(index), y + offset);
+    if (!Number.isNaN(y) && label !== '') {
+      ctx.fillText(label, points.x(index), y + offset);
     }
   }
 }

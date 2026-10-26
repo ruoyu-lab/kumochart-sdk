@@ -1,7 +1,7 @@
 import { font } from '../canvas/canvas';
 import { withAlpha } from '../canvas/color';
 import { shapeDirection } from '../canvas/shapes';
-import type { ValueFormat } from '../format/value-format';
+import { formatValue, type ValueFormat } from '../format/value-format';
 import type { Theme } from '../options/types';
 import {
   paletteColor,
@@ -99,6 +99,28 @@ class IndicatorContributor implements Contributor {
     }
 
     return this.reader(this.entry.outputs.findIndex((output) => output.key === from));
+  }
+
+  /**
+   * The text of the marker of output `column` on each logical index of `[from, to]`: its text and
+   * its value, as the legend writes it; none where it has no value.
+   */
+  private valueTexts(column: number, output: IndicatorOutput, from: number, to: number): string[] {
+    const read = this.reader(column);
+    const format = outputFormat(output, this.format);
+    const text = output.plot.kind === 'marker' ? output.plot.text : undefined;
+    const texts: string[] = [];
+
+    for (let index = from; index <= to; index += 1) {
+      const value = read(index);
+      texts.push(
+        Number.isNaN(value)
+          ? ''
+          : [text, formatValue(this.sources.formatter, value, format)].filter(Boolean).join(' ')
+      );
+    }
+
+    return texts;
   }
 
   /** The runs of a `box` output over logical indices `[from, to]`. */
@@ -358,7 +380,9 @@ class IndicatorContributor implements Contributor {
           points,
           color: this.colors.get(output.key) ?? plainColor(output.plot, theme),
           shape: output.plot.shape ?? null,
-          text: output.plot.text ?? '',
+          text: output.plot.value
+            ? this.valueTexts(column, output, from, to)
+            : (output.plot.text ?? ''),
           size: output.plot.size ?? 5,
           font: font(options.font.size - 1, options.font.family)
         });

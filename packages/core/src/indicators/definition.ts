@@ -168,8 +168,12 @@ export function checkOutputs(outputs: readonly IndicatorOutput[], type: string):
         checkNumber(`${label}: width`, plot.width, { min: 0, max: 1, exclusiveMin: true });
       }
     } else if (plot.kind === 'marker') {
-      if (plot.shape === undefined && plot.text === undefined) {
-        fail(`The marker of ${label} needs a shape, a text or both.`);
+      if (plot.value !== undefined) {
+        checkBoolean(`${label}: value`, plot.value);
+      }
+
+      if (plot.shape === undefined && plot.text === undefined && plot.value !== true) {
+        fail(`The marker of ${label} needs a shape, a text or the value.`);
       }
 
       if (plot.shape !== undefined) {

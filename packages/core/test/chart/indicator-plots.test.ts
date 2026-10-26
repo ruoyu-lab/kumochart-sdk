@@ -210,13 +210,38 @@ describe('markers', () => {
     expect(count(after, 'fill') - count(before, 'fill')).toBe(1);
   });
 
-  it('need a shape or a text', () => {
+  it('write their value, after their text, as the legend writes it', () => {
+    const chart = chartWithBars(BARS);
+    chart.indicators.register({
+      ...plots(
+        [
+          { key: 'top', label: 'Top', plot: { kind: 'marker', shape: 'circle', value: true } },
+          { key: 'low', label: 'Low', plot: { kind: 'marker', text: 'L', value: true } }
+        ],
+        (i) => [i === 3 ? 101.5 : NaN, i === 7 ? 99.25 : NaN],
+        'main'
+      ),
+      type: 'VALUES'
+    });
+    chart.indicators.add({ type: 'VALUES' });
+    const after = scene(chart);
+
+    expect(count(after, 'fillText', '101.50')).toBe(1);
+    expect(count(after, 'fillText', 'L 99.25')).toBe(1);
+  });
+
+  it('need a shape, a text or the value', () => {
     const chart = chartWithBars(BARS);
     chart.indicators.register({
       ...plots([{ key: 'v', label: 'V', plot: { kind: 'marker' } }], () => [1]),
       type: 'EMPTY'
     });
-    expect(() => chart.indicators.add({ type: 'EMPTY' })).toThrow(/shape, a text or both/);
+    expect(() => chart.indicators.add({ type: 'EMPTY' })).toThrow(/shape, a text or the value/);
+    chart.indicators.register({
+      ...plots([{ key: 'v', label: 'V', plot: { kind: 'marker', value: 1 as never } }], () => [1]),
+      type: 'NUMBERED'
+    });
+    expect(() => chart.indicators.add({ type: 'NUMBERED' })).toThrow(/value/);
   });
 });
 

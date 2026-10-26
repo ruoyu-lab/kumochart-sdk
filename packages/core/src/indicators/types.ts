@@ -88,6 +88,11 @@ export type IndicatorPlot =
       readonly kind: 'marker';
       readonly shape?: MarkerShape;
       readonly text?: string;
+      /**
+       * Writes the value too, as the legend formats it, after the text if there is one: the price
+       * of a pivot, say. Default `false`.
+       */
+      readonly value?: boolean;
       /** Half the width of the shape in CSS pixels, as for chart markers. Default `5`. */
       readonly size?: number;
     }

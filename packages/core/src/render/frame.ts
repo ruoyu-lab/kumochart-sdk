@@ -89,7 +89,8 @@ export type PlotJob =
       readonly points: PointBuffer;
       readonly color: string;
       readonly shape: MarkerShape | null;
-      readonly text: string;
+      /** The text of every marker, or of each point. */
+      readonly text: string | readonly string[];
       readonly size: number;
       /** Canvas font of the text. */
       readonly font: string;
