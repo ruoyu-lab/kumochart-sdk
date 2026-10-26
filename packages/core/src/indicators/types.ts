@@ -78,6 +78,22 @@ export type IndicatorPlot =
       readonly hollow?: boolean;
     }
   /**
+   * A candle on each bar where this output and the outputs `open`, `high` and `low` all have
+   * values, this one its close: a body from the open to the close and a wick from the low to the
+   * high, as the main series draws candles. It takes the theme's up color where it closes at or
+   * above its open and the down color otherwise, or the output's color on every candle when it
+   * has one, fixed or set; the legend writes the values of the four in the color of the candle.
+   * The other three are usually `hidden`, which shows their values in the legend. The price scale
+   * fits the highs and lows.
+   */
+  | {
+      readonly kind: 'candles';
+      /** The keys of the outputs that give each candle its open, high and low. */
+      readonly open: string;
+      readonly high: string;
+      readonly low: string;
+    }
+  /**
    * A shape, a text or both at the value, on the bars where it is defined: signals such as an
    * arrow under the bar a crossing happens on. Upward shapes point up at the value from below
    * and downward shapes down at it from above; circles and squares sit on it. Text goes beyond

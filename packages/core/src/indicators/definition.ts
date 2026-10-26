@@ -12,7 +12,16 @@ import {
 import { LINE_STYLES } from '../options/types';
 import type { IndicatorDefinition, IndicatorFill, IndicatorOutput } from './types';
 
-const PLOT_KINDS = ['line', 'segments', 'box', 'histogram', 'columns', 'marker', 'hidden'] as const;
+const PLOT_KINDS = [
+  'line',
+  'segments',
+  'box',
+  'histogram',
+  'columns',
+  'candles',
+  'marker',
+  'hidden'
+] as const;
 
 /** Checks that `name` of a definition is a function. */
 function checkFunction(definition: object, name: string): void {
@@ -155,6 +164,16 @@ export function checkOutputs(outputs: readonly IndicatorOutput[], type: string):
 
     if (plot.kind === 'box' && plot.group !== undefined && !keys.has(plot.group)) {
       fail(`The boxes of ${label} are told apart by "${plot.group}", which is no output.`);
+    }
+
+    if (plot.kind === 'candles') {
+      for (const part of ['open', 'high', 'low'] as const) {
+        if (!keys.has(plot[part])) {
+          fail(
+            `The candles of ${label} take their ${part} from "${plot[part]}", which is no output.`
+          );
+        }
+      }
     }
 
     if (plot.kind === 'columns') {

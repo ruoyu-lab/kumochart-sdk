@@ -69,15 +69,16 @@ const APPS = [
     code: `export { createChart } from 'core'; export { indicators, allIndicators } from 'core/indicators';`,
     // The averages to pick from, the moving average of an oscillator and the new options of the
     // types took it from 60.4 to 61.4 kB; the indicators of a timeframe of their own add 1.5 kB,
-    // their words in the chart's language 0.3 kB.
-    gzip: 69
+    // their words in the chart's language 0.3 kB; outputs drawn as candles and `refresh()` for
+    // calculators reading data besides the bars 0.3 kB.
+    gzip: 69.5
   },
   {
     // Only the three definitions go in, 50.5 kB; MACD picks its averages and RSI has its own
-    // moving average with bands since, 52.4 kB.
+    // moving average with bands since, 52.4 kB; outputs drawn as candles and `refresh()` 0.3 kB.
     name: 'the core with MA, MACD and RSI',
     code: `export { createChart } from 'core'; export { indicators, MA, MACD, RSI } from 'core/indicators';`,
-    gzip: 60
+    gzip: 60.5
   },
   {
     // The fixes of the drawings' tools, editors and drags took the drawings module up 0.5 kB;

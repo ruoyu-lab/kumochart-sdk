@@ -11,6 +11,7 @@ import {
 } from '../render/contributors';
 import type { FrameSources, PlotJob } from '../render/frame';
 import { includeValue, type Extents, type PriceScale } from '../scales/price-scale';
+import { candleStyle } from '../series/bars';
 import type { PointBuffer } from '../series/types';
 import type { IndicatorEntry, IndicatorStore } from './indicator-store';
 import type { IndicatorOutput, IndicatorPlot } from './types';
@@ -69,6 +70,42 @@ function runsOf(
   }
 
   return runs;
+}
+
+/** The plot of candles, which three other outputs give their opens, highs and lows. */
+type CandlesPlot = Extract<IndicatorPlot, { kind: 'candles' }>;
+
+/**
+ * The output drawn as candles that `output` is part of: itself, or the one it gives the open, the
+ * high or the low of; `null` for others.
+ */
+function candleOf(
+  outputs: readonly IndicatorOutput[],
+  output: IndicatorOutput
+): (IndicatorOutput & { readonly plot: CandlesPlot }) | null {
+  const found = outputs.find(
+    ({ key, plot }) =>
+      plot.kind === 'candles' &&
+      (key === output.key ||
+        plot.open === output.key ||
+        plot.high === output.key ||
+        plot.low === output.key)
+  );
+  return found ? (found as IndicatorOutput & { readonly plot: CandlesPlot }) : null;
+}
+
+/** Reads output `key` of an indicator by the logical index it is drawn on. */
+function readerOf(entry: IndicatorEntry, key: string): (index: number) => number {
+  return entry.series.reader(entry.outputs.findIndex((output) => output.key === key));
+}
+
+/**
+ * Whether the candle of output `candle` on logical index `index` closes at or above its open, as
+ * it takes the up color; one without values takes it too.
+ */
+function candleRises(entry: IndicatorEntry, candle: IndicatorOutput, index: number): boolean {
+  const plot = candle.plot as CandlesPlot;
+  return !(readerOf(entry, candle.key)(index) < readerOf(entry, plot.open)(index));
 }
 
 class IndicatorContributor implements Contributor {
@@ -148,6 +185,11 @@ class IndicatorContributor implements Contributor {
 
       const read = this.reader(column);
       const start = plot.kind === 'columns' ? this.startOf(plot.from) : null;
+      // A candle reaches from its low to its high, which outputs of their own give.
+      const reaches =
+        plot.kind === 'candles'
+          ? [plot.open, plot.high, plot.low].map((key) => readerOf(this.entry, key))
+          : [];
 
       for (let index = from; index <= to; index += 1) {
         const value = read(index);
@@ -155,6 +197,12 @@ class IndicatorContributor implements Contributor {
 
         if (start && !Number.isNaN(value)) {
           includeValue(extents, start(index));
+        }
+
+        if (!Number.isNaN(value)) {
+          reaches.forEach((reach) => {
+            includeValue(extents, reach(index));
+          });
         }
       }
 
@@ -193,6 +241,42 @@ class IndicatorContributor implements Contributor {
     return null;
   }
 
+  /**
+   * Puts into `points` the candles of output `column` over logical indices `[from, to]`, in plot
+   * coordinates: those of the bars where it and its open, high and low all have values.
+   */
+  private candles(
+    points: PointBuffer,
+    column: number,
+    plot: CandlesPlot,
+    scale: PriceScale,
+    from: number,
+    to: number
+  ): void {
+    const { timeScale } = this.sources;
+    const close = this.reader(column);
+    const [open, high, low] = [plot.open, plot.high, plot.low].map((key) =>
+      readerOf(this.entry, key)
+    ) as [(index: number) => number, (index: number) => number, (index: number) => number];
+
+    for (let index = from; index <= to; index += 1) {
+      const values = [open(index), high(index), low(index), close(index)] as const;
+
+      if (values.every((value) => !Number.isNaN(value))) {
+        const [o, h, l, c] = values;
+        points.pushOhlc(
+          timeScale.indexToX(index),
+          scale.valueToY(o),
+          scale.valueToY(h),
+          scale.valueToY(l),
+          scale.valueToY(c),
+          Number.NaN,
+          c >= o
+        );
+      }
+    }
+  }
+
   emit(scale: PriceScale, jobs: PlotJob[]): void {
     const { outputs, fills, definition, params, id, series } = this.entry;
     const { timeScale, options, seriesTypes } = this.sources;
@@ -217,6 +301,12 @@ class IndicatorContributor implements Contributor {
 
       const points = this.pool.take(`indicator:${id}:${output.key}`);
       points.reset(to - from + 1);
+
+      if (plot.kind === 'candles') {
+        this.candles(points, column, plot, scale, from, to);
+        buffers.set(output.key, points);
+        return;
+      }
 
       if (plot.kind === 'columns') {
         const start = this.startOf(plot.from);
@@ -306,7 +396,20 @@ class IndicatorContributor implements Contributor {
         return;
       }
 
-      if (output.plot.kind === 'histogram') {
+      if (output.plot.kind === 'candles') {
+        // A color of its own, set or fixed, paints every candle, as the legend shows the values.
+        const own = this.colors.get(output.key);
+        jobs.push({
+          kind: 'series',
+          definition: seriesTypes.require('candles'),
+          style: candleStyle(own ?? theme.up, own ?? theme.down),
+          points,
+          valueToY: (value) => scale.valueToY(value),
+          bars: null,
+          first: from,
+          transform: null
+        });
+      } else if (output.plot.kind === 'histogram') {
         // A color of its own, set or fixed, paints every column, as the legend shows the value.
         const own = this.colors.get(output.key);
         const [upColor, downColor] = own ? [own, own] : columnColors(output.plot.colorBy, theme);
@@ -405,7 +508,8 @@ function columnRises(
 /**
  * The color the value of `output`, the indicator's output `column`, is drawn in on logical index
  * `index`, for the legend and `valuesAt()`: the output's color, else for a histogram the theme's
- * color of its column, for an arrow or a triangle the buy or sell color.
+ * color of its column, for an arrow or a triangle the buy or sell color; the four values of a
+ * candle the color of the candle.
  */
 export function valueColor(
   entry: IndicatorEntry,
@@ -416,6 +520,14 @@ export function valueColor(
   theme: Theme
 ): string {
   const { plot } = output;
+  const candle = candleOf(entry.outputs, output);
+
+  // The four values of a candle read in its color.
+  if (candle) {
+    const own = colors.get(candle.key);
+    return own ?? (candleRises(entry, candle, index) ? theme.up : theme.down);
+  }
+
   const color = colors.get(output.key);
 
   if (color) {
@@ -442,16 +554,22 @@ export function drawn(entry: IndicatorEntry, output: IndicatorOutput): boolean {
 /**
  * Colors of the indicator outputs: explicit overrides, then fixed colors, then theme colors, then
  * the palette. Outputs take the palette colors in turn, those overridden too, so that coloring
- * one leaves the others as they were. The output a box reaches down to takes the box's color.
+ * one leaves the others as they were. The output a box reaches down to takes the box's color,
+ * and the outputs of a candle's open, high and low take the candle's when it has one.
  */
 export function indicatorColors(entry: IndicatorEntry, theme: Theme): Map<string, string> {
   const colors = new Map<string, string>();
-  const boxOf = new Map<string, string>();
+  /** The outputs drawn as another's part: the bottoms of boxes, the opens, highs and lows of candles. */
+  const partOf = new Map<string, string>();
   let next = 0;
 
   for (const { key, plot } of entry.outputs) {
     if (plot.kind === 'box') {
-      boxOf.set(plot.from, key);
+      partOf.set(plot.from, key);
+    } else if (plot.kind === 'candles') {
+      [plot.open, plot.high, plot.low].forEach((part) => {
+        partOf.set(part, key);
+      });
     }
   }
 
@@ -459,11 +577,13 @@ export function indicatorColors(entry: IndicatorEntry, theme: Theme): Map<string
     const fixed = output.color ?? (output.themeColor && theme[output.themeColor]);
     const { plot } = output;
     // Values seen nowhere, such as where columns start, leave the palette to the others, and
-    // so do arrows and triangles, which take the buy and sell colors, and the bottoms of boxes.
+    // so do arrows and triangles, which take the buy and sell colors, the bottoms of boxes, and
+    // candles and their parts, which take the up and down colors.
     const unseen = plot.kind === 'hidden' && output.legend === false;
     const directed = plot.kind === 'marker' && plot.shape && shapeDirection(plot.shape) !== 0;
+    const themed = plot.kind === 'histogram' || plot.kind === 'candles';
     const turn =
-      !fixed && plot.kind !== 'histogram' && !unseen && !directed && !boxOf.has(output.key)
+      !fixed && !themed && !unseen && !directed && !partOf.has(output.key)
         ? paletteColor(theme.palette, next++)
         : undefined;
     const color = entry.colors[output.key] ?? fixed ?? turn;
@@ -473,11 +593,11 @@ export function indicatorColors(entry: IndicatorEntry, theme: Theme): Map<string
     }
   }
 
-  boxOf.forEach((box, bottom) => {
-    const color = colors.get(box);
+  partOf.forEach((whole, part) => {
+    const color = colors.get(whole);
 
-    if (color && !colors.has(bottom)) {
-      colors.set(bottom, color);
+    if (color && !colors.has(part)) {
+      colors.set(part, color);
     }
   });
 
