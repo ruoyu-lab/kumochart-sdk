@@ -210,13 +210,167 @@ describe('markers', () => {
     expect(count(after, 'fill') - count(before, 'fill')).toBe(1);
   });
 
-  it('need a shape or a text', () => {
+  it('write their value, after their text, as the legend writes it', () => {
+    const chart = chartWithBars(BARS);
+    chart.indicators.register({
+      ...plots(
+        [
+          { key: 'top', label: 'Top', plot: { kind: 'marker', shape: 'circle', value: true } },
+          { key: 'low', label: 'Low', plot: { kind: 'marker', text: 'L', value: true } }
+        ],
+        (i) => [i === 3 ? 101.5 : NaN, i === 7 ? 99.25 : NaN],
+        'main'
+      ),
+      type: 'VALUES'
+    });
+    chart.indicators.add({ type: 'VALUES' });
+    const after = scene(chart);
+
+    expect(count(after, 'fillText', '101.50')).toBe(1);
+    expect(count(after, 'fillText', 'L 99.25')).toBe(1);
+  });
+
+  it('need a shape, a text or the value', () => {
     const chart = chartWithBars(BARS);
     chart.indicators.register({
       ...plots([{ key: 'v', label: 'V', plot: { kind: 'marker' } }], () => [1]),
       type: 'EMPTY'
     });
-    expect(() => chart.indicators.add({ type: 'EMPTY' })).toThrow(/shape, a text or both/);
+    expect(() => chart.indicators.add({ type: 'EMPTY' })).toThrow(/shape, a text or the value/);
+    chart.indicators.register({
+      ...plots([{ key: 'v', label: 'V', plot: { kind: 'marker', value: 1 as never } }], () => [1]),
+      type: 'NUMBERED'
+    });
+    expect(() => chart.indicators.add({ type: 'NUMBERED' })).toThrow(/value/);
+  });
+});
+
+/** The texts the scene writes, with their color and which way they grow from their point. */
+function written(chart: Chart): { text: string; color: string; baseline: string; x: number }[] {
+  const canvas = chart.element.querySelector<HTMLCanvasElement>('canvas[data-layer="scene"]');
+  const ctx = canvas?.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('No scene layer.');
+  }
+
+  const texts: { text: string; color: string; baseline: string; x: number }[] = [];
+  ctx.fillText = function (this: CanvasRenderingContext2D, text: string, x: number) {
+    texts.push({ text, color: this.fillStyle as string, baseline: this.textBaseline, x });
+  };
+  chart.applyOptions({});
+  chart.screenshot();
+  return texts;
+}
+
+describe('zigzags', () => {
+  /**
+   * Highs on bars 2, 5 (which replaces it) and 20, lows computed on bars 11 and 26 and drawn a
+   * bar earlier, and the line's end on the latest bar.
+   */
+  const zigzag = (plot: Partial<Extract<IndicatorOutput['plot'], { kind: 'zigzag' }>> = {}) =>
+    plots(
+      [
+        {
+          key: 'line',
+          label: 'Line',
+          plot: { kind: 'zigzag', high: 'h', low: 'l', extend: true, ...plot },
+          legend: false
+        },
+        { key: 'h', label: 'H', plot: { kind: 'hidden' }, legend: false },
+        { key: 'l', label: 'L', plot: { kind: 'hidden' }, legend: false, offset: -1 }
+      ],
+      (i) => [
+        i === BARS - 1 ? 101 : NaN,
+        i === 2 ? 110 : i === 5 ? 112 : i === 20 ? 115 : NaN,
+        i === 11 ? 90 : i === 26 ? 95 : NaN
+      ],
+      'main'
+    );
+
+  it('joins the last of each run of highs and of lows, and goes on to the latest bar', () => {
+    const chart = chartWithBars(BARS, { locale: 'en-US' });
+    chart.indicators.register({ ...zigzag(), type: 'SWINGS' });
+    const id = chart.indicators.add({ type: 'SWINGS', colors: { line: '#abcdef' } });
+    const [path] = painted(chart, 'stroke').filter((each) => each.color === '#abcdef');
+    const x = (index: number) => chart.timeScale.indexToX(index);
+
+    expect(path?.shapes.map((shape) => shape.map(([left]) => left))).toEqual([
+      [5, 10, 20, 25, 29].map(x)
+    ]);
+    chart.indicators.update(id, { styles: { line: { visible: false } } });
+    expect(painted(chart, 'stroke').some((each) => each.color === '#abcdef')).toBe(false);
+  });
+
+  it('label each pivot with its price, change and the volume since the one before', () => {
+    const chart = chartWithBars(BARS, { locale: 'en-US' });
+    chart.indicators.register({
+      ...zigzag({ labels: { price: true, change: 'absolute', volume: true } }),
+      type: 'LABELED'
+    });
+    chart.indicators.add({ type: 'LABELED' });
+    const texts = written(chart);
+    const { theme } = chart.options();
+    // The labels, not the times of the axis under them.
+    const at = (index: number) =>
+      texts.filter(
+        (each) =>
+          each.x === chart.timeScale.indexToX(index) &&
+          (each.color === theme.up || each.color === theme.down)
+      );
+
+    // Volumes 1000 + 10 * index: bars 0–5, 6–10, 11–20, 21–25 and 26–29.
+    expect(at(5).map((each) => each.text)).toEqual(['112.00 (0.00)', '6.15K']);
+    expect(at(10).map((each) => each.text)).toEqual(['90.00 (-22.00)', '5.4K']);
+    expect(at(20).map((each) => each.text)).toEqual(['115.00 (+25.00)', '11.55K']);
+    expect(at(25).map((each) => each.text)).toEqual(['95.00 (-20.00)', '6.15K']);
+    expect(at(29).map((each) => each.text)).toEqual(['101.00 (+6.00)', '5.1K']);
+    // Over the highs in the up color, under the lows in the down color.
+    expect(at(20).map((each) => [each.color, each.baseline])).toEqual([
+      [theme.up, 'bottom'],
+      [theme.up, 'bottom']
+    ]);
+    expect(at(10).map((each) => [each.color, each.baseline])).toEqual([
+      [theme.down, 'top'],
+      [theme.down, 'top']
+    ]);
+
+    // At the right edge of the plot, the label of the latest bar moves in to be read whole; one
+    // of a pivot out of view is not written.
+    chart.timeScale.setVisibleLogicalRange({ from: 6, to: 29.5 });
+    const width = chart.layout().panes[0]?.plot.width ?? 0;
+    const edge = written(chart).filter((each) => each.text.startsWith('101.00'));
+    // The test canvas measures six pixels a character.
+    expect(edge.map((each) => each.x)).toEqual([width - (6 * '101.00 (+6.00)'.length) / 2]);
+    expect(written(chart).some((each) => each.text.startsWith('112.00'))).toBe(false);
+  });
+
+  it('label in percent, or only what is picked', () => {
+    const chart = chartWithBars(BARS, { locale: 'en-US' });
+    chart.indicators.register({
+      ...zigzag({ labels: { change: 'percent' } }),
+      type: 'PERCENT'
+    });
+    chart.indicators.add({ type: 'PERCENT' });
+    const texts = written(chart).map((each) => each.text);
+    // (90 - 112) / 112 and (115 - 90) / 90.
+    expect(texts).toContain('(-19.64%)');
+    expect(texts).toContain('(+27.78%)');
+    expect(texts.some((text) => text.endsWith('K'))).toBe(false);
+  });
+
+  it('need outputs of highs and lows, and labels of what there is', () => {
+    const chart = chartWithBars(BARS);
+    const bad = (type: string, plot: Record<string, unknown>) => {
+      chart.indicators.register({ ...zigzag(plot as never), type });
+      return () => chart.indicators.add({ type });
+    };
+
+    expect(bad('NOLOW', { low: 'nope' })).toThrow(/takes its lows from "nope"/);
+    expect(bad('EXTEND', { extend: 'yes' })).toThrow(/extend/);
+    expect(bad('LABELS', { labels: { prices: true } })).toThrow(/has no field "prices"/);
+    expect(bad('CHANGE', { labels: { change: 'ratio' } })).toThrow(/labels.change/);
+    expect(bad('STYLE', { style: 'wavy' })).toThrow(/style/);
   });
 });
 

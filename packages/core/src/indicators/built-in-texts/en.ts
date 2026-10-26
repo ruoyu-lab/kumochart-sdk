@@ -77,6 +77,18 @@ export const en: IndicatorWords = {
     BOP: 'Balance of power',
     CRSI: 'Connors RSI',
     ASI: 'Accumulative swing index',
-    CR: 'Energy index'
+    CR: 'Energy index',
+    DEMA: 'Double EMA',
+    TEMA: 'Triple EMA',
+    LSMA: 'Least squares moving average',
+    MCGINLEY: 'McGinley Dynamic',
+    RIBBON: 'Moving average ribbon',
+    ENVELOPE: 'Envelope',
+    VSTOP: 'Volatility stop',
+    CKSTOP: 'Chande Kroll stop',
+    VORTEX: 'Vortex indicator',
+    PIVOTHL: 'Pivot points high low',
+    MIKE: 'MIKE support and resistance',
+    ZIGZAG: 'Zig Zag'
   }
 };

@@ -39,6 +39,11 @@ import { ATR, CHOP, STD } from './definitions/volatility';
 import { CMF, EMV, MFI, OBV, VOL, VR, VWAP } from './definitions/volume';
 import { AD, CHAIKINOSC, EFI, KVO, PVT, VO, WVAD } from './definitions/volume-flow';
 import { ALLIGATOR, FRACTALS } from './definitions/williams';
+import { ENVELOPE, MIKE } from './definitions/envelopes';
+import { DEMA, LSMA, MCGINLEY, RIBBON, TEMA } from './definitions/smoothers';
+import { CKSTOP, VSTOP } from './definitions/stops';
+import { PIVOTHL, ZIGZAG } from './definitions/swings';
+import { VORTEX } from './definitions/vortex';
 import type { IndicatorDefinition } from './types';
 
 /**
@@ -120,5 +125,17 @@ export const allIndicators: readonly IndicatorDefinition[] = [
   BOP,
   CRSI,
   ASI,
-  CR
+  CR,
+  DEMA,
+  TEMA,
+  LSMA,
+  MCGINLEY,
+  RIBBON,
+  ENVELOPE,
+  VSTOP,
+  CKSTOP,
+  VORTEX,
+  PIVOTHL,
+  MIKE,
+  ZIGZAG
 ];

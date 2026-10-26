@@ -1,8 +1,8 @@
 import { font } from '../canvas/canvas';
 import { withAlpha } from '../canvas/color';
 import { shapeDirection } from '../canvas/shapes';
-import type { ValueFormat } from '../format/value-format';
-import type { Theme } from '../options/types';
+import { formatValue, type ValueFormat } from '../format/value-format';
+import type { LineStyle, Theme } from '../options/types';
 import {
   paletteColor,
   type BufferPool,
@@ -14,6 +14,7 @@ import { includeValue, type Extents, type PriceScale } from '../scales/price-sca
 import type { PointBuffer } from '../series/types';
 import type { IndicatorEntry, IndicatorStore } from './indicator-store';
 import type { IndicatorOutput, IndicatorPlot } from './types';
+import { ZigzagView, type ZigzagPlot } from './zigzag-plot';
 
 /** A run of consecutive logical indices with values, and the extent of its values. */
 interface Run {
@@ -101,6 +102,50 @@ class IndicatorContributor implements Contributor {
     return this.reader(this.entry.outputs.findIndex((output) => output.key === from));
   }
 
+  /**
+   * The text of the marker of output `column` on each logical index of `[from, to]`: its text and
+   * its value, as the legend writes it; none where it has no value.
+   */
+  private valueTexts(column: number, output: IndicatorOutput, from: number, to: number): string[] {
+    const read = this.reader(column);
+    const format = outputFormat(output, this.format);
+    const text = output.plot.kind === 'marker' ? output.plot.text : undefined;
+    const texts: string[] = [];
+
+    for (let index = from; index <= to; index += 1) {
+      const value = read(index);
+      texts.push(
+        Number.isNaN(value)
+          ? ''
+          : [text, formatValue(this.sources.formatter, value, format)].filter(Boolean).join(' ')
+      );
+    }
+
+    return texts;
+  }
+
+  /** The zigzag of output `column` over logical indices `[from, to]`. */
+  private zigzag(column: number, plot: ZigzagPlot, from: number, to: number): ZigzagView {
+    const key = (name: string) => this.entry.outputs.findIndex((output) => output.key === name);
+    const columns = { own: column, high: key(plot.high), low: key(plot.low) };
+    return new ZigzagView(this.entry.series, plot, columns, from, to);
+  }
+
+  /** How a line of `output` is stroked: as set, else as its plot has it. */
+  private lineStyle(output: IndicatorOutput): {
+    color: string;
+    lineWidth: number;
+    lineStyle: LineStyle;
+  } {
+    const { plot } = output;
+    const own = plot.kind === 'line' || plot.kind === 'zigzag' ? plot : null;
+    return {
+      color: this.colors.get(output.key) ?? this.sources.options.theme.text,
+      lineWidth: this.entry.styles[output.key]?.lineWidth ?? own?.width ?? 1.25,
+      lineStyle: this.entry.styles[output.key]?.lineStyle ?? own?.style ?? 'solid'
+    };
+  }
+
   /** The runs of a `box` output over logical indices `[from, to]`. */
   private boxRuns(
     column: number,
@@ -143,6 +188,11 @@ class IndicatorContributor implements Contributor {
         !drawn(this.entry, output) ||
         (!everything && (styles[output.key]?.autoscale ?? output.autoscale) === false)
       ) {
+        return;
+      }
+
+      if (plot.kind === 'zigzag') {
+        this.zigzag(column, plot, from, to).include(extents);
         return;
       }
 
@@ -211,7 +261,8 @@ class IndicatorContributor implements Contributor {
         filled.has(output.key) &&
         this.entry.styles[output.key]?.visible !== false;
 
-      if (!drawn(this.entry, output) && !bounds) {
+      // A zigzag draws its pivots, not a value on each bar.
+      if ((!drawn(this.entry, output) && !bounds) || plot.kind === 'zigzag') {
         return;
       }
 
@@ -281,6 +332,21 @@ class IndicatorContributor implements Contributor {
     });
 
     outputs.forEach((output, column) => {
+      const { plot } = output;
+
+      if (plot.kind === 'zigzag' && drawn(this.entry, output)) {
+        this.zigzag(column, plot, from, to).emit(
+          `indicator:${id}:${output.key}`,
+          this.sources,
+          scale,
+          this.pool,
+          this.lineStyle(output),
+          outputFormat(output, this.format),
+          jobs
+        );
+        return;
+      }
+
       const points = buffers.get(output.key);
 
       if (!points) {
@@ -324,11 +390,7 @@ class IndicatorContributor implements Contributor {
         jobs.push({
           kind: 'series',
           definition: seriesTypes.require('line'),
-          style: {
-            color: this.colors.get(output.key) ?? theme.text,
-            lineWidth: this.entry.styles[output.key]?.lineWidth ?? output.plot.width ?? 1.25,
-            lineStyle: this.entry.styles[output.key]?.lineStyle ?? output.plot.style ?? 'solid'
-          },
+          style: this.lineStyle(output),
           points,
           valueToY: (value) => scale.valueToY(value),
           bars: null,
@@ -358,7 +420,9 @@ class IndicatorContributor implements Contributor {
           points,
           color: this.colors.get(output.key) ?? plainColor(output.plot, theme),
           shape: output.plot.shape ?? null,
-          text: output.plot.text ?? '',
+          text: output.plot.value
+            ? this.valueTexts(column, output, from, to)
+            : (output.plot.text ?? ''),
           size: output.plot.size ?? 5,
           font: font(options.font.size - 1, options.font.family)
         });

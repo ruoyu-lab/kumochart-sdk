@@ -5,7 +5,7 @@ English · [简体中文](README.zh-CN.md)
 An open-source SDK for trading charts: the core holds the bars and the scales, and indicators, drawings, alerts and replay load when you need them.
 
 - **A small core**: bars, scales, panes, crosshair, legend, zoom and pan, and timeframes, about 44 kB gzipped.
-- **Modules as you need them**: 63 indicators, 51 drawing tools, 10 chart types, alerts, order lines, replay and volume profiles, each whole or only the parts you pick.
+- **Modules as you need them**: 87 indicators, 51 drawing tools, 10 chart types, alerts, order lines, replay and volume profiles, each whole or only the parts you pick.
 - **Real time**: bars and trades stream in; give it 1-minute bars and it builds any timeframe in the browser, following trading sessions and time zones.
 - **Extensible**: indicators, drawings, series types, bar transforms and plugins of your own work like the built-in ones.
 - **Vue and React** components, complete TypeScript types, no dependencies.

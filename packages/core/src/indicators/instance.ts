@@ -197,6 +197,8 @@ export class IndicatorSeries {
   private readonly scratch: MutableBar = { ...EMPTY_BAR };
   /** Counts full recomputations, so downstream indicators know to start over. */
   private rebuilds = 0;
+  /** Counts the times the values changed, so what is worked out of them knows to again. */
+  private changes = 0;
   private upstreamSeen: { series: IndicatorSeries; rebuilds: number } | null = null;
   private contextSeen: IndicatorContext | null = null;
   /** The bars the values were last computed on. */
@@ -258,6 +260,30 @@ export class IndicatorSeries {
 
     this.computedCount = count;
     this.revision = store.revision;
+    this.changes += 1;
+  }
+
+  /** Changes whenever the values do, as of the latest `sync()`. */
+  get version(): number {
+    return this.changes;
+  }
+
+  /** How many bars the values are computed on. */
+  get length(): number {
+    return this.computedCount;
+  }
+
+  /** The bars the values are computed on. */
+  get bars(): BarStore {
+    return this.current.bars;
+  }
+
+  /**
+   * The first logical index of the displayed bars that the value of output `column` computed on
+   * bar `index` of its bars is drawn on.
+   */
+  indexOf(column: number, index: number): number {
+    return this.current.indexOf(index + this.shift(column));
   }
 
   /** Value of output `column` computed on bar `index` of its bars; `NaN` when absent. */

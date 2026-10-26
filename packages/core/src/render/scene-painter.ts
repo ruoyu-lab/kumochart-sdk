@@ -83,6 +83,44 @@ function paintJob(
     case 'markers':
       paintMarkers(ctx, job);
       return;
+    case 'labels':
+      paintLabels(ctx, job, pane.plot.width);
+      return;
+  }
+}
+
+/** Space between a label and its point. */
+const LABEL_GAP = 4;
+
+/**
+ * Each text centered over its point, its last line nearest it, or under it, its first nearest;
+ * those of points in the plot are moved in from its edges to be read whole.
+ */
+function paintLabels(
+  ctx: CanvasRenderingContext2D,
+  job: Extract<PlotJob, { kind: 'labels' }>,
+  width: number
+): void {
+  ctx.font = job.font;
+  ctx.textAlign = 'center';
+
+  for (const { x, y, text, above, color } of job.labels) {
+    if (x < 0 || x > width) {
+      continue;
+    }
+
+    const lines = text.split('\n');
+    const half = Math.max(...lines.map((line) => ctx.measureText(line).width)) / 2;
+    const center = Math.min(Math.max(x, half), width - half);
+    ctx.fillStyle = color;
+    ctx.textBaseline = above ? 'bottom' : 'top';
+
+    lines.forEach((line, index) => {
+      const offset = above
+        ? -LABEL_GAP - (lines.length - 1 - index) * job.lineHeight
+        : LABEL_GAP + index * job.lineHeight;
+      ctx.fillText(line, center, y + offset);
+    });
   }
 }
 
@@ -299,7 +337,7 @@ function paintMarkers(
     ctx.fill();
   }
 
-  if (!text) {
+  if (text.length === 0) {
     return;
   }
 
@@ -310,9 +348,10 @@ function paintMarkers(
 
   for (let index = 0; index < points.count; index += 1) {
     const y = points.value(index);
+    const label = typeof text === 'string' ? text : (text[index] ?? '');
 
-    if (!Number.isNaN(y)) {
-      ctx.fillText(text, points.x(index), y + offset);
+    if (!Number.isNaN(y) && label !== '') {
+      ctx.fillText(label, points.x(index), y + offset);
     }
   }
 }

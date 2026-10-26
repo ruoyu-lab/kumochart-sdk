@@ -109,7 +109,19 @@ const DEFAULT_OUTPUTS: [type: string, keys: string[]][] = [
   ['BOP', ['bop']],
   ['CRSI', ['crsi']],
   ['ASI', ['asi', 'asit']],
-  ['CR', ['cr', 'ma10', 'ma20', 'ma40', 'ma62']]
+  ['CR', ['cr', 'ma10', 'ma20', 'ma40', 'ma62']],
+  ['DEMA', ['dema']],
+  ['TEMA', ['tema']],
+  ['LSMA', ['lsma']],
+  ['MCGINLEY', ['mcginley']],
+  ['RIBBON', ['ma1', 'ma2', 'ma3', 'ma4']],
+  ['ENVELOPE', ['basis', 'upper', 'lower']],
+  ['VSTOP', ['upTrend', 'downTrend']],
+  ['CKSTOP', ['stopLong', 'stopShort']],
+  ['VORTEX', ['viPlus', 'viMinus']],
+  ['PIVOTHL', ['pivotHigh', 'pivotLow']],
+  ['MIKE', ['stor', 'midr', 'wekr', 'weks', 'mids', 'stos']],
+  ['ZIGZAG', ['zigZag', 'high', 'low']]
 ];
 
 const TYPES = DEFAULT_OUTPUTS.map(([type]) => type);

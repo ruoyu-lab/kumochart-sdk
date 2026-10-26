@@ -10,6 +10,12 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 **Added**
 
+- Twelve trend, average and band indicators, each in `allIndicators` and on its own for applications that pick a few:
+  - `DEMA` and `TEMA`, the double and triple exponential moving averages; `LSMA`, the least squares line of the latest prices read at an offset; `MCGINLEY`, the McGinley Dynamic; `RIBBON`, four moving averages each of its own type and length.
+  - `ENVELOPE`, lines a percentage around an average; `MIKE`, the support and resistance lines of Chinese charting software.
+  - `VSTOP`, the volatility stop; `CKSTOP`, the Chande Kroll stop; `VORTEX`, the vortex indicator.
+  - `PIVOTHL`, pivot points of their own left and right lengths marked with their prices.
+  - `ZIGZAG`, a line through the swings of the price whose last pivot moves on as the price goes beyond it, labelled with each pivot's price, change and volume.
 - Thirteen oscillators, each in `allIndicators` and on its own for applications that pick a few:
   - `AO`, the awesome oscillator, in columns that take the up color where it rose and the down color where it fell or stayed.
   - `PPO`, the percentage price oscillator, of simple or exponential averages.
@@ -26,6 +32,8 @@ The packages of KumoChart share one version. Each release lists what changed for
   - `WVAD`, Williams' variable accumulation distribution with its average, as in Chinese charting software.
   - `HV`, historical volatility: the deviation of the log returns, annualized by the interval of the bars.
   - `MASS`, the mass index; `BBW`, Bollinger BandWidth with its highest expansion and lowest contraction; `BBP`, Bollinger Bands %B.
+- The `zigzag` plot, for any indicator: a line through the last of each run of values of an output of highs and one of lows, so values that each bar gives once draw pivots that later ones replace, on to the latest bar if extended, with labels of each pivot's price, change and volume (`ZigzagLabels`).
+- `marker` plots write their value with `value: true`, such as the price of a pivot.
 
 ## 1.0.0-beta.4
 

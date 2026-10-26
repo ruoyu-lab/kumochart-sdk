@@ -27,6 +27,11 @@ export interface IndicatorBasis {
    * bars, as the values of outputs shifted past them do.
    */
   barAt(index: number): number;
+  /**
+   * The first logical index of the displayed bars that shows bar `bar`, or the bar after it when
+   * none does: where a value of the bar, such as a pivot, is drawn once.
+   */
+  indexOf(bar: number): number;
   /** Where the values of an output shifted by `shift` bars show beyond the displayed bars. */
   reach(shift: number): Reach;
 }
@@ -40,6 +45,10 @@ export class BarsBasis implements IndicatorBasis {
 
   barAt(index: number): number {
     return index;
+  }
+
+  indexOf(bar: number): number {
+    return bar;
   }
 
   reach(shift: number): Reach {
@@ -126,6 +135,33 @@ export class TimeframeBasis implements IndicatorBasis {
     }
 
     return this.barAt(0) - Math.ceil(-index / this.ratio());
+  }
+
+  indexOf(bar: number): number {
+    // `barAt` never decreases: widen a range around the bars until it holds the index, then
+    // halve it.
+    let below = -1;
+    let above = Math.max(1, this.displayed.length);
+
+    while (this.barAt(below) >= bar) {
+      below *= 2;
+    }
+
+    while (this.barAt(above) < bar) {
+      above *= 2;
+    }
+
+    while (above - below > 1) {
+      const middle = Math.floor((below + above) / 2);
+
+      if (this.barAt(middle) < bar) {
+        below = middle;
+      } else {
+        above = middle;
+      }
+    }
+
+    return above;
   }
 
   reach(shift: number): Reach {
