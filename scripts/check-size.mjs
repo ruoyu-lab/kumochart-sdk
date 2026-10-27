@@ -156,6 +156,13 @@ const APPS = [
     gzip: 10
   },
   {
+    // The bars and their timeframes, the indicators and the drawings as a chart keeps them, and
+    // the evaluation of the alerts, without anything drawn: 27.8 kB.
+    name: 'alerts evaluated without a chart',
+    code: `export { createAlertEngine } from 'core/alert-engine';`,
+    gzip: 28.3
+  },
+  {
     // One way to write a level, and the anchors a type has, typed: 7.9 kB.
     name: 'the lines of a Fibonacci retracement without a chart',
     code: `export { computeDrawingLevels, fibRetracement } from 'core/drawings';`,
@@ -169,6 +176,7 @@ const ENTRIES = {
   'core/drawings': 'drawings.js',
   'core/chart-types': 'chart-types.js',
   'core/alerts': 'alerts.js',
+  'core/alert-engine': 'alert-engine.js',
   'core/trading': 'trading.js',
   'core/replay': 'replay.js',
   'core/volume-profile': 'volume-profile.js',

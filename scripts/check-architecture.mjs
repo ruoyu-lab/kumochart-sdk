@@ -39,6 +39,8 @@ const LAYERS = {
   replay: 6,
   // Gives a drawing type too, so it builds on the drawings, whose types it takes.
   'volume-profile': 7,
+  // Alerts evaluated without a chart, on the indicators and the drawings, as a chart has them.
+  'alert-engine': 8,
   watermark: 6,
   'index.ts': 8,
   'all.ts': 8,

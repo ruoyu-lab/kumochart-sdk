@@ -1,26 +1,18 @@
 import type { ChartCore, CommandHandler } from '../chart/chart-core';
 import { defineModule, type ChartModule } from '../chart/modules';
 import type { StatePart } from '../chart/state';
-import type { ValueReader } from '../chart/values';
-import type { ValueSource } from '../data/types';
-import { MAIN_PANE_ID, RIGHT_SCALE } from '../panes/pane-store';
+import { RIGHT_SCALE } from '../panes/pane-store';
 import { formatPaneValue } from '../render/frame';
 import { fail } from '../utils/errors';
 import { Registry } from '../utils/registry';
 import { checkArray } from '../utils/validate';
 import { createDrawingsApi, validateDefinition, type DrawingsApi } from './api';
-import { DrawingStore, type DrawingEntry } from './drawing-store';
+import { DrawingStore } from './drawing-store';
 import { DrawingsDomain, type DrawingsChangeReason } from './drawings-domain';
-import { LINEAR_SCALE, LOG_SCALE, levelContext, levelValue } from './levels';
+import { LINEAR_SCALE, LOG_SCALE } from './levels';
 import { DRAWING_OPTIONS, type DrawingOptions } from './options';
-import { resolveStyle } from './style';
-import type {
-  Drawing,
-  DrawingInput,
-  DrawingLevel,
-  DrawingTypeDefinition,
-  LevelScale
-} from './types';
+import type { Drawing, DrawingInput, DrawingTypeDefinition } from './types';
+import { drawingValues } from './values';
 
 /** The user created, edited or removed drawings, or undid/redid such a change. */
 export interface DrawingsChangeEvent {
@@ -56,59 +48,6 @@ export type DrawingsModule = ChartModule<{
   readonly events: DrawingsEventMap;
   readonly state: { readonly drawings: readonly Drawing[] };
 }>;
-
-type DrawingSource = Extract<ValueSource, { kind: 'drawing' }>;
-
-/** The lines of drawings, which alerts watch, read where the drawings are now. */
-function drawingValues(core: ChartCore, store: DrawingStore): ValueReader<DrawingSource> {
-  /**
-   * Straight lines on the pane's scale: logarithmic, or linear for the other modes, which only
-   * shift and stretch values. Read from the mode, not the fitted scale, so alerts need no frame.
-   */
-  const scaleOf = (paneId: string): LevelScale =>
-    core.panes.get(paneId)?.scales.get(RIGHT_SCALE)?.mode === 'log' ? LOG_SCALE : LINEAR_SCALE;
-  const context = levelContext(core.bars, core.bars);
-  /** The lines of a drawing alerts can watch, as its style draws them. */
-  const levelsOf = (entry: DrawingEntry): readonly DrawingLevel[] =>
-    entry.definition.levels?.(
-      entry.points,
-      scaleOf(entry.pane),
-      resolveStyle(core.options, entry.definition, entry.style),
-      context
-    ) ?? [];
-  /** The watched line of a drawing, or `null` when the drawing or the line is gone. */
-  const levelOf = (entry: DrawingEntry, key: string | undefined): DrawingLevel | null => {
-    const levels = levelsOf(entry);
-    return (key === undefined ? levels[0] : levels.find((level) => level.key === key)) ?? null;
-  };
-
-  return {
-    movable: true,
-    check: (source, label) => {
-      const entry = store.get(source.id) ?? fail(`${label}: unknown drawing "${source.id}".`);
-      const keys = levelsOf(entry).map((level) => level.key);
-
-      if (keys.length === 0) {
-        fail(`${label}: a "${entry.type}" drawing has no lines to watch.`);
-      }
-
-      if (source.level !== undefined && !keys.includes(source.level)) {
-        fail(
-          `${label}: a "${entry.type}" drawing has no line "${source.level}"; it has ${keys.map((key) => `"${key}"`).join(', ')}.`
-        );
-      }
-    },
-    read: (source, index) => {
-      // A removed drawing reads as nothing, so what watches it waits until undo brings it back.
-      const entry = store.get(source.id);
-      const level = entry ? levelOf(entry, source.level) : null;
-      return entry && level
-        ? levelValue(level, core.bars.time(index), core.bars, scaleOf(entry.pane))
-        : Number.NaN;
-    },
-    paneOf: (source) => store.get(source.id)?.pane ?? MAIN_PANE_ID
-  };
-}
 
 /** Escape, Delete, undo, redo, Enter, copy and paste on drawings. */
 function drawingCommands(core: ChartCore, domain: DrawingsDomain): CommandHandler {
@@ -254,7 +193,25 @@ export function drawings(definitions: readonly DrawingTypeDefinition[] = []): Dr
       });
       core.tool = () => domain.activeTool();
       core.commands.push(drawingCommands(core, domain));
-      core.values.provide('drawing', drawingValues(core, domain.store));
+      core.values.provide(
+        'drawing',
+        drawingValues(
+          {
+            bars: core.bars,
+            options: () => core.options,
+            /**
+             * Straight lines on the pane's scale: logarithmic, or linear for the other modes, which
+             * only shift and stretch values. Read from the mode, not the fitted scale, so alerts
+             * need no frame.
+             */
+            scaleOf: (paneId) =>
+              core.panes.get(paneId)?.scales.get(RIGHT_SCALE)?.mode === 'log'
+                ? LOG_SCALE
+                : LINEAR_SCALE
+          },
+          domain.store
+        )
+      );
       core.paneOccupants.push({
         // Drawings go with their pane, so they keep none from being removed.
         occupants: () => [],

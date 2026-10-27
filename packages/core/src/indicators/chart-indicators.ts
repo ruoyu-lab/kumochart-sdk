@@ -6,6 +6,7 @@ import { MAIN_PANE_ID, RIGHT_SCALE, type PaneStore } from '../panes/pane-store';
 import { fail } from '../utils/errors';
 import { checkArray, checkObject, checkString } from '../utils/validate';
 import type { IndicatorEntry, IndicatorStore } from './indicator-store';
+import { checkSource, indicatorValues } from './values';
 import { checkInputFields, checkPatchFields } from './input';
 import type {
   IndicatorInput,
@@ -52,18 +53,6 @@ function upstreamFirst(entries: readonly IndicatorEntry[]): IndicatorEntry[] {
 }
 
 /** The column of output `key` of an indicator, or its first output without a key; `-1` for none. */
-function columnOf(entry: IndicatorEntry, key: string | undefined): number {
-  return key === undefined ? 0 : entry.outputs.findIndex((output) => output.key === key);
-}
-
-/** Checks that `store` has the indicator and output a source reads. */
-function checkSource(store: IndicatorStore, source: IndicatorSource, label: string): void {
-  const entry = store.get(source.id) ?? fail(`${label}: unknown indicator "${source.id}".`);
-
-  if (columnOf(entry, source.key) < 0) {
-    fail(`${label}: indicator "${source.id}" has no output "${String(source.key)}".`);
-  }
-}
 
 /** The indicators of one chart: placing them in panes, the values they give, their state. */
 export class ChartIndicators {
@@ -191,19 +180,7 @@ export class ChartIndicators {
 
   /** The values of the outputs, for alerts and `mainSeries.barColor`. */
   values(): ValueReader<IndicatorSource> {
-    const { store } = this;
-    return {
-      check: (source, label) => {
-        checkSource(store, source, label);
-      },
-      read: (source, index) => {
-        const entry = store.require(source.id);
-        entry.series.sync();
-        return entry.series.drawn(columnOf(entry, source.key), index);
-      },
-      paneOf: (source) => store.require(source.id).pane,
-      scaleOf: (source) => store.require(source.id).scale
-    };
+    return indicatorValues(this.store);
   }
 
   /** What a chart state keeps of the indicators, under `indicators`. */

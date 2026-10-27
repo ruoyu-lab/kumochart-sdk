@@ -31,6 +31,11 @@
       "types": "./dist/alerts.d.ts",
       "default": "./dist/alerts.js"
     },
+    "./alert-engine": {
+      "@kumochart-sdk/source": "./src/alert-engine/index.ts",
+      "types": "./dist/alert-engine.d.ts",
+      "default": "./dist/alert-engine.js"
+    },
     "./trading": {
       "@kumochart-sdk/source": "./src/trading/index.ts",
       "types": "./dist/trading.d.ts",

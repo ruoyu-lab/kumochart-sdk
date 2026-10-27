@@ -9,6 +9,7 @@ export default defineConfig([
       drawings: 'src/drawings/index.ts',
       'chart-types': 'src/chart-types/index.ts',
       alerts: 'src/alerts/index.ts',
+      'alert-engine': 'src/alert-engine/index.ts',
       trading: 'src/trading/index.ts',
       replay: 'src/replay/index.ts',
       'volume-profile': 'src/volume-profile/index.ts',

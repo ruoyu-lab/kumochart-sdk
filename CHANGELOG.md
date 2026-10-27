@@ -10,6 +10,7 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 **Added**
 
+- `createAlertEngine()`, in the new entry `@kumochart-sdk/core/alert-engine`: alerts evaluated without a chart, on a server, in a worker or for symbols no chart shows. Give it the bars at their source interval and the timeframe to build, by the trading calendar, the indicators and drawings its alerts read, and the alerts: on the same it fires exactly what a chart fires. Its `data`, `indicators`, `drawings` and `alerts` work as a chart's, without what only drawing needs. Runs in Node.js.
 - Twelve trend, average and band indicators, each in `allIndicators` and on its own for applications that pick a few:
   - `DEMA` and `TEMA`, the double and triple exponential moving averages; `LSMA`, the least squares line of the latest prices read at an offset; `MCGINLEY`, the McGinley Dynamic; `RIBBON`, four moving averages each of its own type and length.
   - `ENVELOPE`, lines a percentage around an average; `MIKE`, the support and resistance lines of Chinese charting software.
