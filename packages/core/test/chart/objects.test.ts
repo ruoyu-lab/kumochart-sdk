@@ -282,6 +282,24 @@ describe('orders', () => {
     });
   });
 
+  it('stays where it is when pulled from, telling where the pointer is let go', () => {
+    const chart = chartWithBars(200, { priceScale: { precision: 2 } });
+    chart.orders.set([{ id: 'p1', side: 'buy', price: 180, pull: true }]);
+    const drags = vi.fn();
+    chart.on('orderDrag', drags);
+    const [x, y] = at(chart, 120, 180);
+    drag(chart, [x, y], [x, y - 30]);
+    const end = drags.mock.calls.at(-1)?.[0] as { phase: string; price: number };
+
+    expect(chart.orders.get('p1')?.price).toBe(180);
+    expect(end.phase).toBe('end');
+    expect(end.price).toBeGreaterThan(180);
+    expect(drags.mock.calls[0]?.[0]).toMatchObject({ phase: 'start', price: 180 });
+    expect(() => {
+      chart.orders.update('p1', { pull: 'yes' as unknown as boolean });
+    }).toThrow('order.pull');
+  });
+
   it('restores the price when the drag is cancelled with Escape', () => {
     const chart = chartWithBars(200);
     chart.orders.set([{ id: 'o1', side: 'sell', price: 180 }]);
@@ -447,6 +465,49 @@ describe('markers', () => {
     chart.screenshot();
 
     expect(filled).toEqual([chart.options().theme.buy]);
+  });
+
+  it('join a marker to the one it links to with a dashed line in that one\u2019s color', () => {
+    const chart = chartWithBars(200, { timeScale: { barSpacing: 10 } });
+    const { theme } = chart.options();
+    const canvas = chart.element.querySelector<HTMLCanvasElement>('canvas[data-layer="objects"]');
+    const ctx = canvas?.getContext('2d') ?? expect.unreachable('No objects layer.');
+    const stroked: Array<{ color: unknown; dashed: boolean }> = [];
+    let dash: number[] = [];
+    ctx.setLineDash = (segments: number[]) => {
+      dash = segments;
+    };
+    ctx.stroke = () => {
+      stroked.push({ color: ctx.strokeStyle, dashed: dash.length > 0 });
+    };
+    const entry = { id: 'in', time: T0 + 190 * MINUTE, position: 'price', price: 150 } as const;
+    chart.markers.set([
+      { ...entry, shape: 'arrow-up' },
+      {
+        id: 'out',
+        time: T0 + 195 * MINUTE,
+        position: 'price',
+        price: 160,
+        shape: 'arrow-down',
+        link: 'in'
+      },
+      // Linked to no marker, or to one before the data: no line.
+      { id: 'lost', time: T0 + 196 * MINUTE, position: 'above', shape: 'circle', link: 'gone' },
+      { id: 'early', time: T0 - 500 * MINUTE, position: 'below', shape: 'arrow-up' },
+      { id: 'late', time: T0 + 197 * MINUTE, position: 'above', shape: 'circle', link: 'early' }
+    ]);
+    chart.screenshot();
+
+    expect(stroked).toEqual([{ color: theme.buy, dashed: true }]);
+
+    // Its entry scrolled out of view, the line still runs to it.
+    chart.timeScale.scrollToIndex(193, 'left');
+    stroked.length = 0;
+    chart.screenshot();
+    expect(stroked).toEqual([{ color: theme.buy, dashed: true }]);
+    expect(() => {
+      chart.markers.update('out', { link: 7 as unknown as string });
+    }).toThrow('marker.link');
   });
 
   it('centers markers on their bar', () => {

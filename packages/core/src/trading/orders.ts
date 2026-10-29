@@ -41,6 +41,12 @@ export interface OrderInput {
   quantity?: number | string;
   /** Lets the user drag the order to a new price. Default `true`. */
   draggable?: boolean;
+  /**
+   * Dragging it pulls a price out of it instead of moving it, as a stop loss out of a position:
+   * it stays where it is, and `orderDrag` tells where the pointer is, for the application to draw
+   * what is pulled and to act on where it is let go. Default `false`.
+   */
+  pull?: boolean;
   visible?: boolean;
   /** Defaults to the theme's buy or sell color. */
   color?: string;
@@ -55,6 +61,7 @@ export interface Order {
   readonly label: string | null;
   readonly quantity: number | string | null;
   readonly draggable: boolean;
+  readonly pull: boolean;
   readonly visible: boolean;
   readonly color: string | null;
   readonly lineStyle: LineStyle;
@@ -68,6 +75,7 @@ const ORDER_FIELDS = fieldsOf<OrderInput>({
   label: true,
   quantity: true,
   draggable: true,
+  pull: true,
   visible: true,
   color: true,
   lineStyle: true,
@@ -95,6 +103,7 @@ function parseOrder(input: OrderInput, label = 'order'): OrderSettings {
     quantity: input.quantity ?? null,
     draggable:
       input.draggable === undefined ? true : checkBoolean(`${label}.draggable`, input.draggable),
+    pull: input.pull === undefined ? false : checkBoolean(`${label}.pull`, input.pull),
     visible: input.visible === undefined ? true : checkBoolean(`${label}.visible`, input.visible),
     color: input.color === undefined ? null : checkColor(`${label}.color`, input.color),
     lineStyle:
@@ -110,6 +119,7 @@ function orderInput(order: Order): OrderInput {
     price: order.price,
     side: order.side,
     draggable: order.draggable,
+    pull: order.pull,
     visible: order.visible,
     lineStyle: order.lineStyle,
     buttons: order.buttons.map((button) => ({ ...button })),
@@ -246,10 +256,11 @@ export class OrdersDomain implements ObjectDomain, Collection<OrderInput, Order>
     let price = initialPrice;
     this.host.dragged({ id: order.id, phase: 'start', price, initialPrice });
 
+    // An order pulled from stays: only the events tell where the pointer is.
     const setPrice = (next: number) => {
       const current = this.orders.get(order.id);
 
-      if (current) {
+      if (current && !current.pull) {
         this.orders.set(order.id, { ...current, price: next });
         this.host.repaint();
       }

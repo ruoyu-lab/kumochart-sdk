@@ -2,7 +2,7 @@ import { checkColor } from '../canvas/color';
 import { toTime, type TimeInput } from '../data/time';
 import type { DragSession, Point } from '../interaction/types';
 import { MAIN_PANE_ID } from '../panes/pane-store';
-import { font } from '../canvas/canvas';
+import { applyStroke, font } from '../canvas/canvas';
 import { MARKER_SHAPES, shapeDirection, traceShape, type MarkerShape } from '../canvas/shapes';
 import {
   HitPriority,
@@ -37,6 +37,11 @@ export interface MarkerInput {
   text?: string;
   /** Marker size in CSS pixels. Default 8. */
   size?: number;
+  /**
+   * The id of another marker to join with a dashed line in that one's color, such as a trade's
+   * exit to its entry. The line shows while both are in the data, across bars out of view too.
+   */
+  link?: string;
 }
 
 export interface Marker {
@@ -48,6 +53,7 @@ export interface Marker {
   readonly color: string | null;
   readonly text: string;
   readonly size: number;
+  readonly link: string | null;
 }
 
 const POSITIONS = ['above', 'below', 'price'] as const;
@@ -59,7 +65,8 @@ const MARKER_FIELDS = fieldsOf<MarkerInput>({
   shape: true,
   color: true,
   text: true,
-  size: true
+  size: true,
+  link: true
 });
 const GAP = 4;
 
@@ -86,7 +93,8 @@ function parseMarker(input: MarkerInput, label = 'marker'): MarkerSettings {
     color: input.color === undefined ? null : checkColor(`${label}.color`, input.color),
     text: input.text ?? '',
     size:
-      input.size === undefined ? 8 : checkNumber(`${label}.size`, input.size, { min: 2, max: 40 })
+      input.size === undefined ? 8 : checkNumber(`${label}.size`, input.size, { min: 2, max: 40 }),
+    link: input.link === undefined ? null : checkString(`${label}.link`, input.link)
   };
 }
 
@@ -98,7 +106,8 @@ function markerInput(marker: Marker): MarkerInput {
     text: marker.text,
     size: marker.size,
     ...(marker.price !== null ? { price: marker.price } : {}),
-    ...(marker.color !== null ? { color: marker.color } : {})
+    ...(marker.color !== null ? { color: marker.color } : {}),
+    ...(marker.link !== null ? { link: marker.link } : {})
   };
 }
 
@@ -108,6 +117,16 @@ interface PlacedMarker {
   readonly x: number;
   readonly y: number;
   readonly color: string;
+}
+
+/**
+ * A marker's color: its own, else the theme's buy color for upward shapes, its sell color for
+ * downward ones, its text color for the others.
+ */
+function colorOf(context: ObjectContext, marker: Marker): string {
+  const direction = shapeDirection(marker.shape);
+  const { theme } = context.options;
+  return marker.color ?? (direction > 0 ? theme.buy : direction < 0 ? theme.sell : theme.text);
 }
 
 /** First index of `markers`, sorted by time, of a marker at or after `time`. */
@@ -216,7 +235,7 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
       return [];
     }
 
-    const { bars, timeScale, options } = context;
+    const { bars, timeScale } = context;
     const from = Math.max(0, visible.from - 1);
     const to = Math.min(bars.length - 1, visible.to + 1);
     const stacks = new Map<string, number>();
@@ -245,17 +264,62 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
         y = pane.scale.valueToY(marker.price ?? Number.NaN);
       }
 
-      const direction = shapeDirection(marker.shape);
-      const { theme } = options;
-      placed.push({
-        marker,
-        x,
-        y,
-        color: marker.color ?? (direction > 0 ? theme.buy : direction < 0 ? theme.sell : theme.text)
-      });
+      placed.push({ marker, x, y, color: colorOf(context, marker) });
     }
 
     return placed;
+  }
+
+  /**
+   * The lines of the markers linked to others, from where each end is: placed in view, or on its
+   * bar out of view (unstacked); none with an end not in the data or past the revealed data.
+   */
+  private links(
+    context: ObjectContext,
+    placed: readonly PlacedMarker[]
+  ): Array<{ from: Point; to: Point; color: string }> {
+    const pane = paneOf(context.frame, MAIN_PANE_ID);
+    const { bars, timeScale } = context;
+
+    if (!pane || bars.length === 0) {
+      return [];
+    }
+
+    const shown = new Map(placed.map((each) => [each.marker.id, each]));
+    const pointOf = (marker: Marker): Point | null => {
+      const at = shown.get(marker.id);
+
+      if (at) {
+        return { x: at.x, y: at.y };
+      }
+
+      const index = bars.indexAt(marker.time);
+
+      if (index < 0 || marker.time > context.cutoff) {
+        return null;
+      }
+
+      const y =
+        marker.position === 'above'
+          ? pane.scale.valueToY(bars.high(index)) - GAP - marker.size
+          : marker.position === 'below'
+            ? pane.scale.valueToY(bars.low(index)) + GAP + marker.size
+            : pane.scale.valueToY(marker.price ?? Number.NaN);
+      return { x: timeScale.indexToX(index), y };
+    };
+    const lines: Array<{ from: Point; to: Point; color: string }> = [];
+
+    for (const marker of this.markers.values()) {
+      const other = marker.link === null ? undefined : this.markers.get(marker.link);
+      const from = other && pointOf(other);
+      const to = other && pointOf(marker);
+
+      if (other && from && to) {
+        lines.push({ from, to, color: shown.get(other.id)?.color ?? colorOf(context, other) });
+      }
+    }
+
+    return lines;
   }
 
   hitTest(context: ObjectContext, point: Point): ObjectHit | null {
@@ -308,8 +372,17 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
     ctx.translate(pane.plot.x, pane.plot.y);
     ctx.font = font(options.font.size - 1, options.font.family);
     ctx.textAlign = 'center';
+    const placed = this.place(context);
 
-    for (const { marker, x, y, color } of this.place(context)) {
+    for (const { from, to, color } of this.links(context, placed)) {
+      applyStroke(ctx, color, 1, 'dashed');
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+    }
+
+    for (const { marker, x, y, color } of placed) {
       const selected =
         (context.selection?.kind === 'marker' && context.selection.id === marker.id) ||
         (context.hovered?.kind === 'marker' && context.hovered.id === marker.id);
