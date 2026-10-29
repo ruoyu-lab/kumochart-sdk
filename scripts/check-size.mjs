@@ -115,9 +115,10 @@ const APPS = [
     gzip: 53
   },
   {
+    // A price pulled out of an order line, markers linked and outlined took it to 52.0 kB on CI.
     name: 'the core with orders and markers',
     code: `export { createChart } from 'core'; export { orders, markers } from 'core/trading';`,
-    gzip: 52
+    gzip: 52.5
   },
   {
     name: 'the core with replay',
