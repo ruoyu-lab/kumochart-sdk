@@ -2,7 +2,7 @@ import { checkColor } from '../canvas/color';
 import { toTime, type TimeInput } from '../data/time';
 import type { DragSession, Point } from '../interaction/types';
 import { MAIN_PANE_ID } from '../panes/pane-store';
-import { applyStroke, font } from '../canvas/canvas';
+import { applyStroke, dashPattern, font } from '../canvas/canvas';
 import { MARKER_SHAPES, shapeDirection, traceShape, type MarkerShape } from '../canvas/shapes';
 import {
   HitPriority,
@@ -38,8 +38,14 @@ export interface MarkerInput {
   /** Marker size in CSS pixels. Default 8. */
   size?: number;
   /**
-   * The id of another marker to join with a dashed line in that one's color, such as a trade's
-   * exit to its entry. The line shows while both are in the data, across bars out of view too.
+   * A CSS color for a line of 1px around the shape, and along each side of the line of a marker
+   * linked to it, so that they stand out of the bars they lie on. None by default.
+   */
+  outline?: string;
+  /**
+   * The id of another marker to join with a dashed line in that one's color and outline, such as a
+   * trade's exit to its entry. The line shows while both are in the data, across bars out of view
+   * too.
    */
   link?: string;
 }
@@ -53,6 +59,7 @@ export interface Marker {
   readonly color: string | null;
   readonly text: string;
   readonly size: number;
+  readonly outline: string | null;
   readonly link: string | null;
 }
 
@@ -66,6 +73,7 @@ const MARKER_FIELDS = fieldsOf<MarkerInput>({
   color: true,
   text: true,
   size: true,
+  outline: true,
   link: true
 });
 const GAP = 4;
@@ -94,6 +102,7 @@ function parseMarker(input: MarkerInput, label = 'marker'): MarkerSettings {
     text: input.text ?? '',
     size:
       input.size === undefined ? 8 : checkNumber(`${label}.size`, input.size, { min: 2, max: 40 }),
+    outline: input.outline === undefined ? null : checkColor(`${label}.outline`, input.outline),
     link: input.link === undefined ? null : checkString(`${label}.link`, input.link)
   };
 }
@@ -107,6 +116,7 @@ function markerInput(marker: Marker): MarkerInput {
     size: marker.size,
     ...(marker.price !== null ? { price: marker.price } : {}),
     ...(marker.color !== null ? { color: marker.color } : {}),
+    ...(marker.outline !== null ? { outline: marker.outline } : {}),
     ...(marker.link !== null ? { link: marker.link } : {})
   };
 }
@@ -272,12 +282,13 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
 
   /**
    * The lines of the markers linked to others, from where each end is: placed in view, or on its
-   * bar out of view (unstacked); none with an end not in the data or past the revealed data.
+   * bar out of view (unstacked), in the color and the outline of the one linked to; none with an
+   * end not in the data or past the revealed data.
    */
   private links(
     context: ObjectContext,
     placed: readonly PlacedMarker[]
-  ): Array<{ from: Point; to: Point; color: string }> {
+  ): Array<{ from: Point; to: Point; color: string; outline: string | null }> {
     const pane = paneOf(context.frame, MAIN_PANE_ID);
     const { bars, timeScale } = context;
 
@@ -307,7 +318,7 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
             : pane.scale.valueToY(marker.price ?? Number.NaN);
       return { x: timeScale.indexToX(index), y };
     };
-    const lines: Array<{ from: Point; to: Point; color: string }> = [];
+    const lines: Array<{ from: Point; to: Point; color: string; outline: string | null }> = [];
 
     for (const marker of this.markers.values()) {
       const other = marker.link === null ? undefined : this.markers.get(marker.link);
@@ -315,7 +326,12 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
       const to = other && pointOf(marker);
 
       if (other && from && to) {
-        lines.push({ from, to, color: shown.get(other.id)?.color ?? colorOf(context, other) });
+        lines.push({
+          from,
+          to,
+          color: shown.get(other.id)?.color ?? colorOf(context, other),
+          outline: other.outline
+        });
       }
     }
 
@@ -374,11 +390,19 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
     ctx.textAlign = 'center';
     const placed = this.place(context);
 
-    for (const { from, to, color } of this.links(context, placed)) {
-      applyStroke(ctx, color, 1, 'dashed');
+    for (const { from, to, color, outline } of this.links(context, placed)) {
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
       ctx.lineTo(to.x, to.y);
+
+      // The outline is the same dashes, a pixel wider on each side, under them.
+      if (outline !== null) {
+        applyStroke(ctx, outline, 3);
+        ctx.setLineDash(dashPattern('dashed', 1));
+        ctx.stroke();
+      }
+
+      applyStroke(ctx, color, 1, 'dashed');
       ctx.stroke();
     }
 
@@ -391,6 +415,11 @@ export class MarkersDomain implements ObjectDomain, Collection<MarkerInput, Mark
       ctx.beginPath();
       traceShape(ctx, marker.shape, x, y, size);
       ctx.fill();
+
+      if (marker.outline !== null) {
+        applyStroke(ctx, marker.outline, 1);
+        ctx.stroke();
+      }
 
       if (marker.text) {
         const below = marker.position === 'below';

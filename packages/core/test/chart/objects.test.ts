@@ -510,6 +510,46 @@ describe('markers', () => {
     }).toThrow('marker.link');
   });
 
+  it('outline a marker, and the line of one linked to it, so that they stand out of the bars', () => {
+    const chart = chartWithBars(200, { timeScale: { barSpacing: 10 } });
+    const { theme } = chart.options();
+    const canvas = chart.element.querySelector<HTMLCanvasElement>('canvas[data-layer="objects"]');
+    const ctx = canvas?.getContext('2d') ?? expect.unreachable('No objects layer.');
+    const stroked: Array<[unknown, number]> = [];
+    ctx.stroke = () => {
+      stroked.push([ctx.strokeStyle, ctx.lineWidth]);
+    };
+    chart.markers.set([
+      {
+        id: 'in',
+        time: T0 + 190 * MINUTE,
+        position: 'price',
+        price: 150,
+        shape: 'triangle-up',
+        outline: '#000000'
+      },
+      {
+        id: 'out',
+        time: T0 + 195 * MINUTE,
+        position: 'price',
+        price: 160,
+        shape: 'triangle-down',
+        link: 'in'
+      }
+    ]);
+    chart.screenshot();
+
+    // The line's outline under it, then the line; then the outline of the shape that has one.
+    expect(stroked).toEqual([
+      ['#000000', 3],
+      [theme.buy, 1],
+      ['#000000', 1]
+    ]);
+    expect(() => {
+      chart.markers.update('in', { outline: 'not a color' });
+    }).toThrow('marker.outline');
+  });
+
   it('centers markers on their bar', () => {
     const chart = chartWithBars(60, { timeScale: { barSpacing: 40 } });
     chart.markers.set([

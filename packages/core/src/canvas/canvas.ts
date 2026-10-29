@@ -1,6 +1,7 @@
 import type { LineStyle } from '../options/types';
 
-function dashPattern(style: LineStyle, lineWidth: number): number[] {
+/** The dashes of a line of `lineWidth` CSS pixels in a style: none for a solid one. */
+export function dashPattern(style: LineStyle, lineWidth: number): number[] {
   switch (style) {
     case 'solid':
       return [];
