@@ -63,7 +63,8 @@ const SECTION_FIELDS: {
     visible: true,
     rows: true,
     buttons: true,
-    hideValuesOnHover: true
+    hideValuesOnHover: true,
+    top: true
   }),
   interaction: fieldsOf<InteractionOptions>({
     pan: true,

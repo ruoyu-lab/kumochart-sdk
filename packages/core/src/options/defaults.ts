@@ -64,7 +64,8 @@ export function createDefaultOptions(sections: readonly OptionsSection[] = []): 
       visible: true,
       rows: null,
       buttons: null,
-      hideValuesOnHover: true
+      hideValuesOnHover: true,
+      top: 0
     },
     texts: unsetTexts(CHART_TEXTS),
     interaction: {

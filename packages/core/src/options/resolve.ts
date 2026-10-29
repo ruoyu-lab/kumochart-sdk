@@ -152,6 +152,7 @@ function validateOptions(options: ChartOptions): void {
 
   checkBoolean('options.legend.visible', options.legend.visible);
   checkBoolean('options.legend.hideValuesOnHover', options.legend.hideValuesOnHover);
+  checkNumber('options.legend.top', options.legend.top, { min: 0 });
 
   const interaction = options.interaction;
   checkBoolean('options.interaction.pan', interaction.pan);

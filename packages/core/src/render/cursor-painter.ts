@@ -3,6 +3,7 @@ import { applyStroke, drawLabel, font, snap } from '../canvas/canvas';
 import { withAlpha } from '../canvas/color';
 import type { IconCache } from '../canvas/icon-cache';
 import type { Rect } from '../layout/layout';
+import { MAIN_PANE_ID } from '../panes/pane-store';
 import { LABEL_PADDING_X, timeLabelCenter } from './axis-covers';
 import { placeAxisLabels } from './axis-labels';
 import type { Frame } from './frame';
@@ -205,8 +206,9 @@ function paintLegendButton(
 }
 
 /**
- * Paints the legend rows of each pane at its top left, a row wrapping onto the next line rather
- * than running under the price axis, and returns where the rows and their buttons went.
+ * Paints the legend rows of each pane at its top left, the main pane's below the room it leaves
+ * above, a row wrapping onto the next line rather than running under the price axis, and returns
+ * where the rows and their buttons went.
  */
 function paintLegends(
   ctx: CanvasRenderingContext2D,
@@ -237,10 +239,11 @@ function paintLegends(
     const start = pane.plot.x + 8;
     const end = pane.plot.x + pane.plot.width - 8;
     const bottom = pane.plot.y + pane.plot.height;
+    const above = pane.plot.y + 6 + (pane.id === MAIN_PANE_ID ? options.legend.top : 0);
     const first = linesByPane.get(item.paneId) ?? 0;
     let line = first;
     let x = start;
-    let y = pane.plot.y + 6 + line * lineHeight;
+    let y = above + line * lineHeight;
     let right = start;
     /** Room a piece of the row takes: on this line, or the next. */
     const place = (width: number): boolean => {
@@ -304,7 +307,7 @@ function paintLegends(
     }
 
     ctx.globalAlpha = 1;
-    const top = pane.plot.y + 6 + first * lineHeight - 2;
+    const top = above + first * lineHeight - 2;
     rows.push({
       item,
       rect: { x: start, y: top, width: right - start, height: (line - first + 1) * lineHeight }

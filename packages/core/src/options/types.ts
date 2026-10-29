@@ -173,6 +173,11 @@ export interface LegendOptions {
   buttons: ((item: LegendItem) => readonly LegendButton[]) | null;
   /** Hides the values of the row under the pointer while its buttons show. */
   hideValuesOnHover: boolean;
+  /**
+   * Room above the legend of the main pane, in CSS pixels, for what the application shows over
+   * the chart there, such as buttons to trade. Default `0`.
+   */
+  top: number;
 }
 
 /** Words that replace those a chart or a module paints, each `null` while it is not replaced. */

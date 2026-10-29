@@ -33,8 +33,9 @@ const BUDGETS = [
   // thirteen oscillators from AO to CR, twelve of volume and volatility from A/D to %B), the
   // zigzag plot with its labels and markers that write their value took it from 114.6 to 122.9 kB;
   // their words in four languages took the script of the words from 6.1 to 9.4 kB. Outputs drawn as
-  // candles and `refresh()` for calculators reading data besides the bars, to 123.5 kB.
-  { file: 'packages/core/dist/kumochart.iife.js', gzip: 124 },
+  // candles and `refresh()` for calculators reading data besides the bars, to 123.5 kB. A price
+  // pulled out of an order line, markers linked and room above the legend, to 124.0 kB.
+  { file: 'packages/core/dist/kumochart.iife.js', gzip: 124.5 },
   { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 9.8 },
   { file: 'packages/vue/dist/index.js', gzip: 3 },
   { file: 'packages/react/dist/index.js', gzip: 3 }
@@ -142,10 +143,11 @@ const APPS = [
     // the thirteen drawing types after it 1.5 kB; the fixes of the view, the drags and the
     // crosshair after them 0.5 kB. Thirty-seven indicators, the zigzag plot and markers that
     // write their value, from 113.7 to 122.0 kB; outputs drawn as candles and `refresh()` to
-    // 122.6 kB.
+    // 122.6 kB; a price pulled out of an order line, markers linked and room above the legend to
+    // 123.1 kB.
     name: 'everything',
     code: `export { createChart } from 'core'; export { allModules } from 'core/all';`,
-    gzip: 123.1
+    gzip: 123.5
   },
   {
     // MACD picks EMAs or SMAs, which brings the averages to pick from: 8.5 kB; the checks of a

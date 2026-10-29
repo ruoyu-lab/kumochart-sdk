@@ -31,6 +31,33 @@ describe('legend rows', () => {
   });
 });
 
+describe('room above the legend', () => {
+  it('moves the main pane\u2019s rows down by it, those of the other panes staying', () => {
+    const chart = chartWithBars(120);
+    chart.indicators.add({ id: 'rsi', type: 'RSI' });
+    const rows = () => {
+      const canvas = chart.element.querySelector<HTMLCanvasElement>('canvas[data-layer="cursor"]');
+      const calls = canvas ? canvasCalls(canvas) : [];
+      calls.length = 0;
+      chart.applyOptions({});
+      chart.screenshot();
+      const texts = calls.filter((call) => call.name === 'fillText');
+      const yOf = (start: string) =>
+        Number(texts.find((call) => String(call.args[0]).startsWith(start))?.args[2]);
+      return { main: Number(texts[0]?.args[2]), rsi: yOf('RSI') };
+    };
+    const before = rows();
+    chart.applyOptions({ legend: { top: 40 } });
+    const after = rows();
+
+    expect(after.main - before.main).toBe(40);
+    expect(after.rsi).toBe(before.rsi);
+    expect(() => {
+      chart.applyOptions({ legend: { top: -1 } });
+    }).toThrow('options.legend.top');
+  });
+});
+
 describe('legend buttons', () => {
   it('show on the row under the pointer, and report their clicks', async () => {
     const buttons = vi.fn((item: LegendItem) =>
