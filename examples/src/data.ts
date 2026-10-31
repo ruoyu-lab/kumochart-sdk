@@ -1,4 +1,4 @@
-import type { BarInput, TradeInput } from '@kumochart-sdk/core';
+import type { BarInput, TradeInput } from 'kumo-charts';
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;

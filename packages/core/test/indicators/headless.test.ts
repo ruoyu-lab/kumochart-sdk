@@ -21,7 +21,7 @@ function fail(): never {
 const TYPES = allIndicators.map((definition) => definition.type);
 
 describe('indicators without a chart', () => {
-  it('names every type of the SDK once', () => {
+  it('names every type of the library once', () => {
     expect(new Set(TYPES).size).toBe(TYPES.length);
     expect(definitionOf('MACD')).toBe(MACD);
   });

@@ -36,7 +36,7 @@ import { anchoredVwap } from './tools/vwap';
 import type { DrawingTypeDefinition } from './types';
 
 /**
- * Every drawing type of the SDK, for `drawings(allDrawings)`. Listed one by one, so that an
+ * Every drawing type of the library, for `drawings(allDrawings)`. Listed one by one, so that an
  * application picking a few ships only those.
  */
 export const allDrawings: readonly DrawingTypeDefinition[] = [

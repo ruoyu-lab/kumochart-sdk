@@ -1,13 +1,13 @@
 {
-  "name": "@kumochart-sdk/react",
+  "name": "@kumo-charts/react",
   "version": "1.0.0-beta.4",
-  "description": "Official React adapter for @kumochart-sdk/core.",
+  "description": "Official React adapter for kumo-charts.",
   "license": "Apache-2.0",
   "type": "module",
   "sideEffects": false,
   "exports": {
     ".": {
-      "@kumochart-sdk/source": "./src/index.ts",
+      "@kumo-charts/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
@@ -25,17 +25,17 @@
     "build": "tsdown"
   },
   "peerDependencies": {
-    "@kumochart-sdk/core": "1.0.0-beta.4",
+    "kumo-charts": "1.0.0-beta.4",
     "react": "^18.3.0 || ^19.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ruoyu-lab/kumochart-sdk.git",
+    "url": "git+https://github.com/ruoyu-lab/kumo-charts.git",
     "directory": "packages/react"
   },
   "homepage": "https://www.kumochart.com/",
   "bugs": {
-    "url": "https://github.com/ruoyu-lab/kumochart-sdk/issues"
+    "url": "https://github.com/ruoyu-lab/kumo-charts/issues"
   },
   "keywords": [
     "react",

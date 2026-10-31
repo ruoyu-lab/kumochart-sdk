@@ -2,7 +2,7 @@
 
 [English](README.md) · 简体中文
 
-开源的交易图表 SDK：核心只有 K 线和坐标，指标、画线、提醒、回放按需加载。
+开源的交易图表库：核心只有 K 线和坐标，指标、画线、提醒、回放按需加载。
 
 - **核心小**：K 线、坐标、多窗格、十字线、图例、缩放平移、周期合成，gzip 后约 44 kB。
 - **按需加载**：87 种指标、51 种画线、10 种图表类型、提醒、委托单线、回放、成交量分布，每个模块可以整块载入，也可以只挑几项。
@@ -13,15 +13,15 @@
 ## 安装
 
 ```bash
-npm install @kumochart-sdk/core
+npm install kumo-charts
 ```
 
 ## 用法
 
 ```ts
-import { createChart } from '@kumochart-sdk/core';
-import { indicators, MA, MACD } from '@kumochart-sdk/core/indicators';
-import { drawings, allDrawings } from '@kumochart-sdk/core/drawings';
+import { createChart } from 'kumo-charts';
+import { indicators, MA, MACD } from 'kumo-charts/indicators';
+import { drawings, allDrawings } from 'kumo-charts/drawings';
 
 const chart = createChart(document.getElementById('chart')!, {
   modules: [indicators([MA, MACD]), drawings(allDrawings)]

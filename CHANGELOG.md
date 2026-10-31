@@ -6,11 +6,12 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 **Breaking**
 
+- The packages have new names: `@kumochart-sdk/core` is now `kumo-charts`, `@kumochart-sdk/vue` and `@kumochart-sdk/react` are `@kumo-charts/vue` and `@kumo-charts/react`, and the script for a page without a bundler is `dist/kumo-charts.iife.js` (its indicator texts `dist/kumo-charts-indicator-texts.iife.js`). The repository is `ruoyu-lab/kumo-charts`.
 - A histogram colored by its change (`colorBy: 'change'`) draws a column that stays level with the one before in the down color, as one that fell; it took the up color.
 
 **Added**
 
-- `createAlertEngine()`, in the new entry `@kumochart-sdk/core/alert-engine`: alerts evaluated without a chart, on a server, in a worker or for symbols no chart shows. Give it the bars at their source interval and the timeframe to build, by the trading calendar, the indicators and drawings its alerts read, and the alerts: on the same it fires exactly what a chart fires. Its `data`, `indicators`, `drawings` and `alerts` work as a chart's, without what only drawing needs. Runs in Node.js.
+- `createAlertEngine()`, in the new entry `kumo-charts/alert-engine`: alerts evaluated without a chart, on a server, in a worker or for symbols no chart shows. Give it the bars at their source interval and the timeframe to build, by the trading calendar, the indicators and drawings its alerts read, and the alerts: on the same it fires exactly what a chart fires. Its `data`, `indicators`, `drawings` and `alerts` work as a chart's, without what only drawing needs. Runs in Node.js.
 - Twelve trend, average and band indicators, each in `allIndicators` and on its own for applications that pick a few:
   - `DEMA` and `TEMA`, the double and triple exponential moving averages; `LSMA`, the least squares line of the latest prices read at an offset; `MCGINLEY`, the McGinley Dynamic; `RIBBON`, four moving averages each of its own type and length.
   - `ENVELOPE`, lines a percentage around an average; `MIKE`, the support and resistance lines of Chinese charting software.
@@ -103,14 +104,14 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 **Added**
 
-- A module made with `createModule()` adds a section of options of its own, emits events of its own and keeps a part of the saved state, through the context `install` receives, as the SDK's modules do.
-- The building blocks of the SDK's indicators are exported for custom ones: `movingAverage()`, `Previous`, `RingBuffer`, `RollingExtremes` and `StandardDeviation`.
+- A module made with `createModule()` adds a section of options of its own, emits events of its own and keeps a part of the saved state, through the context `install` receives, as the library's modules do.
+- The building blocks of the library's indicators are exported for custom ones: `movingAverage()`, `Previous`, `RingBuffer`, `RollingExtremes` and `StandardDeviation`.
 - `optionsChange` reports every setting of the options, by `applyOptions()` and `loadState()`, with the options before and after.
 - `intervalDuration()` gives the length of an interval of seconds, minutes or hours; `volumeProfileGrid()` and `checkVolumeProfileOptions()` divide and check a profile of your own, such as one of trades, as the chart's volume profiles do.
 - `LINE_STYLES` lists the line styles, as `PRICE_SOURCES` lists the prices, for the forms of an application.
 - `checkColor()` checks a color as the chart does, and `indicatorLanguage()` gives the words of indicators in a locale without a chart, for the forms of an application.
-- The words of indicators follow the chart's `locale`: `indicators(types, { texts })` takes them by language, and `indicatorTexts` brings those of the SDK's indicators in English, Chinese, Japanese and Korean, left out of a bundle that does not import it. `chart.indicators.title()` and `label()` give names and labels for a settings form. For a page without a bundler, they are a script of their own, `kumochart-indicator-texts.iife.js`, as `KumoChartIndicatorTexts`, and `allModules({ indicators: { texts } })` gives them to the indicators.
-- The watermark module, `watermark()` from `@kumochart-sdk/core/watermark`, shows lines of large faint text, such as the symbol and its timeframe, in the middle of the main pane, from its `watermark` option.
+- The words of indicators follow the chart's `locale`: `indicators(types, { texts })` takes them by language, and `indicatorTexts` brings those of the library's indicators in English, Chinese, Japanese and Korean, left out of a bundle that does not import it. `chart.indicators.title()` and `label()` give names and labels for a settings form. For a page without a bundler, they are a script of their own, `kumo-charts-indicator-texts.iife.js`, as `KumoChartIndicatorTexts`, and `allModules({ indicators: { texts } })` gives them to the indicators.
+- The watermark module, `watermark()` from `kumo-charts/watermark`, shows lines of large faint text, such as the symbol and its timeframe, in the middle of the main pane, from its `watermark` option.
 - Trades carry the side of their taker, `side: 'buy' | 'sell'`, which transforms built from the trades receive as `next(bar, side)`; `series.addTrades()` folds trades into a series, such as a symbol compared, as `data.addTrades()` folds them into the main bars: into its bars, or for a line or another series of values, into a value per source interval, the price of its last trade.
 - Trades carry the side of their taker, `side: 'buy' | 'sell'`, which transforms built from the trades receive as `next(bar, side)`; `series.addTrades()` folds trades into a series of bars, such as a symbol compared, as `data.addTrades()` folds them into the main bars.
 - Indicators of a timeframe of their own: `timeframe: '1h'` computes an indicator on hourly bars built from the source bars with the trading calendar, as the chart builds its timeframe, while the chart shows shorter bars, such as 5-minute ones. Each bar of the chart shows the value of the latest hourly bar closed by its end, so no bar uses data that was not there yet, and the latest bar the hourly bar still forming. On a timeframe as long or longer, one the source cannot build, or bars without time such as Renko bricks, the indicator is computed on the chart's bars. An indicator of an indicator is computed in that one's timeframe. `Indicator.timeframe`, the legend (`MA 20 1h`) and the saved state give it.
@@ -147,7 +148,7 @@ The packages of KumoChart share one version. Each release lists what changed for
 
 ## 1.0.0-beta.1
 
-The first release on npm: `@kumochart-sdk/core`, `@kumochart-sdk/vue` and `@kumochart-sdk/react`.
+The first release on npm: `kumo-charts`, `@kumo-charts/vue` and `@kumo-charts/react`.
 
 - **Core**: bars, price and time scales, panes, crosshair, legend, zoom and pan; 1-minute bars build any timeframe in the browser, following trading sessions and time zones; bars and trades stream in; the chart's state saves and loads.
 - **Modules**, each loaded whole or only the parts you pick: 50 indicators, 38 drawing tools, 10 chart types, alerts, order lines and markers, replay, and volume profiles of the bars in view, of each trading day and of a range drawn on the chart.

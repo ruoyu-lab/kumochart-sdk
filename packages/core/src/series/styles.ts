@@ -102,7 +102,7 @@ export interface PointFigureStyle {
  * Resolved style of every series type. Plugins add their own types through declaration merging:
  *
  * ```ts
- * declare module '@kumochart-sdk/core' {
+ * declare module 'kumo-charts' {
  *   interface SeriesStyleMap { renko: { boxColor: string } }
  * }
  * ```

@@ -1,7 +1,7 @@
 import type { IndicatorWords } from '../texts';
 
 /**
- * The words of the SDK's indicators in Korean: their full names, and the labels of their outputs,
+ * The words of the library's indicators in Korean: their full names, and the labels of their outputs,
  * parameters and options.
  */
 export const ko: IndicatorWords = {

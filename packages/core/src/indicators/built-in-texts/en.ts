@@ -1,6 +1,6 @@
 import type { IndicatorWords } from '../texts';
 
-/** The words of the SDK's indicators in English: their full names. */
+/** The words of the library's indicators in English: their full names. */
 export const en: IndicatorWords = {
   names: {
     MA: 'Moving average',

@@ -43,7 +43,7 @@ export const turnoverBars: ChartType = { transform: turnoverTransform };
 /** Candles as wide as their volume. */
 export const volumeCandles: ChartType = { series: volumeCandlesSeries };
 
-/** Every chart type of the SDK, for `chartTypes(allChartTypes)`. */
+/** Every chart type of the library, for `chartTypes(allChartTypes)`. */
 export const allChartTypes: readonly ChartType[] = [
   heikinAshi,
   renko,

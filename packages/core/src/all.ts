@@ -17,7 +17,7 @@ export interface AllModulesOptions {
 }
 
 /**
- * Every module of the SDK with everything in it: `createChart(container, { modules:
+ * Every module of the library with everything in it: `createChart(container, { modules:
  * allModules() })` gives a chart with all its indicators, drawings (the fixed range volume profile
  * among them), chart types, alerts, orders, markers, replay, volume profiles and the watermark.
  */
@@ -66,8 +66,8 @@ const EVENT_NAMES: { readonly [K in keyof AllEventMap]-?: true } = {
 };
 
 /**
- * The name of every event of the core and of the modules of the SDK, e.g. to forward them all as
- * the components of the SDK for frameworks do. A chart emits those of the modules it has.
+ * The name of every event of the core and of the modules of the library, e.g. to forward them all as
+ * the components of the library for frameworks do. A chart emits those of the modules it has.
  */
 export const ALL_EVENTS = /* @__PURE__ */ Object.keys(
   EVENT_NAMES

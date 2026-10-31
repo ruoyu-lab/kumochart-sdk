@@ -25,7 +25,7 @@ export type IndicatorsModule = ChartModule<{
 /** What `indicators()` takes beside the types. */
 export interface IndicatorsModuleOptions {
   /**
-   * The words of the indicators in other languages, such as the `indicatorTexts` of the SDK's
+   * The words of the indicators in other languages, such as the `indicatorTexts` of the library's
    * types; those given later win. The legend and `valuesAt()` follow the chart's `locale`.
    */
   readonly texts?: readonly IndicatorTexts[];

@@ -23,7 +23,7 @@ export default defineConfig([
   },
   {
     // One script for a page without a bundler: the core and every module, as `KumoChart`.
-    entry: { kumochart: 'src/browser.ts' },
+    entry: { 'kumo-charts': 'src/browser.ts' },
     platform: 'browser',
     target: 'es2022',
     dts: false,
@@ -35,7 +35,7 @@ export default defineConfig([
   {
     // The words of the indicators in other languages, for a page without a bundler that wants
     // them, as `KumoChartIndicatorTexts`.
-    entry: { 'kumochart-indicator-texts': 'src/browser-texts.ts' },
+    entry: { 'kumo-charts-indicator-texts': 'src/browser-texts.ts' },
     platform: 'browser',
     target: 'es2022',
     dts: false,

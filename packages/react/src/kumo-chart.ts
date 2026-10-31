@@ -7,9 +7,9 @@ import {
   type ChartModule,
   type ChartOptionsInput,
   type IntervalInput
-} from '@kumochart-sdk/core';
-import type { AlertInput } from '@kumochart-sdk/core/alerts';
-import type { MarkerInput, OrderInput } from '@kumochart-sdk/core/trading';
+} from 'kumo-charts';
+import type { AlertInput } from 'kumo-charts/alerts';
+import type { MarkerInput, OrderInput } from 'kumo-charts/trading';
 import {
   createElement,
   forwardRef,

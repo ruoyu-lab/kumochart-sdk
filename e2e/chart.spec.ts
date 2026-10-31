@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-import type { Chart } from '@kumochart-sdk/core';
-import type { AllModules } from '@kumochart-sdk/core/all';
+import type { Chart } from 'kumo-charts';
+import type { AllModules } from 'kumo-charts/all';
 
 declare global {
   interface Window {

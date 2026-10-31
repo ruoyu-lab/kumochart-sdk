@@ -9,7 +9,7 @@ import { walk } from './reference';
 
 const bars = walk(400);
 
-/** Every indicator type of the SDK, in the order of `allIndicators`, and its default outputs. */
+/** Every indicator type of the library, in the order of `allIndicators`, and its default outputs. */
 const DEFAULT_OUTPUTS: [type: string, keys: string[]][] = [
   ['MA', ['ma9']],
   ['EMA', ['ema9']],
@@ -127,7 +127,7 @@ const DEFAULT_OUTPUTS: [type: string, keys: string[]][] = [
 const TYPES = DEFAULT_OUTPUTS.map(([type]) => type);
 
 describe('indicator types', () => {
-  it('are every type of the SDK', () => {
+  it('are every type of the library', () => {
     expect(allIndicators.map((definition) => definition.type)).toEqual(TYPES);
   });
 

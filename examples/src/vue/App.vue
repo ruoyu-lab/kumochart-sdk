@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { lightTheme, type BarInput, type Chart, type PriceDragEvent } from '@kumochart-sdk/core';
-import { indicators, MA, MACD } from '@kumochart-sdk/core/indicators';
-import { orders as ordersModule, type OrderInput } from '@kumochart-sdk/core/trading';
-import { KumoChart } from '@kumochart-sdk/vue';
+import { lightTheme, type BarInput, type Chart, type PriceDragEvent } from 'kumo-charts';
+import { indicators, MA, MACD } from 'kumo-charts/indicators';
+import { orders as ordersModule, type OrderInput } from 'kumo-charts/trading';
+import { KumoChart } from '@kumo-charts/vue';
 import { onBeforeUnmount, ref, shallowRef } from 'vue';
 import { sampleBars, streamTrades } from '../data';
 

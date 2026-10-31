@@ -60,8 +60,8 @@ export default typescriptEslint.config(
         {
           patterns: [
             {
-              group: ['vue', 'react', '@kumochart-sdk/*'],
-              message: 'The core SDK must not depend on any framework or adapter package.'
+              group: ['vue', 'react', '@kumo-charts/*'],
+              message: 'The core must not depend on any framework or adapter package.'
             }
           ]
         }

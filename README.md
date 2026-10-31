@@ -2,7 +2,7 @@
 
 English · [简体中文](README.zh-CN.md)
 
-An open-source SDK for trading charts: the core holds the bars and the scales, and indicators, drawings, alerts and replay load when you need them.
+An open-source library for trading charts: the core holds the bars and the scales, and indicators, drawings, alerts and replay load when you need them.
 
 - **A small core**: bars, scales, panes, crosshair, legend, zoom and pan, and timeframes, about 44 kB gzipped.
 - **Modules as you need them**: 87 indicators, 51 drawing tools, 10 chart types, alerts, order lines, replay and volume profiles, each whole or only the parts you pick.
@@ -13,15 +13,15 @@ An open-source SDK for trading charts: the core holds the bars and the scales, a
 ## Install
 
 ```bash
-npm install @kumochart-sdk/core
+npm install kumo-charts
 ```
 
 ## Use
 
 ```ts
-import { createChart } from '@kumochart-sdk/core';
-import { indicators, MA, MACD } from '@kumochart-sdk/core/indicators';
-import { drawings, allDrawings } from '@kumochart-sdk/core/drawings';
+import { createChart } from 'kumo-charts';
+import { indicators, MA, MACD } from 'kumo-charts/indicators';
+import { drawings, allDrawings } from 'kumo-charts/drawings';
 
 const chart = createChart(document.getElementById('chart')!, {
   modules: [indicators([MA, MACD]), drawings(allDrawings)]

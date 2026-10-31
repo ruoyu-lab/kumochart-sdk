@@ -1,15 +1,15 @@
-# @kumochart-sdk/vue
+# @kumo-charts/vue
 
-The `KumoChart` component and the `useKumoChart` composable for Vue 3, around [`@kumochart-sdk/core`](https://www.npmjs.com/package/@kumochart-sdk/core).
+The `KumoChart` component and the `useKumoChart` composable for Vue 3, around [`kumo-charts`](https://www.npmjs.com/package/kumo-charts).
 
 ```bash
-npm install @kumochart-sdk/core @kumochart-sdk/vue
+npm install kumo-charts @kumo-charts/vue
 ```
 
 ```vue
 <script setup lang="ts">
-import { KumoChart } from '@kumochart-sdk/vue';
-import { indicators, MACD } from '@kumochart-sdk/core/indicators';
+import { KumoChart } from '@kumo-charts/vue';
+import { indicators, MACD } from 'kumo-charts/indicators';
 
 const modules = [indicators([MACD])];
 defineProps<{ bars: { time: number; open: number; high: number; low: number; close: number }[] }>();

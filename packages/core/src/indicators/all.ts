@@ -47,7 +47,7 @@ import { VORTEX } from './definitions/vortex';
 import type { IndicatorDefinition } from './types';
 
 /**
- * Every indicator type of the SDK, for `indicators(allIndicators)`. Listed one by one, so that an
+ * Every indicator type of the library, for `indicators(allIndicators)`. Listed one by one, so that an
  * application picking a few ships only those.
  */
 export const allIndicators: readonly IndicatorDefinition[] = [

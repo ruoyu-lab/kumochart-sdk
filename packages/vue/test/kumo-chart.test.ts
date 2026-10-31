@@ -1,6 +1,6 @@
-import { createModule, type BarInput, type Chart as ChartOf } from '@kumochart-sdk/core';
-import { ALL_EVENTS, allModules, type AllModules } from '@kumochart-sdk/core/all';
-import type { OrderInput } from '@kumochart-sdk/core/trading';
+import { createModule, type BarInput, type Chart as ChartOf } from 'kumo-charts';
+import { ALL_EVENTS, allModules, type AllModules } from 'kumo-charts/all';
+import type { OrderInput } from 'kumo-charts/trading';
 import { describe, expect, it, vi, type MockInstance } from 'vitest';
 import { createApp, defineComponent, h, nextTick, ref } from 'vue';
 import { KumoChart } from '../src';

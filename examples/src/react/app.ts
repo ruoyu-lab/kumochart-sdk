@@ -6,9 +6,9 @@ import {
   type Chart,
   type ChartOptionsInput,
   type CrosshairMoveEvent
-} from '@kumochart-sdk/core';
-import { indicators, MA, MACD } from '@kumochart-sdk/core/indicators';
-import { KumoChart } from '@kumochart-sdk/react';
+} from 'kumo-charts';
+import { indicators, MA, MACD } from 'kumo-charts/indicators';
+import { KumoChart } from '@kumo-charts/react';
 import { createElement as h, useEffect, useMemo, useRef, useState } from 'react';
 import { sampleBars, streamTrades } from '../data';
 
@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-/** A minimal React page: the SDK driven through the React adapter. */
+/** A minimal React page: the library driven through the React adapter. */
 export function App() {
   const [dark, setDark] = useState(false);
   const [bars, setBars] = useState<BarInput[] | undefined>(undefined);

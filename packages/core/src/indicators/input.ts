@@ -202,7 +202,7 @@ export function parseSettings(definition: IndicatorRules, input: IndicatorInput)
  * parameters and the outputs and shades they make, the source, the timeframe, the colors and
  * styles by output key and the reference lines. Throws the `ChartError` that `add()` would, e.g.
  * on what a user typed into a settings form, before keeping it. `definition` is the type's, such
- * as `MACD` of `@kumochart-sdk/core/indicators` or one of `chart.indicators.definition()`. What
+ * as `MACD` of `kumo-charts/indicators` or one of `chart.indicators.definition()`. What
  * needs the chart is left to `add()`: the pane, the indicator a source reads and its timeframe, a
  * free id.
  */

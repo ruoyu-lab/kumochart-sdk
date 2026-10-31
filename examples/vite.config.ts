@@ -6,7 +6,7 @@ export default defineConfig({
   base: process.env.EXAMPLES_BASE ?? '/',
   plugins: [vue()],
   resolve: {
-    conditions: ['@kumochart-sdk/source', ...defaultClientConditions]
+    conditions: ['@kumo-charts/source', ...defaultClientConditions]
   },
   build: {
     rolldownOptions: {

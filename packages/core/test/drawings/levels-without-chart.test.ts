@@ -16,7 +16,7 @@ import { btcusdtHours } from '../helpers/market';
 
 const BARS = btcusdtHours() as Bar[];
 
-/** A drawing type of the SDK. */
+/** A drawing type of the library. */
 function definitionOf(type: string): DrawingTypeDefinition {
   const definition = allDrawings.find((candidate) => candidate.type === type);
 

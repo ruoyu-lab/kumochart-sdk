@@ -1,6 +1,6 @@
 const PREFIX = '[kumochart]';
 
-/** Error thrown for every invalid argument, unknown id or illegal state reported by the SDK. */
+/** Error thrown for every invalid argument, unknown id or illegal state reported by the library. */
 export class ChartError extends Error {
   override readonly name = 'ChartError';
 

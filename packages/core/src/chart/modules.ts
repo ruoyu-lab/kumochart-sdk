@@ -86,7 +86,7 @@ export interface ModuleDefinition<
   readonly name: string;
   readonly options?: ModuleOptionsOf<Types>;
   /**
-   * Joins the chart once the chart and the SDK's modules given with it are there, before the
+   * Joins the chart once the chart and the library's modules given with it are there, before the
    * chart uses its options; returns the namespaces the module adds, or nothing.
    */
   install(chart: Chart, context: ModuleContext<Types>): Api | undefined;
@@ -97,13 +97,13 @@ export interface ModuleSpec {
   readonly name: string;
   readonly options?: OptionsSection;
   /**
-   * A module of the SDK: joins the core before anything uses it, registering its types, hooks
+   * A module of the library: joins the core before anything uses it, registering its types, hooks
    * and objects, and returns the namespaces it adds to the chart's API.
    */
   install?(core: ChartCore): Readonly<Record<string, object>>;
   /**
    * A module of an application or another package: joins the chart through its API once the
-   * chart and the SDK's modules are there, and returns the namespaces it adds.
+   * chart and the library's modules are there, and returns the namespaces it adds.
    */
   extend?(chart: Chart, context: ModuleContext<AnyModuleTypes>): object;
 }
@@ -119,7 +119,7 @@ export function defineModule<Types extends ModuleTypes>(spec: ModuleSpec): Chart
 
 /**
  * A module of an application or another package, such as one registering its own indicator or
- * drawing types: `install` runs on the chart once the chart and the SDK's modules given with it
+ * drawing types: `install` runs on the chart once the chart and the library's modules given with it
  * are there, before the chart uses its options, so the options can use the types it registers.
  * What it returns joins the chart as namespaces, e.g. `{ footprint: footprintApi }` becomes
  * `chart.footprint`. A module may add a section of options, emit events of its own and keep a

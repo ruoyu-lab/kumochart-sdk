@@ -1,7 +1,7 @@
 import type { IndicatorWords } from '../texts';
 
 /**
- * The words of the SDK's indicators in Japanese: their full names, and the labels of their outputs,
+ * The words of the library's indicators in Japanese: their full names, and the labels of their outputs,
  * parameters and options.
  */
 export const ja: IndicatorWords = {

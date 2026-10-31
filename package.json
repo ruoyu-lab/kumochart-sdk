@@ -1,5 +1,5 @@
 {
-  "name": "kumochart-workspace",
+  "name": "kumo-charts-workspace",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -13,7 +13,7 @@
   },
   "scripts": {
     "dev": "npm run dev -w examples",
-    "build": "npm run build -w @kumochart-sdk/core && npm run build -w @kumochart-sdk/vue && npm run build -w @kumochart-sdk/react",
+    "build": "npm run build -w kumo-charts && npm run build -w @kumo-charts/vue && npm run build -w @kumo-charts/react",
     "build:examples": "npm run build -w examples",
     "typecheck": "tsc -p packages/core && tsc -p packages/vue && tsc -p packages/react && vue-tsc -p examples && tsc -p .",
     "lint": "eslint . --max-warnings=0",

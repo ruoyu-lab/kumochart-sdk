@@ -227,7 +227,7 @@ function ribbonParams(): { [K in keyof RibbonParams]: ParamSpec } {
 /**
  * Moving average ribbon: four moving averages of the price, SMAs of 20, 50, 100 and 200 by
  * default, each of the type picked: simple, exponential, Wilder's (RMA), linearly weighted or
- * volume-weighted, as the averages of the SDK compute them.
+ * volume-weighted, as the averages of the library compute them.
  */
 export const RIBBON: IndicatorDefinition<RibbonParams> = {
   type: 'RIBBON',

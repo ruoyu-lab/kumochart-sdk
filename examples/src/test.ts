@@ -1,5 +1,5 @@
-import { createChart, type Chart } from '@kumochart-sdk/core';
-import { allModules } from '@kumochart-sdk/core/all';
+import { createChart, type Chart } from 'kumo-charts';
+import { allModules } from 'kumo-charts/all';
 import { sampleBars } from './data';
 
 /** The events the end-to-end tests read. */

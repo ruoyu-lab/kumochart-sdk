@@ -1,5 +1,5 @@
-import { createChart, type BarInput, type Chart, type ChartPlugin } from '@kumochart-sdk/core';
-import { allModules } from '@kumochart-sdk/core/all';
+import { createChart, type BarInput, type Chart, type ChartPlugin } from 'kumo-charts';
+import { allModules } from 'kumo-charts/all';
 
 /** One measurement: a duration in milliseconds, or a rate. */
 export interface BenchResult {

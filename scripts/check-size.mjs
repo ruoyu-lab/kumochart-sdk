@@ -35,8 +35,8 @@ const BUDGETS = [
   // their words in four languages took the script of the words from 6.1 to 9.4 kB. Outputs drawn as
   // candles and `refresh()` for calculators reading data besides the bars, to 123.5 kB. A price
   // pulled out of an order line, markers linked and room above the legend, to 124.0 kB.
-  { file: 'packages/core/dist/kumochart.iife.js', gzip: 124.5 },
-  { file: 'packages/core/dist/kumochart-indicator-texts.iife.js', gzip: 9.8 },
+  { file: 'packages/core/dist/kumo-charts.iife.js', gzip: 124.5 },
+  { file: 'packages/core/dist/kumo-charts-indicator-texts.iife.js', gzip: 9.8 },
   { file: 'packages/vue/dist/index.js', gzip: 3 },
   { file: 'packages/react/dist/index.js', gzip: 3 }
 ];

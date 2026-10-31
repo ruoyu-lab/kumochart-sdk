@@ -203,7 +203,7 @@ export class VolumeWeightedAverage implements BarStep {
 }
 
 /**
- * A moving average of the latest `period` values, as the indicators of the SDK pick them: `NaN`
+ * A moving average of the latest `period` values, as the indicators of the library pick them: `NaN`
  * until `period` values came, and a `NaN` skipped, the average left as it was. The EMA and the
  * RMA start from the simple average of their first `period` values; the volume-weighted one
  * weighs each value by the volume of its bar.

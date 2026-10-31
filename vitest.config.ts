@@ -1,7 +1,7 @@
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vitest/config';
 
-const sourceConditions = ['@kumochart-sdk/source'];
+const sourceConditions = ['@kumo-charts/source'];
 
 export default defineConfig({
   test: {

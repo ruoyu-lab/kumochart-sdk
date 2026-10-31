@@ -11,7 +11,7 @@ import type { IndicatorDefinition, ParamValues } from '../../src/indicators/type
 /** A calendar of whole UTC days, as crypto charts use. */
 export const UTC_DAYS = createCalendar({ timeZone: 'UTC' });
 
-/** An indicator type of the SDK. */
+/** An indicator type of the library. */
 export function definitionOf(type: string): IndicatorDefinition {
   const definition = allIndicators.find((candidate) => candidate.type === type);
 

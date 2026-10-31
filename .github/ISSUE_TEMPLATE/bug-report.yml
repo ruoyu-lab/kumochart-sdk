@@ -21,7 +21,7 @@ body:
     id: version
     attributes:
       label: 版本 / Version
-      description: '`@kumochart-sdk/core` 的版本号。The version of `@kumochart-sdk/core`.'
+      description: '`kumo-charts` 的版本号。The version of `kumo-charts`.'
     validations:
       required: true
   - type: input

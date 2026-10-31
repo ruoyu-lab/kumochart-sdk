@@ -1,9 +1,4 @@
-import {
-  createChart,
-  type Chart,
-  type ChartModule,
-  type CreateChartOptions
-} from '@kumochart-sdk/core';
+import { createChart, type Chart, type ChartModule, type CreateChartOptions } from 'kumo-charts';
 import { useRef, useState } from 'react';
 import { useBrowserLayoutEffect } from './layout-effect';
 

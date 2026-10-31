@@ -17,7 +17,7 @@ import {
 } from '../src/indicators';
 import { computeVolumeProfile, pointOfControl, valueAreaOf } from '../src/volume-profile';
 
-// Runs in Node, without a DOM: importing the SDK and its modules and computing indicators and the
+// Runs in Node, without a DOM: importing the library and its modules and computing indicators and the
 // lines of drawings must not need one.
 
 describe('indicators in Node', () => {

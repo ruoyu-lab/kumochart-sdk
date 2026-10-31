@@ -1,6 +1,6 @@
 import { ChartError, fail } from '../utils/errors';
 
-/** Checks the browser APIs the SDK relies on and returns the container's window. */
+/** Checks the browser APIs the library relies on and returns the container's window. */
 export function assertEnvironment(container: unknown): Window {
   if (typeof HTMLElement === 'undefined' || !(container instanceof HTMLElement)) {
     fail('createChart() needs an HTMLElement container.');
