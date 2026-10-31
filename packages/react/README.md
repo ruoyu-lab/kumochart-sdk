@@ -1,15 +1,15 @@
 # @kumo-charts/react
 
-The `KumoChart` component and the `useKumoChart` hook for React, around [`kumo-charts`](https://www.npmjs.com/package/kumo-charts).
+The `KumoChart` component and the `useKumoChart` hook for React, around [`@kumo-charts/core`](https://www.npmjs.com/package/@kumo-charts/core).
 
 ```bash
-npm install kumo-charts @kumo-charts/react
+npm install @kumo-charts/core @kumo-charts/react
 ```
 
 ```tsx
 import { KumoChart } from '@kumo-charts/react';
-import { indicators, MACD } from 'kumo-charts/indicators';
-import type { BarInput } from 'kumo-charts';
+import { indicators, MACD } from '@kumo-charts/core/indicators';
+import type { BarInput } from '@kumo-charts/core';
 
 const modules = [indicators([MACD])];
 

@@ -8,9 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "kumo-charts": "1.0.0-beta.5",
-    "@kumo-charts/react": "1.0.0-beta.5",
-    "@kumo-charts/vue": "1.0.0-beta.5",
+    "@kumo-charts/core": "1.0.0-beta.6",
+    "@kumo-charts/react": "1.0.0-beta.6",
+    "@kumo-charts/vue": "1.0.0-beta.6",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "vue": "^3.5.43"

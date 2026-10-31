@@ -10,6 +10,7 @@ import { join, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const PACKAGES = ['core', 'vue', 'react'];
+const SCOPE = '@kumo-charts/';
 const VERSION = /^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$/;
 
 function fail(message) {
@@ -25,15 +26,10 @@ async function writeJson(path, value) {
   await writeFile(join(root, path), `${JSON.stringify(value, null, 2)}\n`);
 }
 
-/** Whether `name` is a package of the workspace: the core, or an adapter in its scope. */
-function isWorkspacePackage(name) {
-  return name === 'kumo-charts' || name.startsWith('@kumo-charts/');
-}
-
 /** Points every dependency on a package of the workspace at `version`. */
 function pinWorkspace(dependencies, version) {
   for (const name of Object.keys(dependencies ?? {})) {
-    if (isWorkspacePackage(name)) {
+    if (name.startsWith(SCOPE)) {
       dependencies[name] = version;
     }
   }
@@ -92,7 +88,7 @@ async function check(tag) {
   for (const name of PACKAGES) {
     const manifest = await readJson(`packages/${name}/package.json`);
     const peers = Object.entries(manifest.peerDependencies ?? {}).filter(([peer]) =>
-      isWorkspacePackage(peer)
+      peer.startsWith(SCOPE)
     );
 
     if (manifest.version !== version) {

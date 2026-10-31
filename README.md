@@ -13,15 +13,15 @@ An open-source library for trading charts: the core holds the bars and the scale
 ## Install
 
 ```bash
-npm install kumo-charts
+npm install @kumo-charts/core
 ```
 
 ## Use
 
 ```ts
-import { createChart } from 'kumo-charts';
-import { indicators, MA, MACD } from 'kumo-charts/indicators';
-import { drawings, allDrawings } from 'kumo-charts/drawings';
+import { createChart } from '@kumo-charts/core';
+import { indicators, MA, MACD } from '@kumo-charts/core/indicators';
+import { drawings, allDrawings } from '@kumo-charts/core/drawings';
 
 const chart = createChart(document.getElementById('chart')!, {
   modules: [indicators([MA, MACD]), drawings(allDrawings)]

@@ -1,14 +1,14 @@
-# kumo-charts
+# @kumo-charts/core
 
 An open-source library for trading charts: the core holds the bars and the scales, and indicators, drawings, alerts and replay load when you need them.
 
 ```bash
-npm install kumo-charts
+npm install @kumo-charts/core
 ```
 
 ```ts
-import { createChart } from 'kumo-charts';
-import { indicators, MA, MACD } from 'kumo-charts/indicators';
+import { createChart } from '@kumo-charts/core';
+import { indicators, MA, MACD } from '@kumo-charts/core/indicators';
 
 const chart = createChart(document.getElementById('chart')!, {
   modules: [indicators([MA, MACD])]

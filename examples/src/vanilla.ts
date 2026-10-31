@@ -1,6 +1,6 @@
-import { createChart, lightTheme } from 'kumo-charts';
-import { allDrawings, drawings } from 'kumo-charts/drawings';
-import { indicators, MA, MACD, VOL } from 'kumo-charts/indicators';
+import { createChart, lightTheme } from '@kumo-charts/core';
+import { allDrawings, drawings } from '@kumo-charts/core/drawings';
+import { indicators, MA, MACD, VOL } from '@kumo-charts/core/indicators';
 import { sampleBars, streamTrades } from './data';
 
 const container = document.getElementById('chart');

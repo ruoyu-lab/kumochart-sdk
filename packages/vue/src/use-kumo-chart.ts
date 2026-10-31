@@ -1,4 +1,9 @@
-import { createChart, type Chart, type ChartModule, type CreateChartOptions } from 'kumo-charts';
+import {
+  createChart,
+  type Chart,
+  type ChartModule,
+  type CreateChartOptions
+} from '@kumo-charts/core';
 import {
   onBeforeUnmount,
   onMounted,

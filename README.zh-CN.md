@@ -13,15 +13,15 @@
 ## 安装
 
 ```bash
-npm install kumo-charts
+npm install @kumo-charts/core
 ```
 
 ## 用法
 
 ```ts
-import { createChart } from 'kumo-charts';
-import { indicators, MA, MACD } from 'kumo-charts/indicators';
-import { drawings, allDrawings } from 'kumo-charts/drawings';
+import { createChart } from '@kumo-charts/core';
+import { indicators, MA, MACD } from '@kumo-charts/core/indicators';
+import { drawings, allDrawings } from '@kumo-charts/core/drawings';
 
 const chart = createChart(document.getElementById('chart')!, {
   modules: [indicators([MA, MACD]), drawings(allDrawings)]

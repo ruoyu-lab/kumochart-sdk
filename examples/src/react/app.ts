@@ -6,8 +6,8 @@ import {
   type Chart,
   type ChartOptionsInput,
   type CrosshairMoveEvent
-} from 'kumo-charts';
-import { indicators, MA, MACD } from 'kumo-charts/indicators';
+} from '@kumo-charts/core';
+import { indicators, MA, MACD } from '@kumo-charts/core/indicators';
 import { KumoChart } from '@kumo-charts/react';
 import { createElement as h, useEffect, useMemo, useRef, useState } from 'react';
 import { sampleBars, streamTrades } from '../data';

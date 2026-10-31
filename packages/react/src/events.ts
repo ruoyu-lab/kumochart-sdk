@@ -1,4 +1,4 @@
-import { ALL_EVENTS, type AllEventMap } from 'kumo-charts/all';
+import { ALL_EVENTS, type AllEventMap } from '@kumo-charts/core/all';
 
 /** The events of the chart and of its modules; those of a module the chart lacks never fire. */
 export type KumoChartEventMap = AllEventMap;

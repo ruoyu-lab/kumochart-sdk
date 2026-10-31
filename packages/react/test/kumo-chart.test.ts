@@ -3,9 +3,9 @@ import {
   type BarInput,
   type Chart as ChartOf,
   type ChartOptionsInput
-} from 'kumo-charts';
-import { allModules, type AllModules } from 'kumo-charts/all';
-import type { OrderInput } from 'kumo-charts/trading';
+} from '@kumo-charts/core';
+import { allModules, type AllModules } from '@kumo-charts/core/all';
+import type { OrderInput } from '@kumo-charts/core/trading';
 import { act, createElement, StrictMode, useEffect, type ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi, type MockInstance } from 'vitest';
