@@ -1,6 +1,6 @@
 {
   "name": "kumo-charts",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "Framework-agnostic, high-performance Canvas trading chart library: a small core, and indicators, drawing tools, chart types, alerts, orders, markers, replay, volume profiles and a watermark as modules.",
   "license": "Apache-2.0",
   "type": "module",
